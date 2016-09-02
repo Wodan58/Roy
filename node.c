@@ -1,7 +1,7 @@
 /*
     module  : node.c
-    version : 1.1
-    date    : 08/30/16
+    version : 1.2
+    date    : 09/02/16
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,21 +12,23 @@
 
 // #define DEBUG
 
-#ifndef MAXSYM
-#define MAXSYM	300
-#endif
-
 #ifndef MAXSTK
 #define MAXSTK	300
 #endif
 
+#ifndef MAXSYM
+#define MAXSYM	300
+#endif
+
 int compiling;
 
-int symptr;
-node_t symtab[MAXSYM];
-
+#ifdef _MSC_VER
 int stkptr;
-node_t stktab[MAXSTK];
+#endif
+stack_t stktab[MAXSTK];
+
+node_t symtab[MAXSYM];
+int symptr;
 
 /*
     Add a symbol to the symbol table
@@ -153,13 +155,14 @@ node_t *copy(node_t *node)
 /*
     Copy a node
 */
-node_t *alloc(node_t *node)
+node_t *cons(stack_t *node, node_t *next)
 {
     node_t *cur;
 
     if ((cur = mem_alloc()) == 0)
 	return 0;
-    *cur = *node;
+    memcpy(cur, node, sizeof(stack_t));
+    cur->next = next;
     return cur;
 }
 
@@ -174,7 +177,7 @@ node_t *stk2lst()
     for (cur = &root, stk = stkptr - 1; stk >= 0; stk--) {
 	if ((*cur = mem_alloc()) == 0)
 	    return 0;
-	**cur = stktab[stk];
+	memcpy(*cur, &stktab[stk], sizeof(stack_t));
 	cur = &(*cur)->next;
 	*cur = 0;
     }
@@ -192,10 +195,8 @@ void lst2stk(node_t *root)
     for (cur = root; cur; cur = cur->next)
 	num++;
     stkptr = num;
-    for (cur = root; cur; cur = cur->next) {
-	stktab[--num] = *cur;
-	stktab[num].next = 0;
-    }
+    for (cur = root; cur; cur = cur->next)
+	memcpy(&stktab[--num], cur, sizeof(stack_t));
 }
 
 /*
@@ -219,7 +220,7 @@ static short newline;
 /*
     Print a factor to screen
 */
-void writefactor(node_t *cur)
+void writefactor(stack_t *cur)
 {
     newline = 0;
     switch (cur->type) {
@@ -331,8 +332,11 @@ void writefactor(node_t *cur)
 */
 void writeterm(node_t *cur)
 {
+    stack_t temp;
+
     while (cur) {
-	writefactor(cur);
+	memcpy(&temp, cur, sizeof(stack_t));
+	writefactor(&temp);
 	if (cur->next)
 	    putchar(' ');
 	cur = cur->next;
@@ -375,8 +379,9 @@ void debug(node_t *cur)
 */
 void exeterm(node_t *cur)
 {
-    node_t temp, *tmp /* list */,
-		 *ptr /* program */;
+    stack_t temp;
+    node_t *tmp /* list */,
+	   *ptr /* program */;
 
     while (cur) {
 #ifdef DEBUG
@@ -400,8 +405,8 @@ void exeterm(node_t *cur)
 		    stktab[stkptr-1].num == NOTHING)
 		    stktab[stkptr-1] = stktab[stkptr];
 		else {
-		    stktab[stkptr-1].next = stktab[stkptr].ptr;
-		    stktab[stkptr-1].ptr = alloc(&stktab[stkptr-1]);
+		    stktab[stkptr-1].ptr = cons(&stktab[stkptr-1],
+						stktab[stkptr].ptr);
 		    stktab[stkptr-1].type = List;
 		}
 		break;
@@ -426,7 +431,7 @@ void exeterm(node_t *cur)
 		tmp = stktab[--stkptr].ptr;
 		if (stktab[stkptr-1].num)
 		    tmp = tmp->next;
-		stktab[stkptr-1] = *tmp;
+		memcpy(&stktab[stkptr-1], tmp, sizeof(stack_t));
 		break;
 	    case NOT:
 		stktab[stkptr-1].num = !stktab[stkptr-1].num;
@@ -462,7 +467,7 @@ void exeterm(node_t *cur)
 	    case STEP:
 		ptr = stktab[--stkptr].ptr;
 		for (tmp = stktab[--stkptr].ptr; tmp; tmp = tmp->next) {
-		    stktab[stkptr++] = *tmp;
+		    memcpy(&stktab[stkptr++], tmp, sizeof(stack_t));
 		    exeterm(ptr);
 		}
 		break;
@@ -478,7 +483,7 @@ void exeterm(node_t *cur)
 		    stktab[stkptr-1].type = Symbol;
 		} else {
 		    tmp = stktab[stkptr].ptr;
-		    stktab[stkptr-1] = *tmp;
+		    memcpy(&stktab[stkptr-1], tmp, sizeof(stack_t));
 		    stktab[stkptr].ptr = tmp->next;
 		}
 		stkptr++;

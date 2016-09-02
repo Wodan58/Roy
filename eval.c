@@ -1,7 +1,7 @@
 /*
     module  : eval.c
-    version : 1.1
-    date    : 08/30/16
+    version : 1.2
+    date    : 09/02/16
 */
 #include <stdio.h>
 #include <string.h>
@@ -33,8 +33,7 @@ void initcompile()
     printf("#ifndef MAXSTK\n");
     printf("#define MAXSTK	300\n");
     printf("#endif\n\n");
-    printf("int stkptr;\n");
-    printf("node_t stktab[MAXSTK];\n\n");
+    printf("stack_t stktab[MAXSTK];\n\n");
 }
 
 char *scramble(char *str)
@@ -50,6 +49,7 @@ char *scramble(char *str)
 void compilelib()
 {
     int sym;
+    char *ptr;
     short changed;
     UT_string *str;
 
@@ -59,11 +59,11 @@ void compilelib()
 		symtab[sym].mark = changed = 1;
 		utstring_new(str);
 		evaluate(symtab[sym].next, str);
+		ptr = scramble(symtab[sym].str);
 		utstring_printf(declhdr, "void %s_%d(void);\n",
-				scramble(symtab[sym].str), symtab[sym].uniq);
+				ptr, symtab[sym].uniq);
 		utstring_printf(library, "void %s_%d(void) {\n%s}\n\n",
-				scramble(symtab[sym].str), symtab[sym].uniq,
-				utstring_body(str));
+				ptr, symtab[sym].uniq, utstring_body(str));
 		utstring_free(str);
 	    }
     while (changed);
@@ -71,12 +71,11 @@ void compilelib()
 
 void exitcompile()
 {
-    utstring_new(declhdr);
-    utstring_new(library);
     compilelib();
     initcompile();
     printf("%s\n", utstring_body(declhdr));
-    printf("int main() {\n%sreturn 0; }\n\n", utstring_body(program));
+    printf("int main() {\nstkptr = 0;\n");
+    printf("%sreturn 0; }\n\n", utstring_body(program));
     printf("%s", utstring_body(library));
 }
 
@@ -90,7 +89,9 @@ void compile(node_t *cur)
     if (!init) {
 	init = 1;
 	atexit(exitcompile);
+	utstring_new(declhdr);
 	utstring_new(program);
+	utstring_new(library);
     }
     evaluate(cur, program);
     utstring_printf(program, "writestack();\n");
@@ -101,12 +102,57 @@ void compile(node_t *cur)
 */
 int eval(node_t *cur)
 {
+    static short uniq;
     UT_string *str;
     short changed = 0;
+    node_t *first, *second, *third, *fourth;
 
     switch (cur->type) {
     case Symbol:
 	switch (cur->num) {
+	case BINREC:
+	    if ((fourth = cur->next) == 0)
+		break;
+	    if ((third = fourth->next) == 0)
+		break;
+	    if ((second = third->next) == 0)
+		break;
+	    if ((first = second->next) == 0)
+		break;
+	    if (fourth->type != List)
+		break;
+	    if (third->type != List)
+		break;
+	    if (second->type != List)
+		break;
+	    if (first->type != List)
+		break;
+
+	    changed = 1;
+	    utstring_new(str);
+	    Q("/* BINREC */ void binrec_%d();\n", ++uniq);
+	    Q("binrec_%d();\n", uniq);
+	    cur->str = utstring_body(str);
+	    cur->type = 0;
+	    cur->next = first->next;
+	    
+	    utstring_new(str);
+	    Q("void binrec_%d()\n", uniq);
+	    P("{ stack_t temp;\n");
+	    evaluate(first->ptr, str);
+	    P("if (stktab[--stkptr].num) {\n");
+	    evaluate(second->ptr, str);
+	    P("} else {\n");
+	    evaluate(third->ptr, str);
+	    P("temp = stktab[--stkptr];\n");
+	    Q("binrec_%d();\n", uniq);
+	    P("stktab[stkptr++] = temp;\n");
+	    Q("binrec_%d();\n", uniq);
+	    evaluate(fourth->ptr, str);
+	    P("} }\n\n");
+
+	    utstring_printf(library, "%s", utstring_body(str));
+	    break;
 	case I:
 	    if (cur->next && cur->next->type == List) {
 		changed = 1;
@@ -122,7 +168,7 @@ int eval(node_t *cur)
 	    if (cur->next && cur->next->type == List) {
 		changed = 1;
 		utstring_new(str);
-		P("/* DIP */ { node_t temp = stktab[--stkptr];\n");
+		P("/* DIP */ { stack_t temp = stktab[--stkptr];\n");
 		evaluate(cur->next->ptr, str);
 		P("stktab[stkptr++] = temp; }\n");
 		cur->str = utstring_body(str);
@@ -136,7 +182,7 @@ int eval(node_t *cur)
 		utstring_new(str);
 		P("/* STEP */ { node_t *tmp;\n");
 		P("for (tmp = stktab[--stkptr].ptr; tmp; tmp = tmp->next) {\n");
-		P("    stktab[stkptr++] = *tmp;\n");
+		P("    memcpy(&stktab[stkptr++], tmp, sizeof(stack_t));\n");
 		evaluate(cur->next->ptr, str);
 		P("} }\n");
 		cur->str = utstring_body(str);
@@ -294,13 +340,13 @@ void printterm(node_t *cur, UT_string *str)
 		P("    stktab[stkptr-1].num == NOTHING)\n");
 		P("    stktab[stkptr-1] = stktab[stkptr];\n");
 		P("else {\n");
-		P("    stktab[stkptr-1].next = stktab[stkptr].ptr;\n");
-		P("    stktab[stkptr-1].ptr = alloc(&stktab[stkptr-1]);\n");
+		P("    stktab[stkptr-1].ptr = cons(&stktab[stkptr-1],\n");
+		P("	stktab[stkptr].ptr);\n");
 		P("    stktab[stkptr-1].type = List;\n");
 		P("} }\n");
 		break;
 	    case DIP:
-		P("/* DIP-EXE */ { node_t temp; stkptr -= 2;\n");
+		P("/* DIP-EXE */ { stack_t temp; stkptr -= 2;\n");
 		P("temp = stktab[stkptr];\n");
 		P("exeterm(stktab[stkptr+1].ptr);\n");
 		P("stktab[stkptr++] = temp; }\n");
@@ -320,7 +366,7 @@ void printterm(node_t *cur, UT_string *str)
 		P("/* INDEX */ { node_t *tmp = stktab[--stkptr].ptr;\n");
 		P("if (stktab[stkptr-1].num)\n");
 		P("    tmp = tmp->next;\n");
-		P("stktab[stkptr-1] = *tmp; }\n");
+		P("memcpy(&stktab[stkptr-1], tmp, sizeof(stack_t)); }\n");
 		break;
 	    case NOT:
 		P("/* NOT */ stktab[stkptr-1].num = !stktab[stkptr-1].num;\n");
@@ -357,25 +403,24 @@ void printterm(node_t *cur, UT_string *str)
 		P("/* STEP-EXE */ { node_t *ptr, *tmp;\n");
 		P("ptr = stktab[--stkptr].ptr;\n");
 		P("for (tmp = stktab[--stkptr].ptr; tmp; tmp = tmp->next) {\n");
-		P("    stktab[stkptr++] = *tmp;\n");
+		P("    memcpy(&stktab[stkptr++], tmp, sizeof(stack_t));\n");
 		P("    exeterm(ptr); } }\n");
 		break;
 	    case SWAP:
-		P("/* SWAP */ { node_t temp; temp = stktab[stkptr-2];\n");
+		P("/* SWAP */ { stack_t temp; temp = stktab[stkptr-2];\n");
 		P("stktab[stkptr-2] = stktab[stkptr-1];\n");
 		P("stktab[stkptr-1] = temp; }\n");
 		break;
 	    case UNCONS:
-		P("/* UNCONS */ { node_t *tmp;\n");
-		P("stktab[stkptr] = stktab[stkptr-1];\n");
+		P("/* UNCONS */ stktab[stkptr] = stktab[stkptr-1];\n");
 		P("if (!stktab[stkptr].ptr) {\n");
 		P("    stktab[stkptr-1].num = NOTHING;\n");
 		P("    stktab[stkptr-1].type = Symbol;\n");
 		P("} else {\n");
-		P("    tmp = stktab[stkptr].ptr;\n");
-		P("    stktab[stkptr-1] = *tmp;\n");
+		P("    node_t *tmp = stktab[stkptr].ptr;\n");
+		P("    memcpy(&stktab[stkptr-1], tmp, sizeof(stack_t));\n");
 		P("    stktab[stkptr].ptr = tmp->next;\n");
-		P("} }\n");
+		P("}\n");
 		P("stkptr++;\n");
 		break;
 	    case UNSTACK:

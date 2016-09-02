@@ -1,10 +1,9 @@
 /*
     module  : memory.h
-    version : 1.1
-    date    : 08/30/16
+    version : 1.2
+    date    : 09/02/16
 */
 #define malloc(x)	GC_malloc(x)
-#define calloc(x,n)	GC_malloc(x)
 #define realloc(x,n)	GC_realloc(x,n)
 #define strdup(x)	GC_strdup(x)
 #define free(x)

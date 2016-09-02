@@ -1,7 +1,7 @@
 /*
     module  : memory.c
-    version : 1.1
-    date    : 08/30/16
+    version : 1.2
+    date    : 09/02/16
 */
 #include <stdio.h>
 #include <string.h>
@@ -21,9 +21,13 @@ node_t memory[MAXMEM];
 
 node_t *mem_alloc()
 {
+    node_t *cur;
+
     if (!definition && memptr < MAXMEM)
 	return &memory[memptr++];
-    return calloc(sizeof(node_t), 1);    
+    cur = malloc(sizeof(node_t));
+    memset(cur, 0, sizeof(node_t));
+    return cur;
 }
 
 void mem_free()
