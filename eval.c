@@ -1,6 +1,6 @@
 /*
     module  : eval.c
-    version : 1.2
+    version : 1.3
     date    : 09/02/16
 */
 #include <stdio.h>
@@ -110,49 +110,6 @@ int eval(node_t *cur)
     switch (cur->type) {
     case Symbol:
 	switch (cur->num) {
-	case BINREC:
-	    if ((fourth = cur->next) == 0)
-		break;
-	    if ((third = fourth->next) == 0)
-		break;
-	    if ((second = third->next) == 0)
-		break;
-	    if ((first = second->next) == 0)
-		break;
-	    if (fourth->type != List)
-		break;
-	    if (third->type != List)
-		break;
-	    if (second->type != List)
-		break;
-	    if (first->type != List)
-		break;
-
-	    changed = 1;
-	    utstring_new(str);
-	    Q("/* BINREC */ void binrec_%d();\n", ++uniq);
-	    Q("binrec_%d();\n", uniq);
-	    cur->str = utstring_body(str);
-	    cur->type = 0;
-	    cur->next = first->next;
-	    
-	    utstring_new(str);
-	    Q("void binrec_%d()\n", uniq);
-	    P("{ stack_t temp;\n");
-	    evaluate(first->ptr, str);
-	    P("if (stktab[--stkptr].num) {\n");
-	    evaluate(second->ptr, str);
-	    P("} else {\n");
-	    evaluate(third->ptr, str);
-	    P("temp = stktab[--stkptr];\n");
-	    Q("binrec_%d();\n", uniq);
-	    P("stktab[stkptr++] = temp;\n");
-	    Q("binrec_%d();\n", uniq);
-	    evaluate(fourth->ptr, str);
-	    P("} }\n\n");
-
-	    utstring_printf(library, "%s", utstring_body(str));
-	    break;
 	case I:
 	    if (cur->next && cur->next->type == List) {
 		changed = 1;

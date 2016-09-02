@@ -1,7 +1,7 @@
 %{
 /*
     module  : parse.y
-    version : 1.2
+    version : 1.3
     date    : 09/02/16
 */
 #include <stdio.h>
@@ -11,7 +11,7 @@
 
 %token PUBLIC EQUAL
 %token AND BODY CONS DIP DUP GET I INDEX NOT NOTHING OR POP PUT SAMETYPE SELECT
-%token STACK STEP SWAP UNCONS UNSTACK SMALL PRED BINREC
+%token STACK STEP SWAP UNCONS UNSTACK
 
 %token Symbol Boolean Char Int List Defined Function
 
