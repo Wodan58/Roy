@@ -171,13 +171,6 @@ void evaluate(node_t *root, UT_string *str)
     do {
 	for (changed = 0, cur = root; cur; cur = cur->next)
 	    changed |= eval(cur);
-	for (cur = root; cur; prev = cur, cur = cur->next)
-	    if (cur->type == 1) {
-		if (cur == root)
-		    root = root->next;
-		else
-		    prev->next = cur->next;
-	    }
     } while (changed);
     printterm(reverse(root), str);
 }
@@ -279,6 +272,7 @@ void printterm(node_t *cur, UT_string *str)
 	switch (cur->type) {
 	case 0:
 	    Q("%s", cur->str);
+	case 1:
 	    break;
 	case Symbol:
 	    switch (cur->num) {
