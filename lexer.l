@@ -2,12 +2,20 @@
 /*
     module  : lexer.l
     version : 1.1
-    date    : 08/30/16
+    date    : 10/23/16
 */
 #include <string.h>
 #include <stdlib.h>
 #include "memory.h"
 #include "parse.h"
+
+#define YY_NO_UNPUT
+#define YY_NO_INPUT
+
+#ifdef free
+#undef free
+#define free(X)		(!X?X++:0)
+#endif
 %}
 
 alpha		[A-Z_a-z]
@@ -18,6 +26,13 @@ symbol		{alpha}{alphanum}*
 
 DEFINE		{ return PUBLIC; }
 and		{ yylval.num = AND; return Symbol; }
+binrec		{
+#ifdef BENCHMARK
+		  yylval.num = BINREC; return Symbol;
+#else
+		  yylval.str = strdup(yytext); return Defined;
+#endif
+		}
 body		{ yylval.num = BODY; return Symbol; }
 cons		{ yylval.num = CONS; return Symbol; }
 dip		{ yylval.num = DIP; return Symbol; }
@@ -30,9 +45,23 @@ not		{ yylval.num = NOT; return Symbol; }
 nothing		{ yylval.num = NOTHING; return Symbol; }
 or		{ yylval.num = OR; return Symbol; }
 pop		{ yylval.num = POP; return Symbol; }
+pred		{
+#ifdef BENCHMARK
+		  yylval.num = PRED; return Symbol;
+#else
+		  yylval.str = strdup(yytext); return Defined;
+#endif
+		}
 put		{ yylval.num = PUT; return Symbol; }
 sametype	{ yylval.num = SAMETYPE; return Symbol; }
 select		{ yylval.num = SELECT; return Symbol; }
+small		{
+#ifdef BENCHMARK
+		  yylval.num = SMALL; return Symbol;
+#else
+		  yylval.str = strdup(yytext); return Defined;
+#endif
+		}
 stack		{ yylval.num = STACK; return Symbol; }
 step		{ yylval.num = STEP; return Symbol; }
 swap		{ yylval.num = SWAP; return Symbol; }
@@ -48,6 +77,7 @@ unstack		{ yylval.num = UNSTACK; return Symbol; }
 [*+/<=-]	{ yylval.num = yytext[0]; return Symbol; }
 [<=>]+		|
 {symbol}	{ yylval.str = strdup(yytext); return Defined; }
+#.*		;
 [.[\]]		|
 .		{ return yytext[0]; }
 

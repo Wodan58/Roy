@@ -1,7 +1,7 @@
 /*
     module  : main.c
     version : 1.1
-    date    : 08/30/16
+    date    : 10/23/16
 */
 #include <stdio.h>
 #include <string.h>

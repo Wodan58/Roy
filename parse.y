@@ -1,17 +1,21 @@
 %{
 /*
     module  : parse.y
-    version : 1.3
-    date    : 09/02/16
+    version : 1.1
+    date    : 10/23/16
 */
 #include <stdio.h>
 #include "memory.h"
 #include "node.h"
+
+#define PARSER
+#define YYSTACK_ALLOC	malloc
 %}
 
 %token PUBLIC EQUAL
+
 %token AND BODY CONS DIP DUP GET I INDEX NOT NOTHING OR POP PUT SAMETYPE SELECT
-%token STACK STEP SWAP UNCONS UNSTACK
+%token STACK STEP SWAP UNCONS UNSTACK SMALL PRED BINREC
 
 %token Symbol Boolean Char Int List Defined Function
 
@@ -27,11 +31,8 @@
 
 %%
 
-script	: { stkptr = 0; } cycle
-	;
-
 cycle	: cycle def_or_term '.'
-	| /* empty */
+	| /* empty */	{ vec_init(theStack); vec_init(theTable); }
 	;
 
 def_or_term

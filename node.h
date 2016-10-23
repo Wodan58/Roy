@@ -1,8 +1,23 @@
 /*
     module  : node.h
-    version : 1.2
-    date    : 09/02/16
+    version : 1.1
+    date    : 10/23/16
 */
+#include "vector.h"
+
+#ifdef BIT_32
+typedef long long_t;
+#define PRINT_NUM	"%ld"
+#define NUM_MAX		INT_MAX
+#endif
+
+#ifdef BIT_64
+typedef long long long_t;
+#define PRINT_NUM	"%lld"
+#define NUM_MAX		LONG_MAX
+#endif
+
+/* linked list */
 typedef struct node_t {
     union {
 	int num;
@@ -14,26 +29,32 @@ typedef struct node_t {
     struct node_t *next;
 } node_t;
 
-typedef struct stack_t {
+/* array */
+typedef struct value_t {
     union {
 	int num;
 	char *str;
 	struct node_t *ptr;
     };
     short type, index;
-} stack_t;
+} value_t;
 
 extern int compiling, definition;
 
-extern int symptr;
-extern node_t symtab[];
+/* declare vector type */
+typedef vector(node_t) Table;
 
-#ifdef _MSC_VER
-extern int stkptr;
-#else
-register int stkptr asm("bl");
-#endif
-extern stack_t stktab[];
+/* declare symbol table */
+extern Table *theTable;
+
+/* declare vector type */
+typedef vector(value_t) Stack;
+
+/* declare data stack */
+extern Stack *theStack;
+
+/* declare vector type */
+typedef vector(char) String;
 
 int yylex(), yyparse(), yyerror(char *str);
 
@@ -45,15 +66,19 @@ node_t *concat(node_t *node, node_t *next);
 node_t *copy(node_t *node);
 node_t *reverse(node_t *cur);
 void writeterm(node_t *cur);
-void writefactor(stack_t *cur);
+void writefactor(value_t *cur);
 void exeterm(node_t *cur);
 void writestack();
 void debug(node_t *cur);
 void compile(node_t *cur);
-node_t *cons(stack_t *node, node_t *next);
-void table();
+node_t *cons(value_t *node, node_t *next);
+void dump();
 node_t *stk2lst();
 void lst2stk(node_t *root);
 void execute(node_t *cur);
 node_t *mem_alloc();
 void mem_free();
+
+#ifdef BENCHMARK
+void binrec(node_t *first, node_t *second, node_t *third, node_t *fourth);
+#endif

@@ -1,7 +1,7 @@
 /*
     module  : node.c
-    version : 1.2
-    date    : 09/02/16
+    version : 1.1
+    date    : 10/23/16
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,23 +12,11 @@
 
 // #define DEBUG
 
-#ifndef MAXSTK
-#define MAXSTK	300
-#endif
-
-#ifndef MAXSYM
-#define MAXSYM	300
-#endif
-
 int compiling;
 
-#ifdef _MSC_VER
-int stkptr;
-#endif
-stack_t stktab[MAXSTK];
-
-node_t symtab[MAXSYM];
-int symptr;
+/* dynamic arrays */
+Stack *theStack;
+Table *theTable;
 
 /*
     Add a symbol to the symbol table
@@ -63,16 +51,17 @@ node_t *allocsym(char *str, int index)
 void enterdef(char *str, node_t *next)
 {
     int sym;
-    node_t cur;
+    node_t *cur;
 
-    for (sym = symptr - 1; sym >= 0; sym--)
-	if (!strcmp(symtab[sym].str, str)) {
-	    symtab[sym].next = next;
+    for (sym = vec_size(theTable) - 1; sym >= 0; sym--) {
+	cur = vec_index(theTable, sym);
+	if (!strcmp(cur->str, str)) {
+	    cur->next = next;
 	    return;
 	}
-    addsym(&cur, str, symptr, next);
-    if (symptr < MAXSYM)
-	symtab[symptr++] = cur;
+    }
+    cur = vec_push(theTable);
+    addsym(cur, str, vec_size(theTable) - 1, next);
 }
 
 /*
@@ -83,13 +72,16 @@ node_t *entersym(char *str)
     int sym;
     node_t *cur;
 
-    for (sym = symptr - 1; sym >= 0; sym--)
-	if (!strcmp(symtab[sym].str, str))
-	    return allocsym(str, sym);
-    cur = allocsym(str, symptr);
-    if (symptr < MAXSYM)
-	symtab[symptr++] = *cur;
-    return cur;
+    for (sym = vec_size(theTable) - 1; sym >= 0; sym--) {
+	cur = vec_index(theTable, sym);
+	if (!strcmp(cur->str, str))
+	    return allocsym(str, cur->index);
+    }
+    cur = vec_push(theTable);
+    cur->str = str;
+    cur->type = Defined;
+    cur->index = vec_size(theTable) - 1;
+    return allocsym(str, cur->index);
 }
 
 /*
@@ -155,13 +147,13 @@ node_t *copy(node_t *node)
 /*
     Copy a node
 */
-node_t *cons(stack_t *node, node_t *next)
+node_t *cons(value_t *node, node_t *next)
 {
     node_t *cur;
 
     if ((cur = mem_alloc()) == 0)
 	return 0;
-    memcpy(cur, node, sizeof(stack_t));
+    memcpy(cur, node, sizeof(value_t));
     cur->next = next;
     return cur;
 }
@@ -171,15 +163,17 @@ node_t *cons(stack_t *node, node_t *next)
 */
 node_t *stk2lst()
 {
-    int stk;
-    node_t *root = 0, **cur;
+    int stk, max_stk;
+    node_t *root = 0, *cur;
 
-    for (cur = &root, stk = stkptr - 1; stk >= 0; stk--) {
-	if ((*cur = mem_alloc()) == 0)
+    max_stk = vec_size(theStack);
+    for (stk = 0; stk < max_stk; stk++) {
+	if ((cur = mem_alloc()) == 0)
 	    return 0;
-	memcpy(*cur, &stktab[stk], sizeof(stack_t));
-	cur = &(*cur)->next;
-	*cur = 0;
+	value_t *top = vec_index(theStack, stk);
+	memcpy(cur, top, sizeof(value_t));
+	cur->next = root;
+	root = cur;
     }
     return root;
 }
@@ -189,14 +183,13 @@ node_t *stk2lst()
 */
 void lst2stk(node_t *root)
 {
-    int num = 0;
     node_t *cur;
 
-    for (cur = root; cur; cur = cur->next)
-	num++;
-    stkptr = num;
-    for (cur = root; cur; cur = cur->next)
-	memcpy(&stktab[--num], cur, sizeof(stack_t));
+    vec_clear(theStack);
+    for (cur = reverse(root); cur; cur = cur->next) {
+	value_t *top = vec_push(theStack);
+	memcpy(top, cur, sizeof(value_t));
+    }
 }
 
 /*
@@ -215,14 +208,11 @@ node_t *reverse(node_t *cur)
     return old;
 }
 
-static short newline;
-
 /*
     Print a factor to screen
 */
-void writefactor(stack_t *cur)
+void writefactor(value_t *cur)
 {
-    newline = 0;
     switch (cur->type) {
     case Symbol:
 	switch (cur->num) {
@@ -268,6 +258,17 @@ void writefactor(stack_t *cur)
 	case SAMETYPE:
 	    printf("sametype");
 	    break;
+#ifdef BENCHMARK
+	case SMALL:
+	    printf("small");
+	    break;
+	case PRED:
+	    printf("pred");
+	    break;
+	case BINREC:
+	    printf("binrec");
+	    break;
+#endif
 	case SELECT:
 	    printf("select");
 	    break;
@@ -307,8 +308,6 @@ void writefactor(stack_t *cur)
 	break;
     case Char:
 	printf("%c", cur->num);
-	if (cur->num == '\n')
-	    newline = 1;
 	break;
     case Int:
 	printf("%d", cur->num);
@@ -322,7 +321,7 @@ void writefactor(stack_t *cur)
 	printf("PROC");
 	break;
     default:
-	printf("ERROR");
+	printf("ERROR\n");
 	break;
     }
 }
@@ -332,10 +331,10 @@ void writefactor(stack_t *cur)
 */
 void writeterm(node_t *cur)
 {
-    stack_t temp;
+    value_t temp;
 
     while (cur) {
-	memcpy(&temp, cur, sizeof(stack_t));
+	memcpy(&temp, cur, sizeof(value_t));
 	writefactor(&temp);
 	if (cur->next)
 	    putchar(' ');
@@ -346,13 +345,15 @@ void writeterm(node_t *cur)
 /*
     Print the contents of the symbol table
 */
-void table()
+void dump()
 {
-    int sym;
+    int sym, max_sym;
 
-    for (sym = 0; sym < symptr; sym++) {
-	printf("%s == ", symtab[sym].str);
-	writeterm(symtab[sym].next);
+    max_sym = vec_size(theTable);
+    for (sym = 0; sym < max_sym; sym++) {
+	node_t *cur = vec_index(theTable, sym);
+	printf("%s == ", cur->str);
+	writeterm(cur->next);
 	printf("\n");
     }
 }
@@ -362,10 +363,12 @@ void table()
 */
 void debug(node_t *cur)
 {
-    int stk;
+    int stk, max_stk;
 
-    for (stk = 0; stk < stkptr; stk++) {
-	writefactor(&stktab[stk]);
+    max_stk = vec_size(theStack);
+    for (stk = 0; stk < max_stk; stk++) {
+	value_t *top = vec_index(theStack, stk);
+	writefactor(top);
 	putchar(' ');
     }
     putchar('.');
@@ -374,12 +377,35 @@ void debug(node_t *cur)
     putchar('\n');
 }
 
+void binrec(node_t *first, node_t *second, node_t *third, node_t *fourth)
+{
+    value_t temp, *top;
+
+    exeterm(first);
+    top = vec_pop(theStack);
+    if (top->num)
+	exeterm(second);
+    else {
+	exeterm(third);
+	top = vec_pop(theStack);
+	temp = *top;
+	binrec(first, second, third, fourth);
+	top = vec_push(theStack);
+	*top = temp;
+	binrec(first, second, third, fourth);
+	exeterm(fourth);
+    }
+}
+
 /*
     Evaluate a term
 */
 void exeterm(node_t *cur)
 {
-    stack_t temp;
+#ifdef BENCHMARK
+    value_t *deep, *down;
+#endif
+    value_t temp, *sub, *top;
     node_t *tmp /* list */,
 	   *ptr /* program */;
 
@@ -391,137 +417,177 @@ void exeterm(node_t *cur)
 	case Symbol:
 	    switch (cur->num) {
 	    case AND:
-		stkptr--;
-		stktab[stkptr-1].num &= stktab[stkptr].num;
-		stktab[stkptr-1].type = Boolean;
+		top = vec_pop(theStack);
+		sub = vec_top(theStack);
+		sub->num &= top->num;
+		sub->type = Boolean;
 		break;
 	    case BODY:
-		stktab[stkptr-1].ptr = symtab[stktab[stkptr-1].index].next;
-		stktab[stkptr-1].type = List;
+		top = vec_top(theStack);
+		tmp = vec_index(theTable, top->index);
+		top->ptr = tmp->next;
+		top->type = List;
 		break;
 	    case CONS:
-		stkptr--;
-		if (stktab[stkptr-1].type == Symbol &&
-		    stktab[stkptr-1].num == NOTHING)
-		    stktab[stkptr-1] = stktab[stkptr];
+		top = vec_pop(theStack);
+		sub = vec_top(theStack);
+		if (sub->type == Symbol && sub->num == NOTHING)
+		    *sub = *top;
 		else {
-		    stktab[stkptr-1].ptr = cons(&stktab[stkptr-1],
-						stktab[stkptr].ptr);
-		    stktab[stkptr-1].type = List;
+		    sub->ptr = cons(sub, top->ptr);
+		    sub->type = List;
 		}
 		break;
 	    case DIP:
-		stkptr -= 2;
-		temp = stktab[stkptr];
-		exeterm(stktab[stkptr+1].ptr);
-		stktab[stkptr++] = temp;
+		top = vec_pop(theStack);
+		sub = vec_pop(theStack);
+		temp = *sub;
+		exeterm(top->ptr);
+		top = vec_push(theStack);
+		*top = temp;
 		break;
 	    case DUP:
-		stktab[stkptr] = stktab[stkptr-1];
-		stkptr++;
+		sub = vec_top(theStack);
+		top = vec_push(theStack);
+		*top = *sub;
 		break;
 	    case GET:
-		stktab[stkptr].type = yylex();
-		stktab[stkptr++].num = yylval.num;
+		top = vec_push(theStack);
+		top->type = yylex();
+		top->ptr = yylval.ptr;
 		break;
 	    case I:
-		exeterm(stktab[--stkptr].ptr);
+		top = vec_pop(theStack);
+		exeterm(top->ptr);
 		break;
 	    case INDEX:
-		tmp = stktab[--stkptr].ptr;
-		if (stktab[stkptr-1].num)
+		top = vec_pop(theStack);
+		sub = vec_top(theStack);
+		tmp = top->ptr;
+		if (sub->num)
 		    tmp = tmp->next;
-		memcpy(&stktab[stkptr-1], tmp, sizeof(stack_t));
+		memcpy(sub, tmp, sizeof(value_t));
 		break;
 	    case NOT:
-		stktab[stkptr-1].num = !stktab[stkptr-1].num;
-		stktab[stkptr-1].type = Boolean;
+		top = vec_top(theStack);
+		top->num = !top->num;
+		top->type = Boolean;
 		break;
 	    case NOTHING:
-		stktab[stkptr].num = cur->num;
-		stktab[stkptr++].type = cur->type;
+		top = vec_push(theStack);
+		memcpy(top, cur, sizeof(value_t));
 		break;
 	    case OR:
-		stkptr--;
-		stktab[stkptr-1].num |= stktab[stkptr].num;
-		stktab[stkptr-1].type = Boolean;
+		top = vec_pop(theStack);
+		sub = vec_top(theStack);
+		sub->num |= top->num;
+		sub->type = Boolean;
 		break;
 	    case POP:
-		stkptr--;
+		(void)vec_pop(theStack);
 		break;
 	    case PUT:
-		writefactor(&stktab[--stkptr]);
+		top = vec_pop(theStack);
+		writefactor(top);
 		break;
 	    case SAMETYPE:
-		stkptr--;
-		stktab[stkptr-1].num  = stktab[stkptr-1].type ==
-					stktab[stkptr].type;
-		stktab[stkptr-1].type = Boolean;
+		top = vec_pop(theStack);
+		sub = vec_top(theStack);
+		sub->num = sub->type == top->type;
+		sub->type = Boolean;
 		break;
+#ifdef BENCHMARK
+	    case SMALL:
+		top = vec_top(theStack);
+		top->num = top->num < 2;
+		top->type = Boolean;
+		break;
+	    case PRED:
+		top = vec_top(theStack);
+		top->num--;
+		break;
+	    case BINREC:
+		top = vec_pop(theStack);
+		sub = vec_pop(theStack);
+		down = vec_pop(theStack);
+		deep = vec_pop(theStack);
+		binrec(deep->ptr, down->ptr, sub->ptr, top->ptr);
+		break;
+#endif
 	    case SELECT:
 		break;
 	    case STACK:
-		stktab[stkptr].ptr = stk2lst();
-		stktab[stkptr++].type = List;
+		tmp = stk2lst();
+		top = vec_push(theStack);
+		top->ptr = tmp;
+		top->type = List;
 		break;
 	    case STEP:
-		ptr = stktab[--stkptr].ptr;
-		for (tmp = stktab[--stkptr].ptr; tmp; tmp = tmp->next) {
-		    memcpy(&stktab[stkptr++], tmp, sizeof(stack_t));
+		top = vec_pop(theStack);
+		sub = vec_pop(theStack);
+		for (ptr = top->ptr, tmp = sub->ptr; tmp; tmp = tmp->next) {
+		    top = vec_push(theStack);
+		    memcpy(top, tmp, sizeof(value_t));
 		    exeterm(ptr);
 		}
 		break;
 	    case SWAP:
-		temp = stktab[stkptr-2];
-		stktab[stkptr-2] = stktab[stkptr-1];
-		stktab[stkptr-1] = temp;
+		top = vec_top(theStack);
+		sub = vec_subtop(theStack);
+		temp = *sub;
+		*sub = *top;
+		*top = temp;
 		break;
 	    case UNCONS:
-		stktab[stkptr] = stktab[stkptr-1];
-		if (!stktab[stkptr].ptr) {
-		    stktab[stkptr-1].num = NOTHING;
-		    stktab[stkptr-1].type = Symbol;
+		sub = vec_top(theStack);
+		top = vec_push(theStack);
+		*top = *sub;
+		if ((tmp = top->ptr) == 0) {
+		    sub->num = NOTHING;
+		    sub->type = Symbol;
 		} else {
-		    tmp = stktab[stkptr].ptr;
-		    memcpy(&stktab[stkptr-1], tmp, sizeof(stack_t));
-		    stktab[stkptr].ptr = tmp->next;
+		    memcpy(sub, tmp, sizeof(value_t));
+		    top->ptr = tmp->next;
 		}
-		stkptr++;
 		break;
 	    case UNSTACK:
-		lst2stk(stktab[stkptr-1].ptr);
+		top = vec_top(theStack);
+		lst2stk(top->ptr);
 		break;
 	    case '*':
-		stkptr--;
-		stktab[stkptr-1].num *= stktab[stkptr].num;
+		top = vec_pop(theStack);
+		sub = vec_top(theStack);
+		sub->num *= top->num;
 		break;
 	    case '+':
-		stkptr--;
-		stktab[stkptr-1].num += stktab[stkptr].num;
+		top = vec_pop(theStack);
+		sub = vec_top(theStack);
+		sub->num += top->num;
 		break;
 	    case '-':
-		stkptr--;
-		stktab[stkptr-1].num -= stktab[stkptr].num;
+		top = vec_pop(theStack);
+		sub = vec_top(theStack);
+		sub->num -= top->num;
 		break;
 	    case '/':
-		stkptr--;
-		stktab[stkptr-1].num /= stktab[stkptr].num;
+		top = vec_pop(theStack);
+		sub = vec_top(theStack);
+		sub->num /= top->num;
 		break;
 	    case '<':
-		stkptr--;
-		if (stktab[stkptr-1].type == Defined)
-		    stktab[stkptr-1].num = strcmp(stktab[stkptr-1].str,
-						  stktab[stkptr].str) < 0;
+		top = vec_pop(theStack);
+		sub = vec_top(theStack);
+		if (sub->type == Defined)
+		    sub->num = strcmp(sub->str, top->str) < 0;
 		else
-		    stktab[stkptr-1].num = stktab[stkptr-1].num <
-					   stktab[stkptr].num;
-		stktab[stkptr-1].type = Boolean;
+		    sub->num = sub->num < top->num;
+		sub->type = Boolean;
 		break;
 	    case '=':
-		stkptr--;
-		stktab[stkptr-1].num  = stktab[stkptr-1].num ==
-					stktab[stkptr].num;
-		stktab[stkptr-1].type = Boolean;
+		top = vec_pop(theStack);
+		sub = vec_top(theStack);
+		sub->num = sub->num == top->num;
+		sub->type = Boolean;
 		break;
 	    default:
 		printf("ERROR");
@@ -529,17 +595,15 @@ void exeterm(node_t *cur)
 	    }
 	    break;
 	case Defined:
-	    exeterm(symtab[cur->index].next);
+	    tmp = vec_index(theTable, cur->index);
+	    exeterm(tmp->next);
 	    break;
 	case Boolean:
 	case Char:
 	case Int:
-	    stktab[stkptr].num = cur->num;
-	    stktab[stkptr++].type = cur->type;
-	    break;
 	case List:
-	    stktab[stkptr].ptr = cur->ptr;
-	    stktab[stkptr++].type = cur->type;
+	    top = vec_push(theStack);
+	    memcpy(top, cur, sizeof(value_t));
 	    break;
 	case Function:
 	    (*cur->fun)();
@@ -557,11 +621,12 @@ void exeterm(node_t *cur)
 */
 void writestack()
 {
-    if (stkptr)
-	writefactor(&stktab[--stkptr]);
-    if (!newline)
+    if (!vec_empty(theStack)) {
+	value_t *cur = vec_pop(theStack);
+	writefactor(cur);
 	putchar('\n');
-    if (!stkptr)
+    }
+    if (vec_empty(theStack))
 	mem_free();
 }
 

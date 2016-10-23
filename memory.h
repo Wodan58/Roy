@@ -1,7 +1,7 @@
 /*
     module  : memory.h
-    version : 1.3
-    date    : 09/09/16
+    version : 1.1
+    date    : 10/23/16
 */
 void *GC_malloc(size_t size);
 void *GC_realloc(void *ptr, size_t new_size);

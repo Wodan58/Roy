@@ -1,3 +1,4 @@
+DEFINE	nl	== '\010 put.
 111 222 + .
 1 2 + 3 4 + * .
 2 2 + 2 2 * = .
@@ -31,7 +32,7 @@ DEFINE	sum	== 0 [+] fold ;
 [1 2 3 4] dup sum put space put product .
 111 [222 333] cons .
 DEFINE	putsp	== put space put .
-[11 22 33 44 55] uncons uncons putsp putsp putsp .
+[11 22 33 44 55] uncons uncons putsp putsp putsp nl .
 ['a 'b] ['d 'e 'f] concat dup .
 uncons uncons 'c swap cons cons cons dup .
 DEFINE	length	== 0 [pop 1 +] fold .
@@ -39,10 +40,10 @@ dup length .
 reverse length .
 get get + .
 123 456
-111 222 [+ put] i .
-111 [put +] reverse 222 swap i .
+111 222 [+ put] i nl .
+111 [put +] reverse 222 swap i nl .
 3 7 100 [*] dip + .
-[1 2 3] [dup * putsp] step .
+[1 2 3] [dup * putsp] step nl .
 2 [dup *] i .
 DEFINE	twice	== dup b ;
 	b	== [i] dip i .
@@ -126,4 +127,4 @@ DEFINE	quicksort1 == dup small []
    [ABELSON Mary 1990 year 2 major Logic] cnos
    [ZEEMAN Fred 1988 year 2 major Accounting] cnos
    [MORRIS Janna 1992 year 1 major undecided] cnos
-quicksort1 dup [putln] step pop.
+quicksort1 dup [putln] step pop .

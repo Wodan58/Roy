@@ -1,7 +1,7 @@
 /*
     module  : memory.c
-    version : 1.2
-    date    : 09/02/16
+    version : 1.1
+    date    : 10/23/16
 */
 #include <stdio.h>
 #include <string.h>
@@ -16,8 +16,8 @@
 
 int definition;
 
-int memptr;
-node_t memory[MAXMEM];
+static int memptr;
+static node_t memory[MAXMEM];
 
 node_t *mem_alloc()
 {
