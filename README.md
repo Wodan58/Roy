@@ -7,7 +7,7 @@ This project depends on the [BDW garbage collector](https://github.com/ivmai/bdw
 Installation
 ------------
 
-The BDW garbage collector has to be present installed as well as CMake. Then run:
+The BDW garbage collector has to be installed as well as CMake. Then run:
 
 CMake -G "Unix Makefiles"
 
