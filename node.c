@@ -1,7 +1,7 @@
 /*
     module  : node.c
-    version : 1.1
-    date    : 10/23/16
+    version : 1.2
+    date    : 11/05/16
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -377,6 +377,7 @@ void debug(node_t *cur)
     putchar('\n');
 }
 
+#ifdef BENCHMARK
 void binrec(node_t *first, node_t *second, node_t *third, node_t *fourth)
 {
     value_t temp, *top;
@@ -396,6 +397,7 @@ void binrec(node_t *first, node_t *second, node_t *third, node_t *fourth)
 	exeterm(fourth);
     }
 }
+#endif
 
 /*
     Evaluate a term

@@ -3,11 +3,14 @@
 #
 cmake_minimum_required(VERSION 3.0)
 project(Coy)
+set(BM true)
 find_package(BISON)
 BISON_TARGET(MyParser parse.y parse.c)
 find_package(FLEX)
 FLEX_TARGET(MyScanner lexer.l lexer.c)
-#add_definitions(-DBENCHMARK)
+if(BM)
+add_definitions(-DBENCHMARK)
+endif(BM)
 add_definitions(-DBIT_32 -Ofast -mno-red-zone -fno-omit-frame-pointer
 		-Wall -Wextra -Werror -Wno-missing-field-initializers
 		-Wno-sign-compare -fno-align-functions -fno-align-loops
@@ -16,7 +19,13 @@ add_definitions(-DBIT_32 -Ofast -mno-red-zone -fno-omit-frame-pointer
 add_executable(joy main.c ${BISON_MyParser_OUTPUTS} ${FLEX_MyScanner_OUTPUTS}
 		node.c eval.c memory.c)
 target_link_libraries(joy /usr/local/lib/libgc-lib.a)
-
+if(BM)
+add_executable(fib fib.c ${FLEX_MyScanner_OUTPUTS} node.c memory.c)
+target_link_libraries(fib /usr/local/lib/libgc-lib.a)
+add_custom_command(OUTPUT fib.c
+		   COMMAND joy -c <fib.joy | clang-format >fib.c
+		   DEPENDS joy fib.joy)
+else(BM)
 add_executable(run run.c ${FLEX_MyScanner_OUTPUTS} node.c memory.c)
 target_link_libraries(run /usr/local/lib/libgc-lib.a)
 add_custom_command(OUTPUT run.c
@@ -26,9 +35,4 @@ add_custom_target(demo1.txt ALL
 		  COMMAND joy <tutorial.joy >demo1.txt)
 add_custom_target(demo2.txt ALL
 		  COMMAND run >demo2.txt)
-
-#add_executable(fib fib.c ${FLEX_MyScanner_OUTPUTS} node.c memory.c)
-#target_link_libraries(fib /usr/local/lib/libgc-lib.a)
-#add_custom_command(OUTPUT fib.c
-#		   COMMAND joy -c <fib.joy | clang-format >fib.c
-#		   DEPENDS joy fib.joy)
+endif(BM)
