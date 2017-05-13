@@ -1,36 +1,43 @@
 /*
     module  : eval.c
-    version : 1.1
-    date    : 10/23/16
+    version : 1.2
+    date    : 05/13/17
 */
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <time.h>
-#include "memory.h"
+#include "gc.h"
 #include "parse.h"
 #include "node.h"
+
+// #define DEBUG
+#define MAXNUM		30
 
 #define D(x)		PrintDouble(str, x)
 #define L(x)		PrintLong(str, x)
 #define P(x)		PrintString(str, x)
 
-void evaluate(node_t *cur, String *str);
+void printstack(String *str);
+void printterm(node_t *cur, String *str);
 
+static int uniq;
 static String *declhdr, *program, *library;
 
 void PrintString(String *str, char *tmp)
 {
+    char *ptr;
+
     while (*tmp) {
-	char *ptr = vec_push(str);
+	ptr = vec_push(str);
 	*ptr = *tmp++;
     }
 }
 
 void PrintDouble(String *str, double dbl)
 {
-    char tmp[30];
+    char tmp[MAXNUM];
 
     sprintf(tmp, "%g", dbl);
     PrintString(str, tmp);
@@ -38,27 +45,33 @@ void PrintDouble(String *str, double dbl)
 
 void PrintLong(String *str, long_t num)
 {
-    char tmp[30];
+    char tmp[MAXNUM];
 
     sprintf(tmp, PRINT_NUM, num);
     PrintString(str, tmp);
 }
 
+/*
+    Start the output file.
+*/
 void initcompile()
 {
     time_t t = time(0);
     printf("/*\n * generated %s */\n", ctime(&t));
     printf("#include <stdio.h>\n");
     printf("#include <stdlib.h>\n");
-    printf("#include <string.h>\n\n");
-    printf("#include \"memory.h\"\n");
+    printf("#include <string.h>\n");
+    printf("#include \"gc.h\"\n");
     printf("#include \"parse.h\"\n");
     printf("#include \"node.h\"\n\n");
     printf("YYSTYPE yylval;\n");
-    printf("Stack *theStack;\n");
-    printf("Table *theTable;\n\n");
+    printf("Stack *theStack;\n\n");
 }
 
+/*
+    Check that a name consists of alphanumerics or underscore and
+    if not, return "op".
+*/
 char *scramble(char *str)
 {
     int i;
@@ -69,22 +82,25 @@ char *scramble(char *str)
     return str;
 }
 
+/*
+    Compile the library.
+*/
 void compilelib()
 {
     char *ptr;
     node_t *cur;
     String *str;
-    int changed;
+    int changed, maxsym, sym;
 
     do {
 	changed = 0;
-	int maxsym = vec_size(theTable);
-	for (int sym = 0; sym < maxsym; sym++) {
+	maxsym = vec_size(theTable);
+	for (sym = 0; sym < maxsym; sym++) {
 	    cur = vec_index(theTable, sym);
 	    if (!cur->mark && cur->uniq) {
 		cur->mark = changed = 1;
 		vec_init(str);
-		evaluate(cur->next, str);
+		printterm(cur->next, str);
 		ptr = vec_push(str);
 		*ptr = 0;
 		ptr = scramble(cur->str);
@@ -105,6 +121,10 @@ void compilelib()
     } while (changed);
 }
 
+/*
+    Compile the library, start the output file, terminate the 3 strings and
+    print them.
+*/
 void exitcompile()
 {
     char *ptr;
@@ -117,18 +137,37 @@ void exitcompile()
     *ptr = 0;
     ptr = vec_push(library);
     *ptr = 0;
-    printf("%s\n", vec_index(declhdr, 0));
+    ptr = vec_index(declhdr, 0);
+    if (*ptr)
+	printf("%s\n", ptr);
     printf("int main() {\nvec_init(theStack);\n");
-    printf("%sreturn 0; }\n\n", vec_index(program, 0));
-    printf("%s", vec_index(library, 0));
+    printf("%sreturn 0; }\n", vec_index(program, 0));
+    ptr = vec_index(library, 0);
+    if (*ptr)
+	printf("\n%s", ptr);
 }
+
+#ifdef DEBUG
+void dumpstack()
+{
+    value_t *top;
+    int stk, max_stk;
+
+    max_stk = vec_size(theStack);
+    for (stk = 0; stk < max_stk; stk++) {
+	top = vec_index(theStack, stk);
+	writefactor(top);
+	putchar(' ');
+    }
+}
+#endif
 
 /*
     Compile a term - instead of being executed, commands are printed.
 */
 void compile(node_t *cur)
 {
-    static short init;
+    static unsigned char init;
 
     if (!init) {
 	init = 1;
@@ -137,162 +176,43 @@ void compile(node_t *cur)
 	vec_init(program);
 	vec_init(library);
     }
-    evaluate(cur, program);
+    printterm(cur, program);
+#ifdef DEBUG
+    debugging = 1;
+    printf("// ");
+    dumpstack();
+    printf("\n");
+    debugging = 0;
+#endif
+    printstack(program);
     PrintString(program, "writestack();\n");
 }
 
-/*
-    Replace occurrences of i, dip, step if possible.
-*/
-int eval(node_t *cur)
+void put_binrec(int ident, node_t *first, node_t *second, node_t *third,
+		node_t *fourth)
 {
-#ifdef BENCHMARK
-    static short uniq;
-
-    node_t *first, *second, *third, *fourth;
-#endif
-    char *ptr;
-    node_t *tmp;
     String *str;
-    int changed = 0;
 
-    switch (cur->type) {
-    case Symbol:
-	switch (cur->num) {
-#ifdef BENCHMARK
-	case BINREC:
-	    if ((fourth = cur->next) == 0)
-		break;
-	    if ((third = fourth->next) == 0)
-		break;
-	    if ((second = third->next) == 0)
-		break;
-	    if ((first = second->next) == 0)
-		break;
-	    if (fourth->type != List)
-		break;
-	    if (third->type != List)
-		break;
-	    if (second->type != List)
-		break;
-	    if (first->type != List)
-		break;
-
-	    changed = 1;
-	    vec_init(str);
-	    P("void binrec_");
-	    L(++uniq);
-	    P("();\nbinrec_");
-	    L(uniq);
-	    P("();\n");
-	    ptr = vec_push(str);
-	    *ptr = 0;
-	    cur->str = vec_index(str, 0);
-	    cur->type = 0;
-	    cur->next = first->next;
-
-	    vec_init(str);
-	    P("void binrec_");
-	    L(uniq);
-	    P("()\n{ value_t temp, *top;\n");
-	    evaluate(first->ptr, str);
-	    P("top = vec_pop(theStack);\n");
-	    P("if (top->num) {\n");
-	    evaluate(second->ptr, str);
-	    P("} else {\n");
-	    evaluate(third->ptr, str);
-	    P("top = vec_pop(theStack);\n");
-	    P("temp = *top;\n");
-	    P("binrec_");
-	    L(uniq);
-	    P("();\ntop = vec_push(theStack);\n");
-	    P("*top = temp;\n");
-	    P("binrec_");
-	    L(uniq);
-	    P("();\n");
-	    evaluate(fourth->ptr, str);
-	    P("} }\n\n");
-
-	    ptr = vec_push(str);
-	    *ptr = 0;
-	    PrintString(library, vec_index(str, 0));
-	    break;
-#endif
-	case I:
-	    if (cur->next && cur->next->type == List) {
-		changed = 1;
-		vec_init(str);
-		P("/* I */\n");
-		evaluate(cur->next->ptr, str);
-		ptr = vec_push(str);
-		*ptr = 0;
-		cur->str = vec_index(str, 0);
-		cur->type = 0;
-		cur->next = cur->next->next;
-	    }
-	    break;
-	case DIP:
-	    if (cur->next && cur->next->type == List) {
-		changed = 1;
-		vec_init(str);
-		P("/* DIP */ { value_t temp, *top;\n");
-		P("top = vec_pop(theStack);\n");
-		P("temp = *top;\n");
-		evaluate(cur->next->ptr, str);
-		P("top = vec_push(theStack);\n");
-		P("*top = temp; }\n");
-		ptr = vec_push(str);
-		*ptr = 0;
-		cur->str = vec_index(str, 0);
-		cur->type = 0;
-		cur->next = cur->next->next;
-	    }
-	    break;
-	case STEP:
-	    if (cur->next && cur->next->type == List) {
-		changed = 1;
-		vec_init(str);
-		P("/* STEP */ { value_t *top; node_t *tmp;\n");
-		P("top = vec_pop(theStack);\n");
-		P("for (tmp = top->ptr; tmp; tmp = tmp->next) {\n");
-		P("top = vec_push(theStack);\n");
-		P("memcpy(top, tmp, sizeof(value_t));\n");
-		evaluate(cur->next->ptr, str);
-		P("} }\n");
-		ptr = vec_push(str);
-		*ptr = 0;
-		cur->str = vec_index(str, 0);
-		cur->type = 0;
-		cur->next = cur->next->next;
-	    }
-	    break;
-	}
-	break;
-    case Defined:
-	cur->type = changed = 1;
-	tmp = vec_index(theTable, cur->index);
-	cur->next = concat(copy(tmp->next), cur->next);
-	break;
-    }
-    return changed;
-}
-
-void printterm(node_t *cur, String *str);
-
-/*
-    Look for replacements until no more replacements can be done
-*/
-void evaluate(node_t *root, String *str)
-{
-    int changed;
-    node_t *cur;
-
-    root = copy(root);
-    do {
-	for (changed = 0, cur = root; cur; cur = cur->next)
-	    changed |= eval(cur);
-    } while (changed);
-    printterm(reverse(root), str);
+    vec_init(str);
+    P("value_t temp, *top;\n");
+    printterm(first, str);
+    P("top = vec_pop(theStack);\n");
+    P("if (top->num) {\n");
+    printterm(second, str);
+    P("} else {\n");
+    printterm(third, str);
+    P("top = vec_pop(theStack);\n");
+    P("temp = *top;\n");
+    P("binrec_");
+    L(ident);
+    P("();\ntop = vec_push(theStack);\n");
+    P("*top = temp;\n");
+    P("binrec_");
+    L(ident);
+    P("();\n");
+    printterm(fourth, str);
+    P("}");
+    PrintString(library, vec_index(str, 0));
 }
 
 int length(node_t *cur)
@@ -346,10 +266,8 @@ void printfactor(node_t *cur, int list, int *pindex, String *str)
 	    L(index);
 	    P("].type=Defined,");
 	} else {
-	    if (!tmp->uniq) {
-		static short uniq;
+	    if (!tmp->uniq)
 		tmp->uniq = ++uniq;
-	    }
 	    P("[");
 	    L(index);
 	    P("].fun=");
@@ -425,7 +343,7 @@ void printfactor(node_t *cur, int list, int *pindex, String *str)
 	}
 	P("\n");
 	*pindex = index + 1;
-	for (cur = reverse(copy(cur->ptr)); cur; cur = cur->next)
+	for (cur = cur->ptr; cur; cur = cur->next)
 	    printfactor(cur, list, pindex, str);
 	break;
     }
@@ -433,18 +351,20 @@ void printfactor(node_t *cur, int list, int *pindex, String *str)
 
 void printlist(node_t *cur, String *str)
 {
+    static int list;
+    int index = 0, leng;
+
     P("{ value_t *top; top = vec_push(theStack);\n");
     if (!cur)
 	P("top->ptr = 0;\n");
     else {
-	static int list;
-	int index = 0, leng = length(cur);
+	leng = length(cur);
 	P("static node_t L");
 	L(++list);
 	P("[");
 	L(leng);
 	P("] = {\n");
-	for (cur = reverse(copy(cur)); cur; cur = cur->next)
+	for (; cur; cur = cur->next)
 	    printfactor(cur, list, &index, str);
 	P("};\ntop->ptr = L");
 	L(list);
@@ -455,16 +375,33 @@ void printlist(node_t *cur, String *str)
 
 void printterm(node_t *cur, String *str)
 {
+    value_t *deep, *down;
+    value_t temp, *sub, *top;
+    node_t *tmp /* list */,
+	   *ptr /* program */;
+
     while (cur) {
-	char *type = 0;
+#ifdef DEBUG
+	debugging = 1;
+	printf("// ");
+	dumpstack();
+	printf(". ");
+	writeterm(cur);
+	printf("\n");
+	debugging = 0;
+#endif
 	switch (cur->type) {
-	case 0:
-	    P(cur->str);
-	case 1:
-	    break;
 	case Symbol:
 	    switch (cur->num) {
 	    case AND:
+		if (vec_size(theStack) >= 2) {
+		    top = vec_pop(theStack);
+		    sub = vec_top(theStack);
+		    sub->num &= top->num;
+		    sub->type = Boolean;
+		    break;
+		}
+		printstack(str);
 		P("/* AND */ { value_t *top, *sub;\n");
 		P("top = vec_pop(theStack);\n");
 		P("sub = vec_top(theStack);\n");
@@ -472,12 +409,27 @@ void printterm(node_t *cur, String *str)
 		P("sub->type = Boolean; }\n");
 		break;
 	    case BODY:
-		P("/* BODY */ { value_t *top;\n");
-		P("top = vec_top(theStack);\n");
-		P("top->ptr = 0;\n");
-		P("top->type = List; }\n");
+		top = vec_top(theStack);
+		tmp = vec_index(theTable, top->index);
+		top->ptr = tmp->next;
+		top->type = List;
 		break;
 	    case CONS:
+		if (vec_size(theStack) >= 2) {
+		    top = vec_top(theStack);
+		    if (top->type == List) {
+			vec_pop(theStack);
+			sub = vec_top(theStack);
+			if (sub->type == Symbol && sub->num == NOTHING)
+			    *sub = *top;
+			else {
+			    sub->ptr = cons(sub, top->ptr);
+			    sub->type = List;
+			}
+			break;
+		    }
+		}
+		printstack(str);
 		P("/* CONS */ { value_t *top, *sub;\n");
 		P("top = vec_pop(theStack);\n");
 		P("sub = vec_top(theStack);\n");
@@ -485,11 +437,23 @@ void printterm(node_t *cur, String *str)
 		P("*sub = *top;\n");
 		P("else {\n");
 		P("sub->ptr = cons(sub, top->ptr);\n");
-		P("sub->type = List;\n");
-		P("} }\n");
+		P("sub->type = List; } }\n");
 		break;
 	    case DIP:
-		P("/* DIP-EXE */ { value_t temp, *top, *sub;\n");
+		if (vec_size(theStack) >= 2) {
+		    top = vec_top(theStack);
+		    if (top->type == List) {
+			vec_pop(theStack);
+			sub = vec_pop(theStack);
+			temp = *sub;
+			printterm(top->ptr, str);
+			top = vec_push(theStack);
+			*top = temp;
+			break;
+		    }
+		}
+		printstack(str);
+		P("/* DIP-2 */ { value_t temp, *top, *sub;\n");
 		P("top = vec_pop(theStack);\n");
 		P("sub = vec_pop(theStack);\n");
 		P("temp = *sub;\n");
@@ -498,12 +462,20 @@ void printterm(node_t *cur, String *str)
 		P("*top = temp; }\n");
 		break;
 	    case DUP:
+		if (vec_size(theStack) >= 1) {
+		    top = vec_push(theStack);
+		    sub = vec_subtop(theStack);
+		    *top = *sub;
+		    break;
+		}
+		printstack(str);
 		P("/* DUP */ { value_t *top, *sub;\n");
-		P("sub = vec_top(theStack);\n");
 		P("top = vec_push(theStack);\n");
+		P("sub = vec_subtop(theStack);\n");
 		P("*top = *sub; }\n");
 		break;
 	    case GET:
+		printstack(str);
 		P("/* GET */ { value_t *top;\n");
 		P("top = vec_push(theStack);\n");
 		P("top->type =");
@@ -513,11 +485,33 @@ void printterm(node_t *cur, String *str)
 		P(";\n }");
 		break;
 	    case I:
+		if (vec_size(theStack) >= 1) {
+		    top = vec_top(theStack);
+		    if (top->type == List) {
+			vec_pop(theStack);
+			printterm(top->ptr, str);
+			break;
+		    }
+		}
+		printstack(str);
 		P("/* I-EXE */ { value_t *top;\n");
 		P("top = vec_pop(theStack);\n");
 		P("exeterm(top->ptr); }\n");
 		break;
 	    case INDEX:
+		if (vec_size(theStack) >= 2) {
+		    top = vec_top(theStack);
+		    if (top->type == List) {
+			vec_pop(theStack);
+			sub = vec_top(theStack);
+			tmp = top->ptr;
+			if (sub->num)
+			    tmp = tmp->next;
+			memcpy(sub, tmp, sizeof(value_t));
+			break;
+		    }
+		}
+		printstack(str);
 		P("/* INDEX */ { value_t *top, *sub; node_t *tmp;\n");
 		P("top = vec_pop(theStack);\n");
 		P("sub = vec_top(theStack);\n");
@@ -527,17 +521,31 @@ void printterm(node_t *cur, String *str)
 		P("memcpy(sub, tmp, sizeof(value_t)); }\n");
 		break;
 	    case NOT:
+		if (vec_size(theStack) >= 1) {
+		    top = vec_top(theStack);
+		    top->num = !top->num;
+		    top->type = Boolean;
+		    break;
+		}
+		printstack(str);
 		P("/* NOT */ { value_t *top;\n");
 		P("top = vec_top(theStack);\n");
 		P("top->num = !top->num;\n");
 		P("top->type = Boolean; }\n");
 		break;
 	    case NOTHING:
-		P("/* NOTHING */ { value_t *top;\n");
-		P("top = vec_push(theStack);\n");
-		P("top->num = NOTHING; top->type = Symbol; }\n");
+		top = vec_push(theStack);
+		memcpy(top, cur, sizeof(value_t));
 		break;
 	    case OR:
+		if (vec_size(theStack) >= 2) {
+		    top = vec_pop(theStack);
+		    sub = vec_top(theStack);
+		    sub->num |= top->num;
+		    sub->type = Boolean;
+		    break;
+		}
+		printstack(str);
 		P("/* OR */ { value_t *top, *sub;\n");
 		P("top = vec_pop(theStack);\n");
 		P("sub = vec_top(theStack);\n");
@@ -545,33 +553,87 @@ void printterm(node_t *cur, String *str)
 		P("sub->type = Boolean; }\n");
 		break;
 	    case POP:
+		if (vec_size(theStack) >= 1) {
+		    vec_pop(theStack);
+		    break;
+		}
+		printstack(str);
 		P("/* POP */ (void)vec_pop(theStack);\n");
 		break;
 	    case PUT:
+		printstack(str);
 		P("/* PUT */ { value_t *top;\n");
 		P("top = vec_pop(theStack);\n");
 		P("writefactor(top); }\n");
 		break;
 	    case SAMETYPE:
+		if (vec_size(theStack) >= 2) {
+		    top = vec_pop(theStack);
+		    sub = vec_top(theStack);
+		    sub->num = sub->type == top->type;
+		    sub->type = Boolean;
+		    break;
+		}
+		printstack(str);
 		P("/* SAMETYPE */ { value_t *top, *sub;\n");
 		P("top = vec_pop(theStack);\n");
 		P("sub = vec_top(theStack);\n");
 		P("sub->num = sub->type == top->type;\n");
 		P("sub->type = Boolean; }\n");
 		break;
-#ifdef BENCHMARK
 	    case SMALL:
+		if (vec_size(theStack) >= 1) {
+		    top = vec_top(theStack);
+		    top->num = top->num < 2;
+		    top->type = Boolean;
+		    break;
+		}
+		printstack(str);
 		P("/* SMALL */ { value_t *top;\n");
 		P("top = vec_top(theStack);\n");
 		P("top->num = top->num < 2;\n");
 		P("top->type = Boolean; }\n");
 		break;
 	    case PRED:
+		if (vec_size(theStack) >= 1) {
+		    top = vec_top(theStack);
+		    top->num--;
+		    break;
+		}
+		printstack(str);
 		P("/* PRED */ { value_t *top;\n");
 		P("top = vec_top(theStack);\n");
 		P("top->num--; }\n");
 		break;
 	    case BINREC:
+		if (vec_size(theStack) >= 4) {
+		    top = vec_top(theStack);
+		    sub = vec_subtop(theStack);
+		    down = vec_index(theStack, vec_size(theStack) - 3);
+		    deep = vec_index(theStack, vec_size(theStack) - 4);
+		    if (top->type == List && sub->type == List &&
+			down->type == List && deep->type == List) {
+			vec_pop(theStack);
+			vec_pop(theStack);
+			vec_pop(theStack);
+			vec_pop(theStack);
+			printstack(str);
+			P("binrec_");
+			L(++uniq);
+			P("();\n");
+			PrintString(declhdr, "void binrec_");
+			PrintLong(declhdr, uniq);
+			PrintString(declhdr, "(void);\n");
+			PrintString(library, "void binrec_");
+			PrintLong(library, uniq);
+			PrintString(library, "(void) {\n");
+			put_binrec(uniq, deep->ptr, down->ptr, sub->ptr,
+				   top->ptr);
+			PrintString(library, "}\n\n");
+			break;
+		    }
+		}
+		printstack(str);
 		P("/* BINREC-EXE */ { value_t *deep, *down, *sub, *top;\n");
 		P("top = vec_pop(theStack);\n");
 		P("sub = vec_pop(theStack);\n");
@@ -579,10 +641,10 @@ void printterm(node_t *cur, String *str)
 		P("deep = vec_pop(theStack);\n");
 		P("binrec(deep->ptr, down->ptr, sub->ptr, top->ptr); }\n");
 		break;
-#endif
 	    case SELECT:
 		break;
 	    case STACK:
+		printstack(str);
 		P("/* STACK */ { node_t *tmp; value_t *top;\n");
 		P("tmp = stk2lst();\n");
 		P("top = vec_push(theStack);\n");
@@ -590,16 +652,56 @@ void printterm(node_t *cur, String *str)
 		P("top->type = List; }\n");
 		break;
 	    case STEP:
-		P("/* STEP-EXE */ { value_t *top, *sub; node_t *ptr, *tmp;\n");
+		if (vec_size(theStack) >= 2) {
+		    top = vec_top(theStack);
+		    sub = vec_subtop(theStack);
+		    if (top->type == List && sub->type == List) {
+			vec_pop(theStack);
+			vec_pop(theStack);
+			ptr = top->ptr;
+			for (tmp = sub->ptr; tmp; tmp = tmp->next) {
+			    top = vec_push(theStack);
+			    memcpy(top, tmp, sizeof(value_t));
+			    printterm(ptr, str);
+			}
+			break;
+		    }
+		} else if (vec_size(theStack) >= 1) {
+		    top = vec_top(theStack);
+		    if (top->type == List) {
+			vec_pop(theStack);
+			ptr = top->ptr;
+			P("/* STEP-1 */ { value_t *top, *sub; node_t *tmp;\n");
+			P("sub = vec_pop(theStack);\n");
+			P("for (tmp = sub->ptr; tmp; tmp = tmp->next) {\n");
+			P("top = vec_push(theStack);\n");
+			P("memcpy(top, tmp, sizeof(value_t));\n");
+			printterm(ptr, str);
+			P("} }\n");
+			break;
+		    }
+		}
+		printstack(str);
+		P("/* STEP-2 */ { value_t *top, *sub; node_t *ptr, *tmp;\n");
 		P("top = vec_pop(theStack);\n");
 		P("sub = vec_pop(theStack);\n");
 		P("ptr = top->ptr;\n");
 		P("for (tmp = sub->ptr; tmp; tmp = tmp->next) {\n");
 		P("top = vec_push(theStack);\n");
 		P("memcpy(top, tmp, sizeof(value_t));\n");
-		P("exeterm(ptr); } }\n");
+		P("exeterm(ptr);\n");
+		P("} }\n");
 		break;
 	    case SWAP:
+		if (vec_size(theStack) >= 2) {
+		    top = vec_top(theStack);
+		    sub = vec_subtop(theStack);
+		    temp = *sub;
+		    *sub = *top;
+		    *top = temp;
+		    break;
+		}
+		printstack(str);
 		P("/* SWAP */ { value_t temp, *top, *sub;\n");
 		P("top = vec_top(theStack);\n");
 		P("sub = vec_subtop(theStack);\n");
@@ -608,48 +710,104 @@ void printterm(node_t *cur, String *str)
 		P("*top = temp; }\n");
 		break;
 	    case UNCONS:
+		if (vec_size(theStack) >= 1) {
+		    sub = vec_top(theStack);
+		    if (sub->type == List) {
+			top = vec_push(theStack);
+			sub = vec_subtop(theStack);
+			*top = *sub;
+			if ((tmp = top->ptr) == 0) {
+			    sub->num = NOTHING;
+			    sub->type = Symbol;
+			} else {
+			    memcpy(sub, tmp, sizeof(value_t));
+			    top->ptr = tmp->next;
+			}
+			break;
+		    }
+		}
+		printstack(str);
 		P("/* UNCONS */ { value_t *top, *sub; node_t *tmp;\n");
-		P("sub = vec_top(theStack);\n");
 		P("top = vec_push(theStack);\n");
+		P("sub = vec_subtop(theStack);\n");
 		P("*top = *sub;\n");
 		P("if ((tmp = top->ptr) == 0) {\n");
 		P("sub->num = NOTHING;\n");
 		P("sub->type = Symbol;\n");
 		P("} else {\n");
 		P("memcpy(sub, tmp, sizeof(value_t));\n");
-		P("top->ptr = tmp->next;\n");
-		P("} }\n");
+		P("top->ptr = tmp->next; } }\n");
 		break;
 	    case UNSTACK:
+		printstack(str);
 		P("/* UNSTACK */ { value_t *top;\n");
 		P("top = vec_top(theStack);\n");
 		P("lst2stk(top->ptr); }\n");
 		break;
 	    case '*':
+		if (vec_size(theStack) >= 2) {
+		    top = vec_pop(theStack);
+		    sub = vec_top(theStack);
+		    sub->num *= top->num;
+		    break;
+		}
+		printstack(str);
 		P("/* * */ { value_t *top, *sub;\n");
 		P("top = vec_pop(theStack);\n");
 		P("sub = vec_top(theStack);\n");
 		P("sub->num *= top->num; }\n");
 		break;
 	    case '+':
+		if (vec_size(theStack) >= 2) {
+		    top = vec_pop(theStack);
+		    sub = vec_top(theStack);
+		    sub->num += top->num;
+		    break;
+		}
+		printstack(str);
 		P("/* + */ { value_t *top, *sub;\n");
 		P("top = vec_pop(theStack);\n");
 		P("sub = vec_top(theStack);\n");
 		P("sub->num += top->num; }\n");
 		break;
 	    case '-':
+		if (vec_size(theStack) >= 2) {
+		    top = vec_pop(theStack);
+		    sub = vec_top(theStack);
+		    sub->num -= top->num;
+		    break;
+		}
+		printstack(str);
 		P("/* - */ { value_t *top, *sub;\n");
 		P("top = vec_pop(theStack);\n");
 		P("sub = vec_top(theStack);\n");
 		P("sub->num -= top->num; }\n");
 		break;
 	    case '/':
+		if (vec_size(theStack) >= 2) {
+		    top = vec_pop(theStack);
+		    sub = vec_top(theStack);
+		    sub->num /= top->num;
+		    break;
+		}
+		printstack(str);
 		P("/* / */ { value_t *top, *sub;\n");
 		P("top = vec_pop(theStack);\n");
 		P("sub = vec_top(theStack);\n");
 		P("sub->num /= top->num; }\n");
 		break;
 	    case '<':
+		if (vec_size(theStack) >= 2) {
+		    top = vec_pop(theStack);
+		    sub = vec_top(theStack);
+		    if (sub->type == Defined)
+			sub->num = strcmp(sub->str, top->str) < 0;
+		    else
+			sub->num = sub->num < top->num;
+		    sub->type = Boolean;
+		    break;
+		}
+		printstack(str);
 		P("/* < */ { value_t *top, *sub;\n");
 		P("top = vec_pop(theStack);\n");
 		P("sub = vec_top(theStack);\n");
@@ -660,6 +818,14 @@ void printterm(node_t *cur, String *str)
 		P("sub->type = Boolean; }\n");
 		break;
 	    case '=':
+		if (vec_size(theStack) >= 2) {
+		    top = vec_pop(theStack);
+		    sub = vec_top(theStack);
+		    sub->num = sub->num == top->num;
+		    sub->type = Boolean;
+		    break;
+		}
+		printstack(str);
 		P("/* = */ { value_t *top, *sub;\n");
 		P("top = vec_pop(theStack);\n");
 		P("sub = vec_top(theStack);\n");
@@ -667,35 +833,113 @@ void printterm(node_t *cur, String *str)
 		P("sub->type = Boolean; }\n");
 		break;
 	    default:
-		printf("ERROR");
+		fprintf(stderr, "ERROR 1\n");
 		break;
 	    }
 	    break;
 	case Defined:
+	    tmp = vec_index(theTable, cur->index);
+	    if (tmp->recur) {
+		printstack(str);
+		if (!tmp->uniq)
+		    tmp->uniq = ++uniq;
+		P(scramble(cur->str));
+		P("_");
+		L(tmp->uniq);
+		P("();\n");
+	    } else {
+		tmp->recur = 1;
+		printterm(tmp->next, str);
+		tmp->recur = 0;
+	    }
 	    break;
 	case Boolean:
-	    type = "Boolean";
 	case Char:
-	    if (!type)
-		type = "Char";
 	case Int:
-	    if (!type)
-		type = "Int";
-	    P("{ value_t *top;\n");
-	    P("top = vec_push(theStack);\n");
-	    P("top->num = ");
-	    L(cur->num);
-	    P(";\ntop->type = ");
-	    P(type);
-	    P("; }\n");
-	    break;
 	case List:
-	    printlist(cur->ptr, str);
+	    top = vec_push(theStack);
+	    memcpy(top, cur, sizeof(value_t));
 	    break;
 	default:
-	    printf("ERROR");
+	    fprintf(stderr, "ERROR 2\n");
 	    break;
 	}
 	cur = cur->next;
     }
+}
+
+void printnode(value_t *cur, String *str)
+{
+    node_t *tmp;
+    char *type = 0;
+
+    switch (cur->type) {
+    case Boolean:
+	type = "Boolean";
+    case Char:
+	if (!type)
+	    type = "Char";
+    case Int:
+	if (!type)
+	    type = "Int";
+	P("{ value_t *top;\n");
+	P("top = vec_push(theStack);\n");
+	P("top->num = ");
+	L(cur->num);
+	P(";\ntop->type = ");
+	P(type);
+	P("; }\n");
+	break;
+    case List:
+	printlist(cur->ptr, str);
+	break;
+    case Symbol:
+	switch (cur->num) {
+	case NOTHING:
+	    P("{ value_t *top;\n");
+	    P("top = vec_push(theStack);\n");
+	    P("top->num = NOTHING;\n");
+	    P("top->type = Symbol; }\n");
+	    break;
+	case DUP:
+	    P("{ value_t *top;\n");
+	    P("top = vec_push(theStack);\n");
+	    P("top->num = DUP;\n");
+	    P("top->type = Symbol; }\n");
+	    break;
+	default:
+	    fprintf(stderr, "ERROR 3\n");
+	    break;
+	}
+	break;
+    case Defined:
+	tmp = vec_index(theTable, cur->index);
+	if (!tmp->uniq)
+	    tmp->uniq = ++uniq;
+	P("{ value_t *top;\n");
+	P("top = vec_push(theStack);\n");
+	P("top->fun =");
+	P(scramble(cur->str));
+	P("_");
+	L(tmp->uniq);
+	P(";\n");
+	P("top->type = Function; }\n");
+	break;
+    default:
+	fprintf(stderr, "ERROR 4\n");
+	break;
+    }
+}
+
+void printstack(String *str)
+{
+    value_t *top;
+    int stk, max_stk;
+
+    max_stk = vec_size(theStack);
+    for (stk = 0; stk < max_stk; stk++) {
+	top = vec_index(theStack, stk);
+	printnode(top, str);
+    }
+    vec_clear(theStack);
 }

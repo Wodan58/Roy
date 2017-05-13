@@ -1,12 +1,12 @@
 /*
     module  : memory.c
-    version : 1.1
-    date    : 10/23/16
+    version : 1.2
+    date    : 05/13/17
 */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "memory.h"
+#include "gc.h"
 #include "parse.h"
 #include "node.h"
 

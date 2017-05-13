@@ -1,18 +1,18 @@
 /*
     module  : node.c
-    version : 1.2
-    date    : 11/05/16
+    version : 1.3
+    date    : 05/13/17
 */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "memory.h"
+#include "gc.h"
 #include "parse.h"
 #include "node.h"
 
 // #define DEBUG
 
-int compiling;
+int compiling, debugging;
 
 /* dynamic arrays */
 Stack *theStack;
@@ -163,6 +163,7 @@ node_t *cons(value_t *node, node_t *next)
 */
 node_t *stk2lst()
 {
+    value_t *top;
     int stk, max_stk;
     node_t *root = 0, *cur;
 
@@ -170,7 +171,7 @@ node_t *stk2lst()
     for (stk = 0; stk < max_stk; stk++) {
 	if ((cur = mem_alloc()) == 0)
 	    return 0;
-	value_t *top = vec_index(theStack, stk);
+	top = vec_index(theStack, stk);
 	memcpy(cur, top, sizeof(value_t));
 	cur->next = root;
 	root = cur;
@@ -184,10 +185,11 @@ node_t *stk2lst()
 void lst2stk(node_t *root)
 {
     node_t *cur;
+    value_t *top;
 
     vec_clear(theStack);
     for (cur = reverse(root); cur; cur = cur->next) {
-	value_t *top = vec_push(theStack);
+	top = vec_push(theStack);
 	memcpy(top, cur, sizeof(value_t));
     }
 }
@@ -258,7 +260,6 @@ void writefactor(value_t *cur)
 	case SAMETYPE:
 	    printf("sametype");
 	    break;
-#ifdef BENCHMARK
 	case SMALL:
 	    printf("small");
 	    break;
@@ -268,7 +269,6 @@ void writefactor(value_t *cur)
 	case BINREC:
 	    printf("binrec");
 	    break;
-#endif
 	case SELECT:
 	    printf("select");
 	    break;
@@ -296,7 +296,7 @@ void writefactor(value_t *cur)
 	    printf("%c", cur->num);
 	    break;
 	default:
-	    printf("ERROR");
+	    fprintf(stderr, "ERROR 5\n");
 	    break;
 	}
 	break;
@@ -307,7 +307,10 @@ void writefactor(value_t *cur)
 	printf(cur->num ? "true" : "false");
 	break;
     case Char:
-	printf("%c", cur->num);
+	if (debugging && cur->num == '\n')
+	    printf("'\\10");
+	else
+	    printf("%c", cur->num);
 	break;
     case Int:
 	printf("%d", cur->num);
@@ -321,7 +324,7 @@ void writefactor(value_t *cur)
 	printf("PROC");
 	break;
     default:
-	printf("ERROR\n");
+	fprintf(stderr, "ERROR 6\n");
 	break;
     }
 }
@@ -347,11 +350,12 @@ void writeterm(node_t *cur)
 */
 void dump()
 {
+    node_t *cur;
     int sym, max_sym;
 
     max_sym = vec_size(theTable);
     for (sym = 0; sym < max_sym; sym++) {
-	node_t *cur = vec_index(theTable, sym);
+	cur = vec_index(theTable, sym);
 	printf("%s == ", cur->str);
 	writeterm(cur->next);
 	printf("\n");
@@ -361,13 +365,15 @@ void dump()
 /*
     Print the contents of stack and program
 */
+#ifdef DEBUG
 void debug(node_t *cur)
 {
+    value_t *top;
     int stk, max_stk;
 
     max_stk = vec_size(theStack);
     for (stk = 0; stk < max_stk; stk++) {
-	value_t *top = vec_index(theStack, stk);
+	top = vec_index(theStack, stk);
 	writefactor(top);
 	putchar(' ');
     }
@@ -376,8 +382,8 @@ void debug(node_t *cur)
     writeterm(cur);
     putchar('\n');
 }
+#endif
 
-#ifdef BENCHMARK
 void binrec(node_t *first, node_t *second, node_t *third, node_t *fourth)
 {
     value_t temp, *top;
@@ -397,16 +403,13 @@ void binrec(node_t *first, node_t *second, node_t *third, node_t *fourth)
 	exeterm(fourth);
     }
 }
-#endif
 
 /*
     Evaluate a term
 */
 void exeterm(node_t *cur)
 {
-#ifdef BENCHMARK
     value_t *deep, *down;
-#endif
     value_t temp, *sub, *top;
     node_t *tmp /* list */,
 	   *ptr /* program */;
@@ -449,8 +452,8 @@ void exeterm(node_t *cur)
 		*top = temp;
 		break;
 	    case DUP:
-		sub = vec_top(theStack);
 		top = vec_push(theStack);
+		sub = vec_subtop(theStack);
 		*top = *sub;
 		break;
 	    case GET:
@@ -498,7 +501,6 @@ void exeterm(node_t *cur)
 		sub->num = sub->type == top->type;
 		sub->type = Boolean;
 		break;
-#ifdef BENCHMARK
 	    case SMALL:
 		top = vec_top(theStack);
 		top->num = top->num < 2;
@@ -515,7 +517,6 @@ void exeterm(node_t *cur)
 		deep = vec_pop(theStack);
 		binrec(deep->ptr, down->ptr, sub->ptr, top->ptr);
 		break;
-#endif
 	    case SELECT:
 		break;
 	    case STACK:
@@ -541,8 +542,8 @@ void exeterm(node_t *cur)
 		*top = temp;
 		break;
 	    case UNCONS:
-		sub = vec_top(theStack);
 		top = vec_push(theStack);
+		sub = vec_subtop(theStack);
 		*top = *sub;
 		if ((tmp = top->ptr) == 0) {
 		    sub->num = NOTHING;
@@ -592,7 +593,7 @@ void exeterm(node_t *cur)
 		sub->type = Boolean;
 		break;
 	    default:
-		printf("ERROR");
+		fprintf(stderr, "ERROR 7\n");
 		break;
 	    }
 	    break;
@@ -611,7 +612,7 @@ void exeterm(node_t *cur)
 	    (*cur->fun)();
 	    break;
 	default:
-	    printf("ERROR");
+	    fprintf(stderr, "ERROR 8 - %d\n", cur->type);
 	    break;
 	}
 	cur = cur->next;
@@ -623,8 +624,10 @@ void exeterm(node_t *cur)
 */
 void writestack()
 {
+    value_t *cur;
+
     if (!vec_empty(theStack)) {
-	value_t *cur = vec_pop(theStack);
+	cur = vec_pop(theStack);
 	writefactor(cur);
 	putchar('\n');
     }

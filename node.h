@@ -1,7 +1,7 @@
 /*
     module  : node.h
-    version : 1.1
-    date    : 10/23/16
+    version : 1.2
+    date    : 05/13/17
 */
 #include "vector.h"
 
@@ -25,8 +25,10 @@ typedef struct node_t {
 	struct node_t *ptr;
 	void (*fun)(void);
     };
-    short type, index, uniq, mark;
+    short type, index;
+
     struct node_t *next;
+    short uniq, mark, recur;
 } node_t;
 
 /* array */
@@ -35,11 +37,12 @@ typedef struct value_t {
 	int num;
 	char *str;
 	struct node_t *ptr;
+	void (*fun)(void);
     };
     short type, index;
 } value_t;
 
-extern int compiling, definition;
+extern int compiling, definition, debugging;
 
 /* declare vector type */
 typedef vector(node_t) Table;
@@ -78,7 +81,4 @@ void lst2stk(node_t *root);
 void execute(node_t *cur);
 node_t *mem_alloc();
 void mem_free();
-
-#ifdef BENCHMARK
 void binrec(node_t *first, node_t *second, node_t *third, node_t *fourth);
-#endif
