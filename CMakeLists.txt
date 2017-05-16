@@ -8,17 +8,17 @@ find_package(BISON)
 BISON_TARGET(MyParser parse.y parse.c)
 find_package(FLEX)
 FLEX_TARGET(MyScanner lexer.l lexer.c)
-add_definitions(-DBIT_32)
+add_definitions(-DBIT_32 -I.)
 add_executable(joy main.c ${BISON_MyParser_OUTPUTS} ${FLEX_MyScanner_OUTPUTS}
 		node.c eval.c memory.c)
-target_link_libraries(joy /usr/local/lib/libgc-lib.a)
+target_link_libraries(joy ../bdwgc/gc-lib)
 add_executable(fib fib.c ${FLEX_MyScanner_OUTPUTS} node.c memory.c)
-target_link_libraries(fib /usr/local/lib/libgc-lib.a)
+target_link_libraries(fib ../bdwgc/gc-lib)
 add_custom_command(OUTPUT fib.c
 		   COMMAND joy -c <fib.joy | clang-format >fib.c
 		   DEPENDS joy fib.joy)
 add_executable(run run.c ${FLEX_MyScanner_OUTPUTS} node.c memory.c)
-target_link_libraries(run /usr/local/lib/libgc-lib.a)
+target_link_libraries(run ../bdwgc/gc-lib)
 add_custom_command(OUTPUT run.c
 		   COMMAND joy -c <tutorial.joy | clang-format >run.c
 		   DEPENDS joy tutorial.joy)
