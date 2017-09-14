@@ -4,3 +4,11 @@ CMakeFiles
 demo1.txt
 demo2.txt
 Makefile
+*.exe
+bdwgc
+fib.c
+joy.map
+lexer.c
+parse.c
+parse.h
+run.c
