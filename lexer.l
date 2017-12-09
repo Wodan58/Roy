@@ -6,7 +6,7 @@
 */
 #include <string.h>
 #include <stdlib.h>
-#include "gc.h"
+#include "joygc.h"
 #include "parse.h"
 
 #define YY_NO_UNPUT
