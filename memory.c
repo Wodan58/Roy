@@ -1,12 +1,12 @@
 /*
     module  : memory.c
     version : 1.2
-    date    : 05/13/17
+    date    : 12/09/17
 */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "gc.h"
+#include "joygc.h"
 #include "parse.h"
 #include "node.h"
 
@@ -21,13 +21,9 @@ static node_t memory[MAXMEM];
 
 node_t *mem_alloc()
 {
-    node_t *cur;
-
     if (!definition && memptr < MAXMEM)
 	return &memory[memptr++];
-    cur = malloc(sizeof(node_t));
-    memset(cur, 0, sizeof(node_t));
-    return cur;
+    return GC_malloc(sizeof(node_t));
 }
 
 void mem_free()
