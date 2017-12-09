@@ -30,8 +30,5 @@ add_custom_command(OUTPUT run.c
 		   DEPENDS joy tutorial.joy)
 add_custom_target(demo1.txt ALL
 		  COMMAND joy <tutorial.joy >demo1.txt)
-if(WIN32)
-else()
 add_custom_target(demo2.txt ALL
 		  COMMAND run >demo2.txt)
-endif()
