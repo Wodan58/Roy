@@ -59,26 +59,32 @@ extern Stack *theStack;
 /* declare vector type */
 typedef vector(char) String;
 
+/* lexer.l, parse.y */
 int yylex(), yyparse(), yyerror(char *str);
 
+/* node.c */
 void enterdef(char *str, node_t *next);
 node_t *entersym(char *str);
 node_t *newlist(node_t *ptr);
 node_t *newnode(int type, int value);
 node_t *concat(node_t *node, node_t *next);
 node_t *copy(node_t *node);
-node_t *reverse(node_t *cur);
-void writeterm(node_t *cur);
-void writefactor(value_t *cur);
-void exeterm(node_t *cur);
-void writestack();
-void debug(node_t *cur);
-void compile(node_t *cur);
 node_t *cons(value_t *node, node_t *next);
-void dump();
 node_t *stk2lst();
 void lst2stk(node_t *root);
+node_t *reverse(node_t *cur);
+void writefactor(value_t *cur);
+void writeterm(node_t *cur);
+void dump();
+void debug(node_t *cur);
+void binrec(node_t *first, node_t *second, node_t *third, node_t *fourth);
+void exeterm(node_t *cur);
+void writestack();
 void execute(node_t *cur);
+
+/* eval.c */
+void compile(node_t *cur);
+
+/* memory.c */
 node_t *mem_alloc();
 void mem_free();
-void binrec(node_t *first, node_t *second, node_t *third, node_t *fourth);
