@@ -1,12 +1,12 @@
 /*
     module  : node.c
-    version : 1.3
-    date    : 05/13/17
+    version : 1.2
+    date    : 12/09/17
 */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "gc.h"
+#include "joygc.h"
 #include "parse.h"
 #include "node.h"
 
@@ -296,7 +296,7 @@ void writefactor(value_t *cur)
 	    printf("%c", cur->num);
 	    break;
 	default:
-	    fprintf(stderr, "ERROR 5\n");
+	    fprintf(stderr, "ERROR #5\n");
 	    break;
 	}
 	break;
@@ -324,7 +324,7 @@ void writefactor(value_t *cur)
 	printf("PROC");
 	break;
     default:
-	fprintf(stderr, "ERROR 6\n");
+	fprintf(stderr, "ERROR #6\n");
 	break;
     }
 }
@@ -337,7 +337,8 @@ void writeterm(node_t *cur)
     value_t temp;
 
     while (cur) {
-	memcpy(&temp, cur, sizeof(value_t));
+	temp.ptr = cur->ptr;
+	temp.type = cur->type;
 	writefactor(&temp);
 	if (cur->next)
 	    putchar(' ');
@@ -593,7 +594,7 @@ void exeterm(node_t *cur)
 		sub->type = Boolean;
 		break;
 	    default:
-		fprintf(stderr, "ERROR 7\n");
+		fprintf(stderr, "ERROR #7\n");
 		break;
 	    }
 	    break;
@@ -612,7 +613,7 @@ void exeterm(node_t *cur)
 	    (*cur->fun)();
 	    break;
 	default:
-	    fprintf(stderr, "ERROR 8 - %d\n", cur->type);
+	    fprintf(stderr, "ERROR #8\n");
 	    break;
 	}
 	cur = cur->next;
