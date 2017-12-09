@@ -1,14 +1,14 @@
 /*
     module  : eval.c
     version : 1.2
-    date    : 05/13/17
+    date    : 12/09/17
 */
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <time.h>
-#include "gc.h"
+#include "joygc.h"
 #include "parse.h"
 #include "node.h"
 
@@ -61,7 +61,7 @@ void initcompile()
     printf("#include <stdio.h>\n");
     printf("#include <stdlib.h>\n");
     printf("#include <string.h>\n");
-    printf("#include \"gc.h\"\n");
+    printf("#include \"joygc.h\"\n");
     printf("#include \"parse.h\"\n");
     printf("#include \"node.h\"\n\n");
     printf("YYSTYPE yylval;\n");
@@ -125,7 +125,7 @@ void compilelib()
     Compile the library, start the output file, terminate the 3 strings and
     print them.
 */
-void exitcompile()
+void exitcompile(void)
 {
     char *ptr;
 
@@ -235,59 +235,40 @@ void printfactor(node_t *cur, int list, int *pindex, String *str)
 
     switch (cur->type) {
     case Symbol:
-	P("[");
-	L(index);
-	P("].num=");
+	P("{.num=");
 	L(cur->num);
-	P(",");
-	P("[");
-	L(index);
-	P("].type=Symbol,");
+	P(",.type=Symbol");
 	if (cur->next) {
-	    P("[");
-	    L(index);
-	    P("].next=L");
+	    P(",.next=L");
 	    L(list);
 	    P("+");
 	    L(index + 1);
-	    P(",");
 	}
-	P("\n");
+	P("},\n");
 	*pindex = index + 1;
 	break;
     case Defined:
 	tmp = vec_index(theTable, cur->index);
 	if (!tmp->next) {
-	    P("[");
-	    L(index);
-	    P("].str=\"");
+	    P("{.str=\"");
 	    P(cur->str);
-	    P("\",[");
-	    L(index);
-	    P("].type=Defined,");
+	    P("\",.type=Defined");
 	} else {
 	    if (!tmp->uniq)
 		tmp->uniq = ++uniq;
-	    P("[");
-	    L(index);
-	    P("].fun=");
+	    P("{.fun=");
 	    P(scramble(cur->str));
 	    P("_");
 	    L(tmp->uniq);
-	    P(",[");
-	    L(index);
-	    P("].type=Function,");
+	    P(",.type=Function");
 	}
 	if (cur->next) {
-	    P("[");
-	    L(index);
-	    P("].next=L");
+	    P(",.next=L");
 	    L(list);
 	    P("+");
 	    L(index + 1);
-	    P(",");
 	}
-	P("\n");
+	P("},\n");
 	*pindex = index + 1;
 	break;
     case Boolean:
@@ -298,50 +279,36 @@ void printfactor(node_t *cur, int list, int *pindex, String *str)
     case Int:
 	if (!type)
 	    type = "Int";
-	P("[");
-	L(index);
-	P("].num=");
+	P("{.num=");
 	L(cur->num);
-	P(",[");
-	L(index);
-	P("].type=");
+	P(",.type=");
 	P(type);
-	P(",");
 	if (cur->next) {
-	    P("[");
-	    L(index);
-	    P("].next=L");
+	    P(",.next=L");
 	    L(list);
 	    P("+");
 	    L(index + 1);
-	    P(",");
 	}
-	P("\n");
+	P("},\n");
 	*pindex = index + 1;
 	break;
     case List:
+	P("{");
 	if (cur->ptr) {
-	    P("[");
-	    L(index);
-	    P("].ptr=L");
+	    P(".ptr=L");
 	    L(list);
 	    P("+");
 	    L(index + 1);
 	    P(",");
 	}
-	P("[");
-	L(index);
-	P("].type=List,");
+	P(".type=List");
 	if (cur->next) {
-	    P("[");
-	    L(index);
-	    P("].next=L");
+	    P(",.next=L");
 	    L(list);
 	    P("+");
 	    L(index + 1 + length(cur->ptr));
-	    P(",");
 	}
-	P("\n");
+	P("},\n");
 	*pindex = index + 1;
 	for (cur = cur->ptr; cur; cur = cur->next)
 	    printfactor(cur, list, pindex, str);
@@ -833,7 +800,7 @@ void printterm(node_t *cur, String *str)
 		P("sub->type = Boolean; }\n");
 		break;
 	    default:
-		fprintf(stderr, "ERROR 1\n");
+		fprintf(stderr, "ERROR #1\n");
 		break;
 	    }
 	    break;
@@ -861,7 +828,7 @@ void printterm(node_t *cur, String *str)
 	    memcpy(top, cur, sizeof(value_t));
 	    break;
 	default:
-	    fprintf(stderr, "ERROR 2\n");
+	    fprintf(stderr, "ERROR #2\n");
 	    break;
 	}
 	cur = cur->next;
@@ -908,7 +875,7 @@ void printnode(value_t *cur, String *str)
 	    P("top->type = Symbol; }\n");
 	    break;
 	default:
-	    fprintf(stderr, "ERROR 3\n");
+	    fprintf(stderr, "ERROR #3\n");
 	    break;
 	}
 	break;
@@ -926,7 +893,7 @@ void printnode(value_t *cur, String *str)
 	P("top->type = Function; }\n");
 	break;
     default:
-	fprintf(stderr, "ERROR 4\n");
+	fprintf(stderr, "ERROR #4\n");
 	break;
     }
 }
