@@ -2,14 +2,14 @@
 /*
     module  : parse.y
     version : 1.2
-    date    : 05/13/17
+    date    : 12/09/17
 */
 #include <stdio.h>
-#include "gc.h"
+#include "joygc.h"
 #include "node.h"
 
 #define PARSER
-#define YYSTACK_ALLOC	malloc
+#define YYSTACK_ALLOC	GC_malloc
 %}
 
 %token PUBLIC	1
