@@ -1,7 +1,7 @@
 /*
     module  : node.c
-    version : 1.2
-    date    : 12/09/17
+    version : 1.3
+    date    : 12/12/17
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,8 +18,10 @@ int compiling, debugging;
 Stack *theStack;
 Table *theTable;
 
+char *lookup(void (*fun)(void));
+
 /*
-    Add a symbol to the symbol table
+    Add a symbol to the symbol table.
 */
 void addsym(node_t *cur, char *str, int index, node_t *next)
 {
@@ -31,7 +33,7 @@ void addsym(node_t *cur, char *str, int index, node_t *next)
 }
 
 /*
-    Allocate a symbol
+    Allocate a symbol.
 */
 node_t *allocsym(char *str, int index)
 {
@@ -65,7 +67,7 @@ void enterdef(char *str, node_t *next)
 }
 
 /*
-    Search a symbol in the symbol table and return a copy
+    Search a symbol in the symbol table and return a copy.
 */
 node_t *entersym(char *str)
 {
@@ -85,7 +87,7 @@ node_t *entersym(char *str)
 }
 
 /*
-    Allocate a node of type List
+    Allocate a node of type List.
 */
 node_t *newlist(node_t *ptr)
 {
@@ -99,7 +101,7 @@ node_t *newlist(node_t *ptr)
 }
 
 /*
-    Allocate a node of any other type
+    Allocate a node of any other type.
 */
 node_t *newnode(int type, int value)
 {
@@ -113,7 +115,7 @@ node_t *newnode(int type, int value)
 }
 
 /*
-    Concatenate two lists
+    Concatenate two lists.
 */
 node_t *concat(node_t *root, node_t *next)
 {
@@ -128,7 +130,7 @@ node_t *concat(node_t *root, node_t *next)
 }
 
 /*
-    Copy a list
+    Copy a list.
 */
 node_t *copy(node_t *node)
 {
@@ -145,7 +147,7 @@ node_t *copy(node_t *node)
 }
 
 /*
-    Copy a node
+    Copy a node.
 */
 node_t *cons(value_t *node, node_t *next)
 {
@@ -159,7 +161,7 @@ node_t *cons(value_t *node, node_t *next)
 }
 
 /*
-    Copy the stack to a list
+    Copy the stack to a list.
 */
 node_t *stk2lst()
 {
@@ -180,7 +182,7 @@ node_t *stk2lst()
 }
 
 /*
-    Replace the stack by a list
+    Replace the stack by a list.
 */
 void lst2stk(node_t *root)
 {
@@ -195,7 +197,7 @@ void lst2stk(node_t *root)
 }
 
 /*
-    Reverse a list
+    Reverse a list.
 */
 node_t *reverse(node_t *cur)
 {
@@ -211,7 +213,7 @@ node_t *reverse(node_t *cur)
 }
 
 /*
-    Print a factor to screen
+    Print a factor to screen.
 */
 void writefactor(value_t *cur)
 {
@@ -321,7 +323,7 @@ void writefactor(value_t *cur)
 	putchar(']');
 	break;
     case Function:
-	printf("PROC");
+	printf("%s", lookup(cur->fun));
 	break;
     default:
 	fprintf(stderr, "ERROR #6\n");
@@ -330,7 +332,7 @@ void writefactor(value_t *cur)
 }
 
 /*
-    Print a term to screen
+    Print a term to screen.
 */
 void writeterm(node_t *cur)
 {
@@ -347,7 +349,7 @@ void writeterm(node_t *cur)
 }
 
 /*
-    Print the contents of the symbol table
+    Print the contents of the symbol table.
 */
 void dump()
 {
@@ -364,7 +366,7 @@ void dump()
 }
 
 /*
-    Print the contents of stack and program
+    Print the contents of stack and program.
 */
 #ifdef DEBUG
 void debug(node_t *cur)
@@ -406,7 +408,7 @@ void binrec(node_t *first, node_t *second, node_t *third, node_t *fourth)
 }
 
 /*
-    Evaluate a term
+    Evaluate a term.
 */
 void exeterm(node_t *cur)
 {
@@ -621,7 +623,7 @@ void exeterm(node_t *cur)
 }
 
 /*
-    Print and remove the top value of the stack
+    Print and remove the top value of the stack.
 */
 void writestack()
 {
@@ -637,7 +639,7 @@ void writestack()
 }
 
 /*
-   Interprete a term
+   Interprete a term.
 */
 void execute(node_t *cur)
 {
