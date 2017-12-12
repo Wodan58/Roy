@@ -23,7 +23,7 @@ Additions
 In addition to normal interpreter mode, this program offers a -c option that
 compiles to C99.
 
-Two output files are created, demo1.txt and demo2.txt and they are similar.
+Two output files are created, demo1.txt and demo2.txt and they are identical.
 The compiled program starts with an empty symbol table.
 
 Adding a builtin, e.g. SELECT requires modification of the program in 5
