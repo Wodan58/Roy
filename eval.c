@@ -1,7 +1,7 @@
 /*
     module  : eval.c
-    version : 1.2
-    date    : 12/09/17
+    version : 1.3
+    date    : 12/12/17
 */
 #include <stdio.h>
 #include <string.h>
@@ -23,7 +23,12 @@ void printstack(String *str);
 void printterm(node_t *cur, String *str);
 
 static int uniq;
-static String *declhdr, *program, *library;
+static String *declhdr, *program, *library, *symbols;
+
+char *lookup(void (*fun)(void))
+{
+    return "";
+}
 
 void PrintString(String *str, char *tmp)
 {
@@ -90,7 +95,7 @@ void compilelib()
     char *ptr;
     node_t *cur;
     String *str;
-    int changed, maxsym, sym;
+    int changed, maxsym, sym, first = 1;
 
     do {
 	changed = 0;
@@ -109,6 +114,18 @@ void compilelib()
 		PrintString(declhdr, "_");
 		PrintLong(declhdr, cur->uniq);
 		PrintString(declhdr, "(void);\n");
+		if (first) {
+		    first = 0;
+		    PrintString(symbols, "struct {\nvoid (*fun)(void);\n");
+		    PrintString(symbols, "char *str;\n} funTable[] = {\n");
+		}
+		PrintString(symbols, "{ ");
+		PrintString(symbols, ptr);
+		PrintString(symbols, "_");
+		PrintLong(symbols, cur->uniq);
+		PrintString(symbols, ", \"");
+		PrintString(symbols, cur->str);
+		PrintString(symbols, "\" },\n");
 		PrintString(library, "void ");
 		PrintString(library, ptr);
 		PrintString(library, "_");
@@ -119,6 +136,16 @@ void compilelib()
 	    }
 	}
     } while (changed);
+    if (!first) {
+	PrintString(symbols, "{ 0, \"\" } };\n\n");
+	PrintString(symbols, "char *lookup(void (*fun)(void)) {\nint i;\n");
+	PrintString(symbols, "for (i = 0; funTable[i].fun; i++)\n");
+	PrintString(symbols, "if (fun == funTable[i].fun) break;\n");
+	PrintString(symbols, "return funTable[i].str;\n}\n");
+    } else {
+	PrintString(symbols, "char *lookup(void (*fun)(void)) {\n");
+	PrintString(symbols, "return \"\";\n}\n");
+    }
 }
 
 /*
@@ -137,9 +164,13 @@ void exitcompile(void)
     *ptr = 0;
     ptr = vec_push(library);
     *ptr = 0;
+    ptr = vec_push(symbols);
+    *ptr = 0;
     ptr = vec_index(declhdr, 0);
     if (*ptr)
 	printf("%s\n", ptr);
+    ptr = vec_index(symbols, 0);
+    printf("%s\n", ptr);
     printf("int main() {\nvec_init(theStack);\n");
     printf("%sreturn 0; }\n", vec_index(program, 0));
     ptr = vec_index(library, 0);
@@ -175,6 +206,7 @@ void compile(node_t *cur)
 	vec_init(declhdr);
 	vec_init(program);
 	vec_init(library);
+	vec_init(symbols);
     }
     printterm(cur, program);
 #ifdef DEBUG
@@ -312,6 +344,9 @@ void printfactor(node_t *cur, int list, int *pindex, String *str)
 	*pindex = index + 1;
 	for (cur = cur->ptr; cur; cur = cur->next)
 	    printfactor(cur, list, pindex, str);
+	break;
+    default:
+	fprintf(stderr, "ERROR #0\n");
 	break;
     }
 }
