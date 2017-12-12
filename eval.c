@@ -172,7 +172,8 @@ void exitcompile(void)
     ptr = vec_index(symbols, 0);
     printf("%s\n", ptr);
     printf("int main() {\nvec_init(theStack);\n");
-    printf("%sreturn 0; }\n", vec_index(program, 0));
+    printf("vec_init(theTable);\n%sreturn 0; }\n",
+	   vec_index(program, 0));
     ptr = vec_index(library, 0);
     if (*ptr)
 	printf("\n%s", ptr);
