@@ -1,9 +1,9 @@
 Coy
 ---
 
-Build|Linux|Windows
----|---|---
-status|[![Travis CI build status](https://travis-ci.org/Wodan58/Coy.svg?branch=master)](https://travis-ci.org/Wodan58/Coy)|[![AppVeyor CI build status](https://ci.appveyor.com/api/projects/status/github/Wodan58/Coy?branch=master&svg=true)](https://ci.appveyor.com/project/Wodan58/Coy)
+Build|Linux|Windows|Coverity
+---|---|---|---
+status|[![Travis CI build status](https://travis-ci.org/Wodan58/Coy.svg?branch=master)](https://travis-ci.org/Wodan58/Coy)|[![AppVeyor CI build status](https://ci.appveyor.com/api/projects/status/github/Wodan58/Coy?branch=master&svg=true)](https://ci.appveyor.com/project/Wodan58/Coy)|<a href="https://scan.coverity.com/projects/wodan58-coy"><img alt="Coverity Scan Build Status" src="https://scan.coverity.com/projects/14634/badge.svg"/></a>
 
 This is a reimplementation of [42minjoy](https://github.com/Wodan58/42minjoy).
 This project depends on the [BDW garbage collector](https://github.com/ivmai/bdwgc).
