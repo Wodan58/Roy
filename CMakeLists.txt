@@ -15,8 +15,7 @@ endif()
 add_definitions(-DGC_NOT_DLL -D_CRT_SECURE_NO_WARNINGS -DBIT_32)
 if(WIN32)
 else()
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0")     # debug, no optimisation
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage") # enabling coverage
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 --coverage")            # debug, no optimisation
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage") # enabling coverage
 endif()
 include_directories(bdwgc/include)
