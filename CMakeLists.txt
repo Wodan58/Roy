@@ -17,7 +17,7 @@ if(WIN32)
 else()
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0")     # debug, no optimisation
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage") # enabling coverage
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lgcov") # enabling coverage
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage") # enabling coverage
 endif()
 include_directories(bdwgc/include)
 add_subdirectory(bdwgc)
