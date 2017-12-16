@@ -3,7 +3,7 @@
 #
 cmake_minimum_required(VERSION 3.0)
 project(Coy)
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 find_package(BISON)
 BISON_TARGET(MyParser parse.y parse.c)
 find_package(FLEX)
@@ -13,6 +13,11 @@ else()
 FLEX_TARGET(MyScanner lexer.l lexer.c)
 endif()
 add_definitions(-DGC_NOT_DLL -D_CRT_SECURE_NO_WARNINGS -DBIT_32)
+if(WIN32)
+else()
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0")     # debug, no optimisation
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage") # enabling coverage
+endif()
 include_directories(bdwgc/include)
 add_subdirectory(bdwgc)
 add_executable(joy main.c ${BISON_MyParser_OUTPUTS} ${FLEX_MyScanner_OUTPUTS}
