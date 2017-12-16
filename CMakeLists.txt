@@ -17,31 +17,20 @@ if(WIN32)
 else()
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0")     # debug, no optimisation
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage") # enabling coverage
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lgcov") # enabling coverage
 endif()
 include_directories(bdwgc/include)
 add_subdirectory(bdwgc)
 add_executable(joy main.c ${BISON_MyParser_OUTPUTS} ${FLEX_MyScanner_OUTPUTS}
 		node.c eval.c memory.c)
-if(WIN32)
-target_link_libraries(joy gc-lib)
-else()
-target_link_libraries(joy gc-lib gcov)
-endif()		
+target_link_libraries(joy gc-lib)	
 add_executable(fib fib.c ${FLEX_MyScanner_OUTPUTS} node.c memory.c)
-if(WIN32)
 target_link_libraries(fib gc-lib)
-else()
-target_link_libraries(fib gc-lib gcov)
-endif()	
 add_custom_command(OUTPUT fib.c
 		   COMMAND joy -c <fib.joy >fib.c
 		   DEPENDS joy fib.joy)
 add_executable(run run.c ${FLEX_MyScanner_OUTPUTS} node.c memory.c)
-if(WIN32)
 target_link_libraries(run gc-lib)
-else()
-target_link_libraries(run gc-lib gcov)
-endif()	
 add_custom_command(OUTPUT run.c
 		   COMMAND joy -c <tutorial.joy >run.c
 		   DEPENDS joy tutorial.joy)
