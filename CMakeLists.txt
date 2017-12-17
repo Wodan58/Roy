@@ -27,13 +27,15 @@ add_executable(fib fib.c ${FLEX_MyScanner_OUTPUTS} node.c memory.c)
 target_link_libraries(fib gc-lib)
 add_custom_command(OUTPUT fib.c
 		   COMMAND joy -c <fib.joy >fib.c
-		   DEPENDS joy fib.joy)
+		   DEPENDS joy)
 add_executable(run run.c ${FLEX_MyScanner_OUTPUTS} node.c memory.c)
 target_link_libraries(run gc-lib)
 add_custom_command(OUTPUT run.c
 		   COMMAND joy -c <tutorial.joy >run.c
-		   DEPENDS joy tutorial.joy)
+		   DEPENDS joy)
 add_custom_target(demo1.txt ALL
-		  COMMAND joy <tutorial.joy >demo1.txt)
+		  COMMAND joy <tutorial.joy >demo1.txt
+		  DEPENDS joy)
 add_custom_target(demo2.txt ALL
-		  COMMAND run >demo2.txt)
+		  COMMAND run >demo2.txt
+		  DEPENDS run)
