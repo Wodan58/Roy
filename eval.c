@@ -1,7 +1,7 @@
 /*
     module  : eval.c
     version : 1.3
-    date    : 12/12/17
+    date    : 12/24/17
 */
 #include <stdio.h>
 #include <string.h>
@@ -303,17 +303,12 @@ void printfactor(node_t *cur, int list, int *pindex, String *str)
 	*pindex = index + 1;
 	break;
     case Boolean:
-	type = "Boolean";
     case Char:
-	if (!type)
-	    type = "Char";
     case Int:
-	if (!type)
-	    type = "Int";
 	P("{.num=");
 	L(cur->num);
 	P(",.type=");
-	P(type);
+	L(cur->type);
 	if (cur->next) {
 	    P(",.next=L");
 	    L(list);
@@ -479,7 +474,7 @@ void printterm(node_t *cur, String *str)
 		printstack(str);
 		P("/* GET */ { value_t *top;\n");
 		P("top = vec_push(theStack);\n");
-		P("top->type =");
+		P("top->type = ");
 		L(yylex());
 		P(";\ntop->num = ");
 		L(yylval.num);
@@ -876,19 +871,14 @@ void printnode(value_t *cur, String *str)
 
     switch (cur->type) {
     case Boolean:
-	type = "Boolean";
     case Char:
-	if (!type)
-	    type = "Char";
     case Int:
-	if (!type)
-	    type = "Int";
 	P("{ value_t *top;\n");
 	P("top = vec_push(theStack);\n");
 	P("top->num = ");
 	L(cur->num);
 	P(";\ntop->type = ");
-	P(type);
+	L(cur->type);
 	P("; }\n");
 	break;
     case List:
