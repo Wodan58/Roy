@@ -28,4 +28,4 @@ Two output files are created, demo1.txt and demo2.txt and they are identical.
 Adding a builtin, e.g. SELECT requires modification of the program in 5
 separate locations.
 
-<img src="Coy.png" alt="picture" width="100" />
+<img src="Coy.png" alt="picture" width="1000" />
