@@ -16,7 +16,7 @@ addons:
       name: "Wodan58/Coy"
       description: "Build submitted via Travis CI"
     notification_email: r.wiersma26@kpnplanet.nl
-    build_command_prepend: "make clean"
+    build_command_prepend: "git clone https://github.com/ivmai/bdwgc.git; cmake -G "Unix Makefiles"; make clean"
     build_command: "make"
     branch_pattern: master
     
