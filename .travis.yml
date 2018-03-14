@@ -1,31 +1,10 @@
 language: c
 compiler: gcc
-
-env:
-  global:
-   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
-   #   via the "travis encrypt" command using the project repo's public key
-   - secure: "xHlngvTBgUgo76Ta+cpypVWVfTeAj9nd4RNFZzpilqAO73gA19iTqo2hzwKX1lpyC2A8l2U8N0PM7rGZOtC+IzfR9DMdWXo8JlJcZSLbyDvz7fssnZbkAAetFEOJ4afrdtIiboAtcDjZZJ9QFcOukDfPAgZJCuJnVZ4fixXPYioarMn338rvdULFOrwyx1aluT/I0P24EAY8WcQ4mFpATUfUq9tZomsl+CPibw0+r2nkKKQwtTugJoz4l0SrboR3s75h6m+RVEBbYdTpQYB7lIlWt1bUKQwU0Rhuzg7eSOdJ8JCj8bpGHhwR87BdDmREfLB7ruijEUGJQZ+J86per/POZ44guo+2FqsaEJ4arZ9OdqLScBSqHlpiIcO1iWbIYvwmKF/faz+EbAlgcG4pewWqhErSAwrRxkFGnOvVtMgBKNNgTGGIAN3RM1ocK1VN6opdGtqxdaOZnbXP5jnqGnH7Oqvamh+SQFqmuj7NZHPoZvpcJyiGLuBCc+LFlRuRvJyppUybPPAD7wgylpccT4CBUEwvYM7QNRMGEXVwT/FG9kfh6hILiksOphG6r7rN0HWz/ui/tCUJX9PutFCdMCdOO+6zuryDDqufmmr6LT7t6sjmwMlSDXJ6CxYT5IpUOvyXk6OcvKfNlfefhIFnqcM/xTU/CsNu8RsOouaNAWk="
-
-before_install:
-      - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
-
-addons:
-  coverity_scan:
-    project:
-      name: "Wodan58/Coy"
-      description: "Build submitted via Travis CI"
-    notification_email: r.wiersma26@kpnplanet.nl
-    build_command_prepend: "make clean"
-    build_command: "make"
-    branch_pattern: master
     
 install:
-# install latest LCOV (1.9 was failing for me) [1]
   - wget http://ftp.de.debian.org/debian/pool/main/l/lcov/lcov_1.11.orig.tar.gz
   - tar xf lcov_1.11.orig.tar.gz
   - sudo make -C lcov-1.11/ install
-# install lcov to coveralls conversion + upload tool
   - gem install coveralls-lcov
   - lcov --version 
   - gcc --version
