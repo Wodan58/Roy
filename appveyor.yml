@@ -25,4 +25,4 @@ build_script:
   - git clone https://github.com/ivmai/bdwgc.git
   - cmake -G "NMake Makefiles"
   - cmake --build . --config Release
-  - ls -l | awk '{ print($5, $9); }' | sort -n
+  - ls -l | awk '{ print($5, $9); }'
