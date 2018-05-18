@@ -25,4 +25,5 @@ build_script:
   - git clone https://github.com/ivmai/bdwgc.git
   - cmake -G "NMake Makefiles"
   - cmake --build . --config Release
-  - ls -l | awk '{ print($5, $9); }'
+  - ls -1Q *.c | sed 's/^/#include /' >includes.c
+  - cat includes.c
