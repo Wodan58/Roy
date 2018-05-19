@@ -25,6 +25,6 @@ build_script:
   - git clone https://github.com/ivmai/bdwgc.git
   - cmake -G "NMake Makefiles"
   - cmake --build . --config Release
-  - PATH=usr\local\wbin;%PATH%
+  - PATH=UnxUtils\usr\local\wbin;%PATH%
   - ls -1Q *.c | sed 's/^/#include /' >includes.c
   - cat includes.c
