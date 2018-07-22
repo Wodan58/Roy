@@ -1,89 +1,185 @@
 /*
     module  : node.c
-    version : 1.3
-    date    : 12/12/17
+    version : 1.5
+    date    : 07/22/18
 */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "joygc.h"
-#include "parse.h"
 #include "node.h"
+#include "parse.h"
+#include "builtin.h"
 
-// #define DEBUG
-
+/* global variables */
 int compiling, debugging;
 
 /* dynamic arrays */
 Stack *theStack;
 Table *theTable;
 
-char *lookup(void (*fun)(void));
+/* local functions */
+static void dump(void);
 
 /*
-    Add a symbol to the symbol table.
-*/
-void addsym(node_t *cur, char *str, int index, node_t *next)
+ * Add a symbol to the symbol table.
+ */
+static symbol_t *addsym(char *str)
 {
-    memset(cur, 0, sizeof(node_t));
-    cur->str = str;
-    cur->type = Defined;
-    cur->index = index;
-    cur->next = next;
-}
+    symbol_t *cur;
 
-/*
-    Allocate a symbol.
-*/
-node_t *allocsym(char *str, int index)
-{
-    node_t *cur;
-
-    if ((cur = mem_alloc()) == 0)
-	return 0;
+    cur = vec_push(theTable);
     cur->str = str;
-    cur->type = Defined;
-    cur->index = index;
+    cur->ptr = 0;
+    cur->type = cur->uniq = cur->mark = cur->recur = 0;
+    cur->print = 0;
     return cur;
 }
 
 /*
-    Enter a symbol in the symbol table, if it is not already there.
-*/
-void enterdef(char *str, node_t *next)
+ * Initialise the symbol table with builtins.
+ */
+static void initsym(void)
 {
-    int sym;
-    node_t *cur;
+    symbol_t *cur;
 
-    for (sym = vec_size(theTable) - 1; sym >= 0; sym--) {
-	cur = vec_index(theTable, sym);
-	if (!strcmp(cur->str, str)) {
-	    cur->next = next;
-	    return;
-	}
-    }
-    cur = vec_push(theTable);
-    addsym(cur, str, vec_size(theTable) - 1, next);
+    vec_init(theTable);
+
+    cur = addsym("+");
+    cur->type = Builtin;
+    cur->proc = do_add;
+    cur->print = "add";
+
+    cur = addsym("*");
+    cur->type = Builtin;
+    cur->proc = do_mul;
+    cur->print = "mul";
+
+    cur = addsym("=");
+    cur->type = Builtin;
+    cur->proc = do_eql;
+    cur->print = "eql";
+
+    cur = addsym("<");
+    cur->type = Builtin;
+    cur->proc = do_lss;
+    cur->print = "lss";
+
+    cur = addsym("swap");
+    cur->type = Builtin;
+    cur->proc = do_swap;
+
+    cur = addsym("true");
+    cur->type = Builtin;
+    cur->proc = do_true;
+
+    cur = addsym("false");
+    cur->type = Builtin;
+    cur->proc = do_false;
+
+    cur = addsym("and");
+    cur->type = Builtin;
+    cur->proc = do_and;
+
+    cur = addsym("or");
+    cur->type = Builtin;
+    cur->proc = do_or;
+
+    cur = addsym("not");
+    cur->type = Builtin;
+    cur->proc = do_not;
+
+    cur = addsym("step");
+    cur->type = Builtin;
+    cur->proc = do_step;
+
+    cur = addsym("cons");
+    cur->type = Builtin;
+    cur->proc = do_cons;
+
+    cur = addsym("dip");
+    cur->type = Builtin;
+    cur->proc = do_dip;
+
+    cur = addsym("i");
+    cur->type = Builtin;
+    cur->proc = do_i;
+
+    cur = addsym("dup");
+    cur->type = Builtin;
+    cur->proc = do_dup;
+
+    cur = addsym("uncons");
+    cur->type = Builtin;
+    cur->proc = do_uncons;
+
+    cur = addsym("pop");
+    cur->type = Builtin;
+    cur->proc = do_pop;
+
+    cur = addsym("index");
+    cur->type = Builtin;
+    cur->proc = do_index;
+
+    cur = addsym("put");
+    cur->type = Builtin;
+    cur->proc = do_put;
+
+    cur = addsym("get");
+    cur->type = Builtin;
+    cur->proc = do_get;
+
+    cur = addsym("-");
+    cur->type = Builtin;
+    cur->proc = do_sub;
+    cur->print = "sub";
+
+    cur = addsym("/");
+    cur->type = Builtin;
+    cur->proc = do_div;
+    cur->print = "div";
+
+    cur = addsym("stack");
+    cur->type = Builtin;
+    cur->proc = do_stack;
+
+    cur = addsym("unstack");
+    cur->type = Builtin;
+    cur->proc = do_unstack;
+
+    cur = addsym("body");
+    cur->type = Builtin;
+    cur->proc = do_body;
 }
 
 /*
-    Search a symbol in the symbol table and return a copy.
+    Search a symbol in the symbol table.
+    Create a new entry when not found.
+    Return the index in the symbol table.
 */
-node_t *entersym(char *str)
+int enterdef(char *str, node_t *ptr)
 {
+    static int first;
     int sym;
-    node_t *cur;
+    symbol_t *cur;
 
+    if (!first) {
+	first = 1;
+	initsym();
+    }
     for (sym = vec_size(theTable) - 1; sym >= 0; sym--) {
 	cur = vec_index(theTable, sym);
-	if (!strcmp(cur->str, str))
-	    return allocsym(str, cur->index);
+	if (!strcmp(cur->str, str)) {
+	    if (ptr) {
+		cur->ptr = ptr;
+		cur->type = Defined;
+	    }
+	    return sym;
+	}
     }
-    cur = vec_push(theTable);
-    cur->str = str;
+    cur = addsym(str);
+    cur->ptr = ptr;
     cur->type = Defined;
-    cur->index = vec_size(theTable) - 1;
-    return allocsym(str, cur->index);
+    return vec_size(theTable) - 1;
 }
 
 /*
@@ -117,6 +213,7 @@ node_t *newnode(int type, int value)
 /*
     Concatenate two lists.
 */
+#if 0
 node_t *concat(node_t *root, node_t *next)
 {
     node_t *cur = root;
@@ -128,6 +225,7 @@ node_t *concat(node_t *root, node_t *next)
     }
     return root;
 }
+#endif
 
 /*
     Copy a list.
@@ -155,7 +253,8 @@ node_t *cons(value_t *node, node_t *next)
 
     if ((cur = mem_alloc()) == 0)
 	return 0;
-    memcpy(cur, node, sizeof(value_t));
+    cur->ptr = node->ptr;
+    cur->type = node->type;
     cur->next = next;
     return cur;
 }
@@ -163,7 +262,7 @@ node_t *cons(value_t *node, node_t *next)
 /*
     Copy the stack to a list.
 */
-node_t *stk2lst()
+node_t *stk2lst(void)
 {
     value_t *top;
     int stk, max_stk;
@@ -174,7 +273,8 @@ node_t *stk2lst()
 	if ((cur = mem_alloc()) == 0)
 	    return 0;
 	top = vec_index(theStack, stk);
-	memcpy(cur, top, sizeof(value_t));
+	cur->ptr = top->ptr;
+	cur->type = top->type;
 	cur->next = root;
 	root = cur;
     }
@@ -192,7 +292,8 @@ void lst2stk(node_t *root)
     vec_clear(theStack);
     for (cur = reverse(root); cur; cur = cur->next) {
 	top = vec_push(theStack);
-	memcpy(top, cur, sizeof(value_t));
+	top->ptr = cur->ptr;
+	top->type = cur->type;
     }
 }
 
@@ -217,116 +318,43 @@ node_t *reverse(node_t *cur)
 */
 void writefactor(value_t *cur)
 {
+    symbol_t *tmp;
+
     switch (cur->type) {
-    case Symbol:
-	switch (cur->num) {
-	case AND:
-	    printf("and");
-	    break;
-	case BODY:
-	    printf("body");
-	    break;
-	case CONS:
-	    printf("cons");
-	    break;
-	case DIP:
-	    printf("dip");
-	    break;
-	case DUP:
-	    printf("dup");
-	    break;
-	case GET:
-	    printf("get");
-	    break;
-	case I:
-	    printf("i");
-	    break;
-	case INDEX:
-	    printf("index");
-	    break;
-	case NOT:
-	    printf("not");
-	    break;
-	case NOTHING:
-	    printf("nothing");
-	    break;
-	case OR:
-	    printf("or");
-	    break;
-	case POP:
-	    printf("pop");
-	    break;
-	case PUT:
-	    printf("put");
-	    break;
-	case SAMETYPE:
-	    printf("sametype");
-	    break;
-	case SMALL:
-	    printf("small");
-	    break;
-	case PRED:
-	    printf("pred");
-	    break;
-	case BINREC:
-	    printf("binrec");
-	    break;
-	case SELECT:
-	    printf("select");
-	    break;
-	case STACK:
-	    printf("stack");
-	    break;
-	case STEP:
-	    printf("step");
-	    break;
-	case SWAP:
-	    printf("swap");
-	    break;
-	case UNCONS:
-	    printf("uncons");
-	    break;
-	case UNSTACK:
-	    printf("unstack");
-	    break;
-	case '*':
-	case '+':
-	case '-':
-	case '/':
-	case '<':
-	case '=':
-	    printf("%c", cur->num);
-	    break;
-	default:
-	    fprintf(stderr, "ERROR #5\n");
-	    break;
-	}
-	break;
+    case Unknown:
+    case Builtin:
     case Defined:
-	printf("%s", cur->str);
+	tmp = vec_index(theTable, cur->num);
+	printf("%s", tmp->str);
 	break;
+
     case Boolean:
 	printf(cur->num ? "true" : "false");
 	break;
+
     case Char:
 	if (debugging && cur->num == '\n')
 	    printf("'\\10");
 	else
 	    printf("%c", cur->num);
 	break;
+
     case Int:
 	printf("%d", cur->num);
 	break;
+
     case List:
 	putchar('[');
 	writeterm(cur->ptr);
 	putchar(']');
 	break;
+
     case Function:
-	printf("%s", lookup(cur->fun));
+	printf("%s", lookup(cur->proc));
 	break;
+
     default:
-	fprintf(stderr, "ERROR #6\n");
+	fprintf(stderr, "ERROR: unknown type %d in writefactor\n", cur->type);
 	break;
     }
 }
@@ -345,23 +373,6 @@ void writeterm(node_t *cur)
 	if (cur->next)
 	    putchar(' ');
 	cur = cur->next;
-    }
-}
-
-/*
-    Print the contents of the symbol table.
-*/
-void dump()
-{
-    node_t *cur;
-    int sym, max_sym;
-
-    max_sym = vec_size(theTable);
-    for (sym = 0; sym < max_sym; sym++) {
-	cur = vec_index(theTable, sym);
-	printf("%s == ", cur->str);
-	writeterm(cur->next);
-	printf("\n");
     }
 }
 
@@ -385,237 +396,71 @@ void debug(node_t *cur)
     writeterm(cur);
     putchar('\n');
 }
-#endif
 
-void binrec(node_t *first, node_t *second, node_t *third, node_t *fourth)
+void debug1(const char *str)
 {
-    value_t temp, *top;
+    value_t *top;
+    int stk, max_stk;
 
-    exeterm(first);
-    top = vec_pop(theStack);
-    if (top->num)
-	exeterm(second);
-    else {
-	exeterm(third);
-	top = vec_pop(theStack);
-	temp = *top;
-	binrec(first, second, third, fourth);
-	top = vec_push(theStack);
-	*top = temp;
-	binrec(first, second, third, fourth);
-	exeterm(fourth);
+    max_stk = vec_size(theStack);
+    for (stk = 0; stk < max_stk; stk++) {
+	top = vec_index(theStack, stk);
+	writefactor(top);
+	putchar(' ');
     }
+    if (!strncmp(str, "do_", 3))
+	str += 3;
+    printf(". %s\n", str);
 }
+#endif
 
 /*
     Evaluate a term.
 */
 void exeterm(node_t *cur)
 {
-    value_t *deep, *down;
-    value_t temp, *sub, *top;
-    node_t *tmp /* list */,
-	   *ptr /* program */;
+    short type;
+    value_t *top;
+    symbol_t *tmp;
 
     while (cur) {
+	type = cur->type;
 #ifdef DEBUG
-	debug(cur);
+	if (debugging)
+	    debug(cur);
 #endif
-	switch (cur->type) {
-	case Symbol:
-	    switch (cur->num) {
-	    case AND:
-		top = vec_pop(theStack);
-		sub = vec_top(theStack);
-		sub->num &= top->num;
-		sub->type = Boolean;
-		break;
-	    case BODY:
-		top = vec_top(theStack);
-		tmp = vec_index(theTable, top->index);
-		top->ptr = tmp->next;
-		top->type = List;
-		break;
-	    case CONS:
-		top = vec_pop(theStack);
-		sub = vec_top(theStack);
-		if (sub->type == Symbol && sub->num == NOTHING)
-		    *sub = *top;
-		else {
-		    sub->ptr = cons(sub, top->ptr);
-		    sub->type = List;
-		}
-		break;
-	    case DIP:
-		top = vec_pop(theStack);
-		sub = vec_pop(theStack);
-		temp = *sub;
-		exeterm(top->ptr);
-		top = vec_push(theStack);
-		*top = temp;
-		break;
-	    case DUP:
-		top = vec_push(theStack);
-		sub = vec_subtop(theStack);
-		*top = *sub;
-		break;
-	    case GET:
-		top = vec_push(theStack);
-		top->type = yylex();
-		top->ptr = yylval.ptr;
-		break;
-	    case I:
-		top = vec_pop(theStack);
-		exeterm(top->ptr);
-		break;
-	    case INDEX:
-		top = vec_pop(theStack);
-		sub = vec_top(theStack);
-		tmp = top->ptr;
-		if (sub->num)
-		    tmp = tmp->next;
-		memcpy(sub, tmp, sizeof(value_t));
-		break;
-	    case NOT:
-		top = vec_top(theStack);
-		top->num = !top->num;
-		top->type = Boolean;
-		break;
-	    case NOTHING:
-		top = vec_push(theStack);
-		memcpy(top, cur, sizeof(value_t));
-		break;
-	    case OR:
-		top = vec_pop(theStack);
-		sub = vec_top(theStack);
-		sub->num |= top->num;
-		sub->type = Boolean;
-		break;
-	    case POP:
-		(void)vec_pop(theStack);
-		break;
-	    case PUT:
-		top = vec_pop(theStack);
-		writefactor(top);
-		break;
-	    case SAMETYPE:
-		top = vec_pop(theStack);
-		sub = vec_top(theStack);
-		sub->num = sub->type == top->type;
-		sub->type = Boolean;
-		break;
-	    case SMALL:
-		top = vec_top(theStack);
-		top->num = top->num < 2;
-		top->type = Boolean;
-		break;
-	    case PRED:
-		top = vec_top(theStack);
-		top->num--;
-		break;
-	    case BINREC:
-		top = vec_pop(theStack);
-		sub = vec_pop(theStack);
-		down = vec_pop(theStack);
-		deep = vec_pop(theStack);
-		binrec(deep->ptr, down->ptr, sub->ptr, top->ptr);
-		break;
-	    case SELECT:
-		break;
-	    case STACK:
-		tmp = stk2lst();
-		top = vec_push(theStack);
-		top->ptr = tmp;
-		top->type = List;
-		break;
-	    case STEP:
-		top = vec_pop(theStack);
-		sub = vec_pop(theStack);
-		for (ptr = top->ptr, tmp = sub->ptr; tmp; tmp = tmp->next) {
-		    top = vec_push(theStack);
-		    memcpy(top, tmp, sizeof(value_t));
-		    exeterm(ptr);
-		}
-		break;
-	    case SWAP:
-		top = vec_top(theStack);
-		sub = vec_subtop(theStack);
-		temp = *sub;
-		*sub = *top;
-		*top = temp;
-		break;
-	    case UNCONS:
-		top = vec_push(theStack);
-		sub = vec_subtop(theStack);
-		*top = *sub;
-		if ((tmp = top->ptr) == 0) {
-		    sub->num = NOTHING;
-		    sub->type = Symbol;
-		} else {
-		    memcpy(sub, tmp, sizeof(value_t));
-		    top->ptr = tmp->next;
-		}
-		break;
-	    case UNSTACK:
-		top = vec_top(theStack);
-		lst2stk(top->ptr);
-		break;
-	    case '*':
-		top = vec_pop(theStack);
-		sub = vec_top(theStack);
-		sub->num *= top->num;
-		break;
-	    case '+':
-		top = vec_pop(theStack);
-		sub = vec_top(theStack);
-		sub->num += top->num;
-		break;
-	    case '-':
-		top = vec_pop(theStack);
-		sub = vec_top(theStack);
-		sub->num -= top->num;
-		break;
-	    case '/':
-		top = vec_pop(theStack);
-		sub = vec_top(theStack);
-		sub->num /= top->num;
-		break;
-	    case '<':
-		top = vec_pop(theStack);
-		sub = vec_top(theStack);
-		if (sub->type == Defined)
-		    sub->num = strcmp(sub->str, top->str) < 0;
-		else
-		    sub->num = sub->num < top->num;
-		sub->type = Boolean;
-		break;
-	    case '=':
-		top = vec_pop(theStack);
-		sub = vec_top(theStack);
-		sub->num = sub->num == top->num;
-		sub->type = Boolean;
-		break;
-	    default:
-		fprintf(stderr, "ERROR #7\n");
-		break;
-	    }
+again:
+	switch (type) {
+	case Unknown:
+	    tmp = vec_index(theTable, cur->num);
+	    type = tmp->type;
+	    goto again;
+
+	case Builtin:
+	    tmp = vec_index(theTable, cur->num);
+	    (*tmp->proc)();
 	    break;
+
 	case Defined:
-	    tmp = vec_index(theTable, cur->index);
-	    exeterm(tmp->next);
+	    tmp = vec_index(theTable, cur->num);
+	    exeterm(tmp->ptr);
 	    break;
+
 	case Boolean:
 	case Char:
 	case Int:
 	case List:
 	    top = vec_push(theStack);
-	    memcpy(top, cur, sizeof(value_t));
+	    top->ptr = cur->ptr;
+	    top->type = cur->type;
 	    break;
+
 	case Function:
-	    (*cur->fun)();
+	    (*cur->proc)();
 	    break;
+
 	default:
-	    fprintf(stderr, "ERROR #8\n");
+	    fprintf(stderr, "ERROR: unknown type %d in exeterm\n", cur->type);
 	    break;
 	}
 	cur = cur->next;
@@ -625,7 +470,7 @@ void exeterm(node_t *cur)
 /*
     Print and remove the top value of the stack.
 */
-void writestack()
+void writestack(void)
 {
     value_t *cur;
 
@@ -645,4 +490,25 @@ void execute(node_t *cur)
 {
     exeterm(cur);
     writestack();
+}
+
+/*
+    Print the contents of the symbol table.
+*/
+static void dump(void)
+{
+    symbol_t *cur;
+    int sym, max_sym;
+
+    max_sym = vec_size(theTable);
+    for (sym = 0; sym < max_sym; sym++) {
+	cur = vec_index(theTable, sym);
+	printf("%s == ", cur->str);
+	if (cur->type == Defined)
+	    writeterm(cur->ptr);
+	else
+	    printf("%p", cur->proc);
+	printf("\n");
+    }
+    printf("---\n");
 }

@@ -1,16 +1,30 @@
 /*
     module  : main.c
-    version : 1.1
-    date    : 10/23/16
+    version : 1.2
+    date    : 07/22/18
 */
 #include <stdio.h>
-#include <string.h>
+#include <stdlib.h>
 #include "node.h"
 
 int main(int argc, char *argv[])
 {
-    if (argc > 1)
-	if (!strcmp(argv[1], "-c"))
-	    compiling = 1;
+    char *ptr;
+
+    setbuf(stdout, 0);
+    if (argc > 1) {
+	ptr = argv[1];
+	if (*ptr == '-') {
+	    while (*++ptr) {
+		if (*ptr == 'c')
+		    compiling = 1;
+		if (*ptr == 'd')
+		    debugging = 1;
+	    }
+	} else if (!freopen(ptr, "r", stdin)) {
+	    fprintf(stderr, "failed to open the file '%s'.\n", ptr);
+	    exit(1);
+	}
+    }
     return yyparse();
 }

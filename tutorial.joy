@@ -1,7 +1,7 @@
 111 222 + .
 1 2 + 3 4 + * .
 2 2 + 2 2 * = .
-DEFINE	>	== swap < .
+DEFINE > == swap < .
 6 6 * 5 7 * > .
 true false or true and not .
 DEFINE	reverse	== [] swap shunt ;
@@ -13,7 +13,8 @@ DEFINE	concat	== [reverse] c shunt ;
 [peter paul] [mary jane] concat .
 DEFINE	last	== dup rest null
 		   [first] [rest last] branch ;
-	null	== car nothing sametype ;
+#	null	== car nothing sametype ;
+	null	== 0 = ;
 	car	== uncons pop ;
 	first	== uncons pop ;
 	rest	== uncons swap pop ;
@@ -40,7 +41,7 @@ dup length .
 reverse length .
 get get + .
 123 456
-111 222 [+ put] i nl .
+pop pop 111 222 [+ put] i nl .
 111 [put +] reverse 222 swap i nl .
 3 7 100 [*] dip + .
 [1 2 3] [dup * putsp] step nl .
@@ -53,8 +54,8 @@ DEFINE	thrice	== dup [twice] dip i .
 DEFINE	square	== dup * ;
 	times	== dup 0 =
 		   [pop pop]
-		   [[dup [i] dip] dip pred1 times] branch ;
-	pred1	== 1 - .
+		   [[dup [i] dip] dip pred times] branch ;
+	pred	== 1 - .
 2 [square] 0 times .
 2 [square] 1 times .
 2 [square] 2 times .
@@ -83,8 +84,8 @@ DEFINE	unpair	== uncons uncons pop .
 'g .
 [Smith Jones Robinson] last .
 DEFINE	definition == first body .
-[last] definition .
-[Smith Jones Robinson] [last] definition i .
+#[last] definition .
+#[Smith Jones Robinson] [last] definition i .
 DEFINE	cdr	== uncons swap pop ;
 	x	== dup i .
 [Smith Jones Robinson]
@@ -95,18 +96,19 @@ DEFINE	y	== fix i ;
 [Smith Jones Robinson]
 [swap dup rest null [car swap pop] [cdr swap i] branch] y .
 DEFINE	factorial_rec == dup 1 <=
-			 [pop 1] [dup pred1 factorial_rec *]
+			 [pop 1] [dup pred factorial_rec *]
 			 branch ;
 	<=	== succ < ;
 	succ	== 1 + .
 6 factorial_rec .
 DEFINE	rolldown == [swap] dip swap .
-6 [swap dup 1 <= [pop pop 1] [dup pred1 rolldown x *] branch] x .
-6 [swap dup 1 <= [pop pop 1] [dup pred1 rolldown i *] branch] y .
-DEFINE	quicksort == dup small1 []
+6 [swap dup 1 <= [pop pop 1] [dup pred rolldown x *] branch] x .
+6 [swap dup 1 <= [pop pop 1] [dup pred rolldown i *] branch] y .
+DEFINE	quicksort == dup small []
 		     [partition quicksort [quicksort] dip concat]
 		     branch ;
-	small1	  == uncons null swap pop ;
+#	small == uncons null swap pop ;
+	small == dup null [ [ uncons null ] [ true ] ] index i swap pop ;
 	partition == [[][]] dip dup [first > [cnos] [swap [cnos]
 		     dip] branch] cons [dup] first cnos step ;
 	putln	  == put nl .
@@ -114,8 +116,8 @@ DEFINE	quicksort == dup small1 []
 [5 6 4 7 3 8 2 9 1] quicksort putln .
 [1 2 3 4 5 6 7 8 9] quicksort putln .
 [9 8 7 6 5 4 3 2 1] quicksort putln .
-[quicksort] definition putln .
-DEFINE	quicksort1 == dup small1 []
+#[quicksort] definition putln .
+DEFINE	quicksort1 == dup small []
 		      [partition1 quicksort1 [quicksort1] dip concat]
 		      branch ;
 	partition1 == [[][]] dip dup first [first > [cnos] [swap [cnos]
