@@ -13,19 +13,22 @@ Installation
 
 The BDW garbage collector has to be installed as well as CMake. Then run:
 
-CMake -G "Unix Makefiles"
+CMake -G "Unix Makefiles" or CMake -G "NMake Makefiles"
 
-make
+make or nmake
 
 Additions
 ---------
 
 In addition to normal interpreter mode, this program offers a -c option that
-compiles to C99.
+compiles to C.
 
-Two output files are created, demo1.txt and demo2.txt and they are identical.
+Two output files are created, demo1.txt and demo2.txt; the build process checks
+that they are identical.
 
-Adding a builtin, e.g. SELECT requires modification of the program in 5
-separate locations.
+Adding a builtin, e.g. SELECT requires modification of the program in 3
+separate locations: builtin.c, builtin.h, and node.c
+
+Some builtins are not supported: nothing, sametype, and select.
 
 <img src="Coy.png" alt="picture" width="1000" />
