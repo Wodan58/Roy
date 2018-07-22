@@ -1,6 +1,6 @@
 /*
     module  : eval.c
-    version : 1.5
+    version : 1.6
     date    : 07/22/18
 */
 #include <stdio.h>
@@ -94,6 +94,11 @@ again:
 
     case Defined:
 	tmp = vec_index(theTable, cur->num);
+	if (!tmp->ptr) {
+	    fprintf(fp, "cur->str = \"%s\";\n", tmp->str);
+	    fprintf(fp, "cur->type = Symbol;\n");
+	    break;
+	}
 	if (!tmp->uniq)
 	    tmp->uniq = ++uniq;
 	fprintf(fp, "cur->proc = %s_%d;\n", scramble(tmp->str), tmp->uniq);

@@ -1,6 +1,6 @@
 /*
     module  : builtin.c
-    version : 1.2
+    version : 1.3
     date    : 07/22/18
 */
 #include <stdio.h>
@@ -79,6 +79,10 @@ void do_lss(void)
 	name1 = lookup(sub->proc);
 	name2 = lookup(top->proc);
 	sub->num = strcmp(name1, name2) < 0;
+	break;
+
+    case Symbol:
+	sub->num = strcmp(sub->str, top->str) < 0;
 	break;
 
     default:

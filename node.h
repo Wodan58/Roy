@@ -1,6 +1,6 @@
 /*
     module  : node.h
-    version : 1.4
+    version : 1.5
     date    : 07/22/18
 */
 #include "joygc.h"
@@ -43,6 +43,7 @@ typedef struct symbol_t {
 typedef struct node_t {
     union {
 	int num;
+	char *str;
 	void (*proc)(void);
 	struct node_t *ptr;
     };
@@ -54,6 +55,7 @@ typedef struct node_t {
 typedef struct value_t {
     union {
 	int num;
+	char *str;
 	void (*proc)(void);
 	struct node_t *ptr;
     };

@@ -1,6 +1,6 @@
 /*
     module  : node.c
-    version : 1.5
+    version : 1.6
     date    : 07/22/18
 */
 #include <stdio.h>
@@ -353,6 +353,10 @@ void writefactor(value_t *cur)
 	printf("%s", lookup(cur->proc));
 	break;
 
+    case Symbol:
+	printf("%s", cur->str);
+	break;
+
     default:
 	fprintf(stderr, "ERROR: unknown type %d in writefactor\n", cur->type);
 	break;
@@ -457,6 +461,12 @@ again:
 
 	case Function:
 	    (*cur->proc)();
+	    break;
+
+	case Symbol:
+	    top = vec_push(theStack);
+	    top->str = cur->str;
+	    top->type = cur->type;
 	    break;
 
 	default:
