@@ -27,7 +27,6 @@ add_custom_target(demo1.txt ALL
 		  COMMAND joy <tutorial.joy >demo1.txt
 		  DEPENDS joy tutorial.joy)
 add_custom_target(demo2.txt ALL
-		  COMMAND sh echo '123 456' >input.txt
 		  COMMAND run <input.txt >demo2.txt
 		  DEPENDS run)
 add_custom_target(compare ALL

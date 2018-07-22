@@ -1,6 +1,6 @@
 /*
     module  : eval.c
-    version : 1.4
+    version : 1.5
     date    : 07/22/18
 */
 #include <stdio.h>
@@ -307,7 +307,6 @@ static void compilelib(FILE *fp)
 static void exitcompile(void)
 {
     int ch;
-    char *ptr;
 
     compilelib(library);
     rewind(declhdr);
