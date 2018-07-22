@@ -12,7 +12,7 @@ FLEX_TARGET(MyScanner lexer.l lexer.c COMPILE_FLAGS --wincompat)
 else()
 FLEX_TARGET(MyScanner lexer.l lexer.c)
 endif()
-add_definitions(-ggdb3 -DDEBUG -DGC_NOT_DLL -D_CRT_SECURE_NO_WARNINGS -DBIT_32)
+add_definitions(-DDEBUG -DGC_NOT_DLL -D_CRT_SECURE_NO_WARNINGS -DBIT_32)
 include_directories(bdwgc/include)
 add_subdirectory(bdwgc)
 add_executable(joy main.c ${BISON_MyParser_OUTPUTS} ${FLEX_MyScanner_OUTPUTS}
@@ -27,7 +27,7 @@ add_custom_target(demo1.txt ALL
 		  COMMAND joy <tutorial.joy >demo1.txt
 		  DEPENDS joy tutorial.joy)
 add_custom_target(demo2.txt ALL
-		  COMMAND echo '123 456' >input.txt
+		  COMMAND sh echo '123 456' >input.txt
 		  COMMAND run <input.txt >demo2.txt
 		  DEPENDS run)
 add_custom_target(compare ALL

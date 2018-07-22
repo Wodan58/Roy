@@ -1,6 +1,6 @@
 /*
     module  : builtin.c
-    version : 1.1
+    version : 1.2
     date    : 07/22/18
 */
 #include <stdio.h>
@@ -82,7 +82,7 @@ void do_lss(void)
 	break;
 
     default:
-	fprintf(stderr, "ERROR: unknown type %d in do_lss\n");
+	fprintf(stderr, "ERROR: unknown type %d in do_lss\n", sub->type);
 	break;
     }
     sub->type = Boolean;
