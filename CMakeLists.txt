@@ -16,9 +16,10 @@ add_definitions(-DDEBUG -DGC_NOT_DLL -D_CRT_SECURE_NO_WARNINGS -DBIT_32)
 include_directories(bdwgc/include)
 add_subdirectory(bdwgc)
 add_executable(joy main.c ${BISON_MyParser_OUTPUTS} ${FLEX_MyScanner_OUTPUTS}
-		eval.c node.c memory.c builtin.c)
+		eval.c node.c memory.c builtin.c factor.c)
 target_link_libraries(joy gc-lib)
-add_executable(run run.c ${FLEX_MyScanner_OUTPUTS} node.c memory.c builtin.c)
+add_executable(run run.c ${FLEX_MyScanner_OUTPUTS} node.c memory.c builtin.c
+		factor.c)
 target_link_libraries(run gc-lib)
 add_custom_command(OUTPUT run.c
 		   COMMAND joy -c <tutorial.joy >run.c

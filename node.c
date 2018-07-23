@@ -1,7 +1,7 @@
 /*
     module  : node.c
-    version : 1.6
-    date    : 07/22/18
+    version : 1.7
+    date    : 07/23/18
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -211,6 +211,34 @@ node_t *newnode(int type, int value)
 }
 
 /*
+    Allocate a node of type Symbol.
+*/
+node_t *newsymbol(char *str)
+{
+    node_t *cur;
+
+    if ((cur = mem_alloc()) == 0)
+	return 0;
+    cur->str = str;
+    cur->type = Symbol;
+    return cur;
+}
+
+/*
+    Allocate a node of type Function.
+*/
+node_t *newfunction(void (*proc)(void))
+{
+    node_t *cur;
+
+    if ((cur = mem_alloc()) == 0)
+	return 0;
+    cur->proc = proc;
+    cur->type = Function;
+    return cur;
+}
+
+/*
     Concatenate two lists.
 */
 #if 0
@@ -318,6 +346,7 @@ node_t *reverse(node_t *cur)
 */
 void writefactor(value_t *cur)
 {
+    char *body;
     symbol_t *tmp;
 
     switch (cur->type) {
@@ -350,7 +379,7 @@ void writefactor(value_t *cur)
 	break;
 
     case Function:
-	printf("%s", lookup(cur->proc));
+	printf("%s", lookup(cur->proc, &body));
 	break;
 
     case Symbol:

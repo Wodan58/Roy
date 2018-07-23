@@ -84,8 +84,8 @@ DEFINE	unpair	== uncons uncons pop .
 'g .
 [Smith Jones Robinson] last .
 DEFINE	definition == first body .
-#[last] definition .
-#[Smith Jones Robinson] [last] definition i .
+[last] definition .
+[Smith Jones Robinson] [last] definition i .
 DEFINE	cdr	== uncons swap pop ;
 	x	== dup i .
 [Smith Jones Robinson]
@@ -116,7 +116,7 @@ DEFINE	quicksort == dup small []
 [5 6 4 7 3 8 2 9 1] quicksort putln .
 [1 2 3 4 5 6 7 8 9] quicksort putln .
 [9 8 7 6 5 4 3 2 1] quicksort putln .
-#[quicksort] definition putln .
+[quicksort] definition putln .
 DEFINE	quicksort1 == dup small []
 		      [partition1 quicksort1 [quicksort1] dip concat]
 		      branch ;

@@ -1,7 +1,7 @@
 /*
     module  : node.h
-    version : 1.5
-    date    : 07/22/18
+    version : 1.6
+    date    : 07/23/18
 */
 #include "joygc.h"
 #include "vector.h"
@@ -29,6 +29,12 @@ typedef long long long_t;
 #define NUM_MAX		LONG_MAX
 #endif
 
+/* function table structure (array) */
+typedef struct function_t {
+    void (*proc)(void);
+    char *name, *body;
+} function_t;
+
 /* symbol table structure (array) */
 typedef struct symbol_t {
     char *str, *print;
@@ -36,7 +42,7 @@ typedef struct symbol_t {
 	void (*proc)(void);
 	struct node_t *ptr;
     };
-    short type, uniq, mark, recur;
+    short type, uniq, mark, recur, used;
 } symbol_t;
 
 /* list structure (linked list) */
@@ -84,6 +90,8 @@ int yylex(), yyparse(), yyerror(char *str);
 int enterdef(char *str, node_t *ptr);
 node_t *newlist(node_t *ptr);
 node_t *newnode(int type, int value);
+node_t *newsymbol(char *str);
+node_t *newfunction(void (*proc)(void));
 node_t *copy(node_t *ptr);
 node_t *cons(value_t *node, node_t *next);
 node_t *stk2lst(void);
@@ -98,8 +106,11 @@ void execute(node_t *cur);
 
 /* eval.c */
 void compile(node_t *cur);
-char *lookup(void (*proc)(void));
+char *lookup(void (*proc)(void), char **body);
 
 /* memory.c */
 node_t *mem_alloc(void);
 void mem_free(void);
+
+/* factor.c */
+node_t *parse(char *str);

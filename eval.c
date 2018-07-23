@@ -1,7 +1,7 @@
 /*
     module  : eval.c
-    version : 1.6
-    date    : 07/22/18
+    version : 1.7
+    date    : 07/23/18
 */
 #include <stdio.h>
 #include <string.h>
@@ -11,6 +11,9 @@
 #include "node.h"
 #include "parse.h"
 
+/* runtime symbol table */
+function_t funTable[1];
+
 static int uniq;
 static FILE *declhdr, *program, *library, *symbols;
 
@@ -19,6 +22,12 @@ static char *types[] = {
     "Char",
     "Int"
 };
+
+/* runtime function, dummy local copy */
+char *lookup(void (*proc)(void), char **body)
+{
+    return *body = "unknown";
+}
 
 /*
     Start the output file.
@@ -43,11 +52,11 @@ static char *scramble(char *str)
 {
     int i;
 
-    for (i = 0; str[i]; i++)
+    for (i = 0; str[i]; i++) {
 	if (isalnum(str[i]) || str[i] == '_')
 	    continue;
-	else
-	    return "op";
+	return "op";
+    }
     return str;
 }
 
@@ -87,7 +96,6 @@ again:
 
     case Builtin:
 	tmp = vec_index(theTable, cur->num);
-	tmp->recur = 1;
 	fprintf(fp, "cur->proc = do_%s;\n", tmp->print ? tmp->print : tmp->str);
 	fprintf(fp, "cur->type = Function;\n");
 	break;
@@ -256,6 +264,77 @@ again:
     }
 }
 
+void printbodyterm(node_t *cur, FILE *fp);
+
+void printbodyfactor(value_t *cur, FILE *fp)
+{
+    char *body;
+    short type;
+    symbol_t *tmp;
+
+    type = cur->type;
+again:
+    switch (type) {
+    case Unknown:
+	tmp = vec_index(theTable, cur->num);
+	type = tmp->type;
+	goto again;
+
+    case Builtin:
+    case Defined:
+	tmp = vec_index(theTable, cur->num);
+	if (type == Defined)
+	    tmp->used = 1;
+	fprintf(fp, "%s", tmp->str);
+	break;
+
+    case Boolean:
+	fprintf(fp, cur->num ? "true" : "false");
+	break;
+
+    case Char:
+	fprintf(fp, "'\\%d", cur->num);
+	break;
+
+    case Int:
+	fprintf(fp, "%d", cur->num);
+	break;
+
+    case List:
+	fputc('[', fp);
+	printbodyterm(cur->ptr, fp);
+	fputc(']', fp);
+	break;
+
+    case Function:
+	fprintf(fp, "%s", lookup(cur->proc, &body));
+	break;
+
+    case Symbol:
+	fprintf(fp, "%s", cur->str);
+	break;
+
+    default:
+	fprintf(stderr, "ERROR: unknown type %d in printbodyfactor\n",
+		cur->type);
+	break;
+    }
+}
+
+void printbodyterm(node_t *cur, FILE *fp)
+{
+    value_t temp;
+
+    while (cur) {
+	temp.ptr = cur->ptr;
+	temp.type = cur->type;
+	printbodyfactor(&temp, fp);
+	if (cur->next)
+	    fputc(' ', fp);
+	cur = cur->next;
+    }
+}
+
 /*
     Compile the library.
 */
@@ -269,7 +348,7 @@ static void compilelib(FILE *fp)
 	maxsym = vec_size(theTable);
 	for (changed = sym = 0; sym < maxsym; sym++) {
 	    cur = vec_index(theTable, sym);
-	    if (!cur->mark && cur->uniq) {
+	    if (!cur->mark && (cur->uniq || cur->used)) {
 		cur->mark = changed = 1;
 		name = scramble(cur->str);
 		fprintf(declhdr, "void %s_%d(void);\n", name, cur->uniq);
@@ -278,32 +357,32 @@ static void compilelib(FILE *fp)
 		fprintf(fp, "}\n");
 		if (!first) {
 		    first = 1;
-		    fprintf(symbols, "struct {\nvoid (*fun)(void);\n");
-		    fprintf(symbols, "char *str;\n} funTable[] = {\n");
+		    fprintf(symbols, "function_t funTable[] = {\n");
 		}
-		fprintf(symbols, "{ %s_%d, \"%s\"},\n", name, cur->uniq, name);
+		fprintf(symbols, "{ %s_%d, \"%s\", \"", name, cur->uniq,
+			cur->str);
+		printbodyterm(cur->ptr, symbols);
+		fprintf(symbols, "\" },\n");
 	    }
 	}
     } while (changed);
-    do {
-	for (sym = 0; sym < maxsym; sym++) {
-	    cur = vec_index(theTable, sym);
-	    if (!cur->mark && !cur->uniq && cur->recur) {
-		name = cur->print ? cur->print : cur->str;
-		if (!first) {
-		    first = 1;
-		    fprintf(symbols, "struct {\nvoid (*fun)(void);\n");
-		    fprintf(symbols, "char *str;\n} funTable[] = {\n");
-		}
-		fprintf(symbols, "{ do_%s, \"%s\"},\n", name, cur->str);
+    for (sym = 0; sym < maxsym; sym++) {
+	cur = vec_index(theTable, sym);
+	if (cur->type == Builtin) {
+	    name = cur->print ? cur->print : cur->str;
+	    if (!first) {
+		first = 1;
+		fprintf(symbols, "function_t funTable[] = {\n");
 	    }
+	    fprintf(symbols, "{ do_%s, \"%s\", 0 },\n", name, cur->str);
 	}
-    } while (changed);
+    }
     fprintf(symbols, "{ 0, \"\" }\n};\n");
-    fprintf(symbols, "char *lookup(void (*fun)(void)) {\n");
-    fprintf(symbols, "int i; for (i = 0; funTable[i].fun; i++)\n");
-    fprintf(symbols, "if (fun == funTable[i].fun) break;\n");
-    fprintf(symbols, "return funTable[i].str; }\n");
+    fprintf(symbols, "char *lookup(void (*proc)(void), char **body) {\n");
+    fprintf(symbols, "int i; for (i = 0; funTable[i].proc; i++)\n");
+    fprintf(symbols, "if (funTable[i].proc == proc) break;\n");
+    fprintf(symbols, "*body = funTable[i].body;\n");
+    fprintf(symbols, "return funTable[i].name; }\n");
 }
 
 /*
@@ -355,9 +434,4 @@ void compile(node_t *cur)
 #endif
     printstack(program);
     fprintf(program, "writestack();\n");
-}
-
-char *lookup(void (*proc)(void))
-{
-    return "unknown";
 }

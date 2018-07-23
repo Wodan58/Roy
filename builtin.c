@@ -1,7 +1,7 @@
 /*
     module  : builtin.c
-    version : 1.3
-    date    : 07/22/18
+    version : 1.4
+    date    : 07/23/18
 */
 #include <stdio.h>
 #include <string.h>
@@ -50,11 +50,14 @@ void do_eql(void)
     sub->type = Boolean;
 }
 
+/*
+ * The assumption is that comparison is between similar datatypes.
+ */
 void do_lss(void)
 {
     value_t *top, *sub;
-    char *name1, *name2;
     symbol_t *first, *second;
+    char *name1, *name2, *body;
 
     TRACE;
     top = vec_pop(theStack);
@@ -76,8 +79,8 @@ void do_lss(void)
 	break;
 
     case Function:
-	name1 = lookup(sub->proc);
-	name2 = lookup(top->proc);
+	name1 = lookup(sub->proc, &body);
+	name2 = lookup(top->proc, &body);
 	sub->num = strcmp(name1, name2) < 0;
 	break;
 
@@ -313,10 +316,16 @@ void do_body(void)
 {
     value_t *top;
     symbol_t *tmp;
+    char *name, *body;
 
     TRACE;
     top = vec_top(theStack);
-    tmp = vec_index(theTable, top->num);
-    top->ptr = tmp->ptr;
+    if (top->type == Function) {
+	name = lookup(top->proc, &body);
+	top->ptr = parse(body);
+    } else {
+	tmp = vec_index(theTable, top->num);
+	top->ptr = tmp->ptr;
+    }
     top->type = List;
 }
