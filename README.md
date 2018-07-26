@@ -31,4 +31,4 @@ separate locations: builtin.c, builtin.h, and node.c
 
 Some builtins are not supported: nothing, sametype, and select.
 
-<img src="Coy.png" alt="picture" width="1000" />
+The tutorial uses only 20 builtins.

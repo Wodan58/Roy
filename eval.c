@@ -1,7 +1,7 @@
 /*
     module  : eval.c
-    version : 1.7
-    date    : 07/23/18
+    version : 1.8
+    date    : 07/26/18
 */
 #include <stdio.h>
 #include <string.h>
@@ -11,9 +11,6 @@
 #include "node.h"
 #include "parse.h"
 
-/* runtime symbol table */
-function_t funTable[1];
-
 static int uniq;
 static FILE *declhdr, *program, *library, *symbols;
 
@@ -22,6 +19,9 @@ static char *types[] = {
     "Char",
     "Int"
 };
+
+/* runtime symbol table */
+function_t funTable[1];
 
 /* runtime function, dummy local copy */
 char *lookup(void (*proc)(void), char **body)
@@ -203,6 +203,7 @@ static void printstack(FILE *fp)
 static void printterm(node_t *cur, FILE *fp)
 {
     short type;
+    node_t *ptr;
     value_t *top;
     symbol_t *tmp;
 
@@ -270,6 +271,7 @@ void printbodyfactor(value_t *cur, FILE *fp)
 {
     char *body;
     short type;
+    node_t *ptr;
     symbol_t *tmp;
 
     type = cur->type;
@@ -293,7 +295,7 @@ again:
 	break;
 
     case Char:
-	fprintf(fp, "'\\%d", cur->num);
+	fprintf(fp, "'\\\\%d", cur->num);
 	break;
 
     case Int:
@@ -351,16 +353,25 @@ static void compilelib(FILE *fp)
 	    if (!cur->mark && (cur->uniq || cur->used)) {
 		cur->mark = changed = 1;
 		name = scramble(cur->str);
-		fprintf(declhdr, "void %s_%d(void);\n", name, cur->uniq);
-		fprintf(fp, "void %s_%d(void) {\n", name, cur->uniq);
+		if (cur->uniq) {
+		    fprintf(declhdr, "void %s_%d(void);\n", name, cur->uniq);
+		    fprintf(fp, "void %s_%d(void) {\n", name, cur->uniq);
+		} else {
+		    fprintf(declhdr, "void %s(void);\n", name);
+		    fprintf(fp, "void %s(void) {\n", name);
+		}
 		printterm(cur->ptr, fp);
+		printstack(fp);
 		fprintf(fp, "}\n");
 		if (!first) {
 		    first = 1;
 		    fprintf(symbols, "function_t funTable[] = {\n");
 		}
-		fprintf(symbols, "{ %s_%d, \"%s\", \"", name, cur->uniq,
-			cur->str);
+		if (cur->uniq)
+		    fprintf(symbols, "{ %s_%d, \"%s\", \"", name, cur->uniq,
+			    cur->str);
+		else
+		    fprintf(symbols, "{ %s, \"%s\", \"", name, cur->str);
 		printbodyterm(cur->ptr, symbols);
 		fprintf(symbols, "\" },\n");
 	    }

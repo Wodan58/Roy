@@ -1,3 +1,14 @@
+DEFINE
+and == * ;
+or == + [[false] [true]] index i ;
+not == [[true] [false]] index i ;
+first == uncons pop ;
+rollup == swap [swap] dip ;
+step == [ dup ] dip swap [ ] = [ [ step2 ] [ pop pop ] ] index i ;
+step2 == [ uncons ] dip dup [ swap ] dip [ i ] first rollup [ step ]
+	 cons cons cons cons [ [ ] cons [ first ] first ] dip cons i ;
+dip == swap [ i ] first swap [ ] cons [ first ] cons cons cons i ;
+.
 111 222 + .
 1 2 + 3 4 + * .
 2 2 + 2 2 * = .
@@ -16,7 +27,7 @@ DEFINE	last	== dup rest null
 #	null	== car nothing sametype ;
 	null	== 0 = ;
 	car	== uncons pop ;
-	first	== uncons pop ;
+#	first	== uncons pop ;
 	rest	== uncons swap pop ;
 	branch	== swap pair index i ;
 	pair	== [] cons cons .
@@ -65,7 +76,7 @@ DEFINE	square	== dup * ;
 [7] 10 times stack .
 DEFINE	map	== maprev reverse ;
 	maprev	== [] rollup shuntmap ;
-	rollup	== swap [swap] dip ;
+#	rollup	== swap [swap] dip ;
 	shuntmap == [[cnos] b] cons step .
 [1 2 3] [dup *] map .
 [1 2 3] 0 [dup * +] fold .

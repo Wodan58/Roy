@@ -1,11 +1,12 @@
 /*
     module  : node.c
-    version : 1.7
-    date    : 07/23/18
+    version : 1.8
+    date    : 07/26/18
 */
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
+#include <stdlib.h>
 #include "node.h"
 #include "parse.h"
 #include "builtin.h"
@@ -30,7 +31,8 @@ static symbol_t *addsym(char *str)
     cur = vec_push(theTable);
     cur->str = str;
     cur->ptr = 0;
-    cur->type = cur->uniq = cur->mark = cur->recur = 0;
+    cur->type = 0;
+    cur->uniq = cur->mark = cur->recur = cur->used = 0;
     cur->print = 0;
     return cur;
 }
@@ -44,6 +46,14 @@ static void initsym(void)
 
     vec_init(theTable);
 
+    cur = addsym("false");
+    cur->type = Builtin;
+    cur->proc = do_false;
+
+    cur = addsym("true");
+    cur->type = Builtin;
+    cur->proc = do_true;
+
     cur = addsym("+");
     cur->type = Builtin;
     cur->proc = do_add;
@@ -53,6 +63,16 @@ static void initsym(void)
     cur->type = Builtin;
     cur->proc = do_mul;
     cur->print = "mul";
+
+    cur = addsym("-");
+    cur->type = Builtin;
+    cur->proc = do_sub;
+    cur->print = "sub";
+
+    cur = addsym("/");
+    cur->type = Builtin;
+    cur->proc = do_div;
+    cur->print = "div";
 
     cur = addsym("=");
     cur->type = Builtin;
@@ -67,14 +87,6 @@ static void initsym(void)
     cur = addsym("swap");
     cur->type = Builtin;
     cur->proc = do_swap;
-
-    cur = addsym("true");
-    cur->type = Builtin;
-    cur->proc = do_true;
-
-    cur = addsym("false");
-    cur->type = Builtin;
-    cur->proc = do_false;
 
     cur = addsym("and");
     cur->type = Builtin;
@@ -127,16 +139,6 @@ static void initsym(void)
     cur = addsym("get");
     cur->type = Builtin;
     cur->proc = do_get;
-
-    cur = addsym("-");
-    cur->type = Builtin;
-    cur->proc = do_sub;
-    cur->print = "sub";
-
-    cur = addsym("/");
-    cur->type = Builtin;
-    cur->proc = do_div;
-    cur->print = "div";
 
     cur = addsym("stack");
     cur->type = Builtin;
@@ -202,6 +204,7 @@ node_t *newlist(node_t *ptr)
 node_t *newnode(int type, int value)
 {
     node_t *cur;
+    symbol_t *tmp;
 
     if ((cur = mem_alloc()) == 0)
 	return 0;
@@ -347,6 +350,7 @@ node_t *reverse(node_t *cur)
 void writefactor(value_t *cur)
 {
     char *body;
+    node_t *ptr;
     symbol_t *tmp;
 
     switch (cur->type) {
@@ -373,9 +377,9 @@ void writefactor(value_t *cur)
 	break;
 
     case List:
-	putchar('[');
+	printf("[ ");
 	writeterm(cur->ptr);
-	putchar(']');
+	printf(" ]");
 	break;
 
     case Function:
@@ -455,6 +459,7 @@ void exeterm(node_t *cur)
     short type;
     value_t *top;
     symbol_t *tmp;
+    node_t *ptr, *next;
 
     while (cur) {
 	type = cur->type;
