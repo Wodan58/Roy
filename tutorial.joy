@@ -8,10 +8,10 @@ or == + [[false] [true]] index i ;
 not == [[true] [false]] index i ;
 first == uncons pop ;
 rollup == swap [swap] dip ;
-step == [ dup ] dip swap [ ] = [ [ step2 ] [ pop pop ] ] index i ;
-step2 == [ uncons ] dip dup [ swap ] dip [ i ] first rollup [ step ]
-	 cons cons cons cons [ [ ] cons [ first ] first ] dip cons i ;
-dip == swap [ i ] first swap [ ] cons [ first ] cons cons cons i ;
+step == [dup] dip swap [] = [[step2] [pop pop]] index i ;
+step2 == [uncons] dip dup [swap] dip [i] first rollup [step]
+	 cons cons cons cons [[] cons [first] first] dip cons i ;
+dip == swap [i] first swap [] cons [first] cons cons cons i ;
 * == dup 0 = [[[dup] dip mul2] [pop pop 0]] index i ;
 mul2 == dup 2 < [[[dup [+] dip] dip 1 - mul2] [pop pop]] index i ;
 nothing == -2147483648 ;
@@ -29,6 +29,8 @@ unstack == reverse [clear] dip unstack2 ;
 / == dup 0 = [[[[0] dip] dip div2] [pop pop nothing]] index i ;
 div2 == [dup 2 <] dip swap [[dup [- div3] dip div2] [pop pop]] index i ;
 div3 == dup 0 < [[[1 +] dip] []] index i ;
+true == false 1 + ;
+false == 1 0 < ;
 .
 111 222 + .
 1 2 + 3 4 + * .
