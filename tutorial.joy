@@ -2,6 +2,7 @@ DEFINE
 dup == LET a IN a a END ;
 swap == LET a b IN b a END ;
 pop == LET a IN END ;
+= == - [[true] [false]] index i ;
 and == * ;
 or == + [[false] [true]] index i ;
 not == [[true] [false]] index i ;
@@ -25,6 +26,9 @@ cnos == swap cons ;
 clear == [] clear2 ;
 clear2 == [empty] dip swap [[cons clear2] [pop]] index i ;
 unstack == reverse [clear] dip unstack2 ;
+/ == dup 0 = [[[[0] dip] dip div2] [pop pop nothing]] index i ;
+div2 == [dup 2 <] dip swap [[dup [- div3] dip div2] [pop pop]] index i ;
+div3 == dup 0 < [[[1 +] dip] []] index i ;
 .
 111 222 + .
 1 2 + 3 4 + * .
