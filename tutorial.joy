@@ -11,6 +11,20 @@ step == [ dup ] dip swap [ ] = [ [ step2 ] [ pop pop ] ] index i ;
 step2 == [ uncons ] dip dup [ swap ] dip [ i ] first rollup [ step ]
 	 cons cons cons cons [ [ ] cons [ first ] first ] dip cons i ;
 dip == swap [ i ] first swap [ ] cons [ first ] cons cons cons i ;
+* == dup 0 = [[[dup] dip mul2] [pop pop 0]] index i ;
+mul2 == dup 2 < [[[dup [+] dip] dip 1 - mul2] [pop pop]] index i ;
+nothing == -2147483648 ;
+empty == nothing swap dup nothing = [[[pop] dip false] [pop true]] index i ;
+over == swap dup [swap] dip ;
+unstack2 == dup [] = [[uncons unstack2] [pop]] index i ;
+stack == [] stack2 dup [unstack2] dip reverse ;
+stack2 == [empty] dip swap [[cons stack2] []] index i ;
+reverse	== [] swap shunt ;
+shunt == [cnos] step ;
+cnos == swap cons ;
+clear == [] clear2 ;
+clear2 == [empty] dip swap [[cons clear2] [pop]] index i ;
+unstack == reverse [clear] dip unstack2 ;
 .
 111 222 + .
 1 2 + 3 4 + * .
@@ -18,9 +32,9 @@ dip == swap [ i ] first swap [ ] cons [ first ] cons cons cons i ;
 DEFINE > == swap < .
 6 6 * 5 7 * > .
 true false or true and not .
-DEFINE	reverse	== [] swap shunt ;
-	shunt	== [cnos] step ;
-	cnos	== swap cons .
+#DEFINE	reverse	== [] swap shunt ;
+#	shunt	== [cnos] step ;
+#	cnos	== swap cons .
 [1 2 3 4 5] reverse .
 DEFINE	concat	== [reverse] c shunt ;
 	c	== [swap] dip i .
@@ -75,7 +89,7 @@ DEFINE	square	== dup * ;
 2 [square] 2 times .
 2 [square] 3 times .
 2 [square] 4 times .
-2 [square] 5 times .
+#2 [square] 5 times .
 [7] 10 times stack .
 DEFINE	map	== maprev reverse ;
 	maprev	== [] rollup shuntmap ;

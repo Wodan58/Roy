@@ -31,5 +31,5 @@ separate locations: builtin.c, builtin.h, and node.c
 
 Some builtins are not supported: nothing, sametype, and select.
 
-After redoing dup, swap, and pop with LET expressions, only 17 builtins are
+After redoing dup, swap, and pop with LET expressions, only 14 builtins are
 used in the tutorial.

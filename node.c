@@ -1,6 +1,6 @@
 /*
     module  : node.c
-    version : 1.9
+    version : 1.10
     date    : 07/31/18
 */
 #include <stdio.h>
@@ -528,6 +528,9 @@ void exeterm(node_t *cur)
 #endif
 again:
 	switch (type) {
+	case 0:
+	    break;
+
 	case Unknown:
 	    tmp = vec_index(theTable, cur->num);
 	    type = tmp->type;
@@ -566,7 +569,7 @@ again:
 	    type = 0;
 	    for (ptr = cur->ptr->ptr; ptr; ptr = ptr->next)
 		type++;
-	    if (type > vec_size(theStack))
+	    if (vec_size(theStack) < type)
 		break;
 	    for (ptr = cur->ptr->ptr; ptr; ptr = ptr->next) {
 		tmp = vec_index(theTable, ptr->num);

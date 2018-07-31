@@ -1,6 +1,6 @@
 /*
     module  : eval.c
-    version : 1.9
+    version : 1.10
     date    : 07/31/18
 */
 #include <stdio.h>
@@ -259,7 +259,10 @@ again:
 
 	case Expression:
 	    printstack(fp);
-	    fprintf(fp, "{\n");
+	    type = 0;
+	    for (ptr = cur->ptr->ptr; ptr; ptr = ptr->next)
+		type++;
+	    fprintf(fp, "if (vec_size(theStack) >= %d) {\n", type);
 	    for (ptr = cur->ptr->ptr; ptr; ptr = ptr->next) {
 		tmp = vec_index(theTable, ptr->num);
 		fprintf(fp, "value_t %s = *vec_pop(theStack);\n", tmp->str);
