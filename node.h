@@ -1,7 +1,7 @@
 /*
     module  : node.h
-    version : 1.7
-    date    : 07/26/18
+    version : 1.8
+    date    : 07/31/18
 */
 #include "joygc.h"
 #include "vector.h"
@@ -92,6 +92,8 @@ node_t *newlist(node_t *ptr);
 node_t *newnode(int type, int value);
 node_t *newsymbol(char *str);
 node_t *newfunction(void (*proc)(void));
+node_t *newexpression(node_t *ptr, node_t *next);
+node_t *newparameter(char *str);
 node_t *copy(node_t *node);
 node_t *cons(value_t *node, node_t *next);
 node_t *stk2lst(void);

@@ -1,4 +1,7 @@
 DEFINE
+dup == LET a IN a a END ;
+swap == LET a b IN b a END ;
+pop == LET a IN END ;
 and == * ;
 or == + [[false] [true]] index i ;
 not == [[true] [false]] index i ;

@@ -1,20 +1,27 @@
 %{
 /*
     module  : parse.y
-    version : 1.4
-    date    : 07/22/18
+    version : 1.5
+    date    : 07/31/18
 */
 #include <stdio.h>
 #include "node.h"
+
+static int inlet;
 %}
 
 %token PUBLIC
 %token EQUAL
+%token LET
+%token IN
+%token END
 
 %token Unknown
 %token Builtin
 %token Defined
 %token Function
+%token Expression
+%token Parameter
 
 %token <num> Boolean Char Int
 %token <str> Symbol
@@ -62,11 +69,14 @@ term	: term factor	{ $2->next = $1; $$ = $2; }
 	| factor
 	;
 
-factor	: Symbol	{ $$ = newnode(Unknown, enterdef($1, 0)); }
+factor	: Symbol	{ if (inlet) $$ = newparameter($1); else
+			  $$ = newnode(Unknown, enterdef($1, 0)); }
 	| Boolean	{ $$ = newnode(Boolean, $1); }
 	| Char		{ $$ = newnode(Char, $1); }
 	| Int		{ $$ = newnode(Int, $1); }
 	| list		{ $$ = newlist($1); }
+	| LET { inlet = 1; } term IN opt_term { inlet = 0; } END
+			{ $$ = newexpression($3, $5); }
 	;
 
 list	: '[' opt_term ']'	{ $$ = $2; }

@@ -1,8 +1,8 @@
 %{
 /*
     module  : lexer.l
-    version : 1.4
-    date    : 07/22/18
+    version : 1.5
+    date    : 07/31/18
 */
 #include <string.h>
 #include <stdlib.h>
@@ -21,6 +21,9 @@ symbol		{alpha}{alphanum}*
 
 DEFINE		{ return PUBLIC; }
 ==		{ return EQUAL; }
+LET		{ return LET; }
+IN		{ return IN; }
+END		{ return END; }
 
 '\\[0-9]+	{ yylval.num = atoi(yytext+2); return Char; }
 '.		{ yylval.num = yytext[1]; return Char; }

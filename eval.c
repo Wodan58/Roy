@@ -1,7 +1,7 @@
 /*
     module  : eval.c
-    version : 1.8
-    date    : 07/26/18
+    version : 1.9
+    date    : 07/31/18
 */
 #include <stdio.h>
 #include <string.h>
@@ -257,6 +257,22 @@ again:
 	    top->type = cur->type;
 	    break;
 
+	case Expression:
+	    printstack(fp);
+	    fprintf(fp, "{\n");
+	    for (ptr = cur->ptr->ptr; ptr; ptr = ptr->next) {
+		tmp = vec_index(theTable, ptr->num);
+		fprintf(fp, "value_t %s = *vec_pop(theStack);\n", tmp->str);
+	    }
+	    printterm(cur->ptr->next, fp);
+	    fprintf(fp, "}\n");
+	    break;
+
+	case Parameter:
+	    tmp = vec_index(theTable, cur->num);
+	    fprintf(fp, "*vec_push(theStack) = %s;\n", tmp->str);
+	    break;
+
 	default:
 	    fprintf(stderr, "ERROR: unknown type %d in printterm\n", cur->type);
 	    break;
@@ -314,6 +330,22 @@ again:
 
     case Symbol:
 	fprintf(fp, "%s", cur->str);
+	break;
+
+    case Expression:
+	fprintf(fp, "LET");
+	for (ptr = cur->ptr->ptr; ptr; ptr = ptr->next) {
+	    tmp = vec_index(theTable, ptr->num);
+	    fprintf(fp, " %s", tmp->str);
+	}
+	fprintf(fp, " IN ");
+	printbodyterm(cur->ptr->next, fp);
+	fprintf(fp, " END");
+	break;
+
+    case Parameter:
+	tmp = vec_index(theTable, cur->num);
+	fprintf(fp, "%s", tmp->str);
 	break;
 
     default:

@@ -1,7 +1,7 @@
 /*
     module  : node.c
-    version : 1.8
-    date    : 07/26/18
+    version : 1.9
+    date    : 07/31/18
 */
 #include <stdio.h>
 #include <string.h>
@@ -19,6 +19,7 @@ Stack *theStack;
 Table *theTable;
 
 /* local functions */
+static void initsym(void);
 static void dump(void);
 
 /*
@@ -31,7 +32,7 @@ static symbol_t *addsym(char *str)
     cur = vec_push(theTable);
     cur->str = str;
     cur->ptr = 0;
-    cur->type = 0;
+    cur->type = Unknown;
     cur->uniq = cur->mark = cur->recur = cur->used = 0;
     cur->print = 0;
     return cur;
@@ -160,16 +161,15 @@ static void initsym(void)
 */
 int enterdef(char *str, node_t *ptr)
 {
-    static int first;
     int sym;
     symbol_t *cur;
 
-    if (!first) {
-	first = 1;
+    if (!theTable)
 	initsym();
-    }
     for (sym = vec_size(theTable) - 1; sym >= 0; sym--) {
 	cur = vec_index(theTable, sym);
+	if (cur->type == Parameter)
+	    continue;
 	if (!strcmp(cur->str, str)) {
 	    if (ptr) {
 		cur->ptr = ptr;
@@ -238,6 +238,51 @@ node_t *newfunction(void (*proc)(void))
 	return 0;
     cur->proc = proc;
     cur->type = Function;
+    return cur;
+}
+
+/*
+    Allocate a node of type Expression.
+*/
+node_t *newexpression(node_t *parm, node_t *list)
+{
+    node_t *cur;
+
+    if ((cur = mem_alloc()) == 0)
+	return 0;
+    if ((cur->ptr = mem_alloc()) == 0)
+	return 0;
+    cur->ptr->ptr = parm;
+    cur->ptr->next = list;
+    cur->type = Expression;
+    return cur;
+}
+
+/*
+    Allocate a node of parameter type.
+*/
+node_t *newparameter(char *str)
+{
+    node_t *cur;
+    int sym = -1;
+    symbol_t *tmp;
+
+    if (!theTable)
+	initsym();
+    for (sym = vec_size(theTable) - 1; sym >= 0; sym--) {
+	 tmp = vec_index(theTable, sym);
+	 if (tmp->type == Parameter && !strcmp(tmp->str, str))
+	     break;
+    }
+    if (sym == -1) {
+	tmp = addsym(str);
+	tmp->type = Parameter;
+	sym = vec_size(theTable) - 1;
+    }
+    if ((cur = mem_alloc()) == 0)
+	return 0;
+    cur->num = sym;
+    cur->type = Parameter;
     return cur;
 }
 
@@ -354,9 +399,13 @@ void writefactor(value_t *cur)
     symbol_t *tmp;
 
     switch (cur->type) {
+    case 0:
+	break;
+
     case Unknown:
     case Builtin:
     case Defined:
+    case Parameter:
 	tmp = vec_index(theTable, cur->num);
 	printf("%s", tmp->str);
 	break;
@@ -377,9 +426,9 @@ void writefactor(value_t *cur)
 	break;
 
     case List:
-	printf("[ ");
+	printf("[");
 	writeterm(cur->ptr);
-	printf(" ]");
+	printf("]");
 	break;
 
     case Function:
@@ -388,6 +437,17 @@ void writefactor(value_t *cur)
 
     case Symbol:
 	printf("%s", cur->str);
+	break;
+
+    case Expression:
+	printf("LET");
+	for (ptr = cur->ptr->ptr; ptr; ptr = ptr->next) {
+	    tmp = vec_index(theTable, ptr->num);
+	    printf(" %s", tmp->str);
+	}
+	printf(" IN ");
+	writeterm(cur->ptr->next);
+	printf(" END");
 	break;
 
     default:
@@ -428,8 +488,7 @@ void debug(node_t *cur)
 	writefactor(top);
 	putchar(' ');
     }
-    putchar('.');
-    putchar(' ');
+    printf(". ");
     writeterm(cur);
     putchar('\n');
 }
@@ -457,9 +516,9 @@ void debug1(const char *str)
 void exeterm(node_t *cur)
 {
     short type;
+    node_t *ptr;
     value_t *top;
     symbol_t *tmp;
-    node_t *ptr, *next;
 
     while (cur) {
 	type = cur->type;
@@ -501,6 +560,28 @@ again:
 	    top = vec_push(theStack);
 	    top->str = cur->str;
 	    top->type = cur->type;
+	    break;
+
+	case Expression:
+	    type = 0;
+	    for (ptr = cur->ptr->ptr; ptr; ptr = ptr->next)
+		type++;
+	    if (type > vec_size(theStack))
+		break;
+	    for (ptr = cur->ptr->ptr; ptr; ptr = ptr->next) {
+		tmp = vec_index(theTable, ptr->num);
+		top = vec_pop(theStack);
+		tmp->ptr = top->ptr;
+		tmp->uniq = top->type;
+	    }
+	    exeterm(cur->ptr->next);
+	    break;
+
+	case Parameter:
+	    tmp = vec_index(theTable, cur->num);
+	    top = vec_push(theStack);
+	    top->ptr = tmp->ptr;
+	    top->type = tmp->uniq;
 	    break;
 
 	default:
