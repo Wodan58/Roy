@@ -33,3 +33,5 @@ Some builtins are not supported: nothing, sametype, and select.
 
 After redoing dup, swap, and pop with LET expressions, only 10 builtins are
 used in the tutorial.
+
+Down the Turing tarpit ? See [Underload](esolangs.org/wiki/Underload).

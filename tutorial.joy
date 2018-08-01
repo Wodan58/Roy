@@ -20,7 +20,7 @@ over == swap dup [swap] dip ;
 unstack2 == dup [] = [[uncons unstack2] [pop]] index i ;
 stack == [] stack2 dup [unstack2] dip reverse ;
 stack2 == [empty] dip swap [[cons stack2] []] index i ;
-reverse	== [] swap shunt ;
+reverse == [] swap shunt ;
 shunt == [cnos] step ;
 cnos == swap cons ;
 clear == [] clear2 ;
