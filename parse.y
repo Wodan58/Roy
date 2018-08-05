@@ -1,8 +1,8 @@
 %{
 /*
     module  : parse.y
-    version : 1.5
-    date    : 07/31/18
+    version : 1.6
+    date    : 08/05/18
 */
 #include <stdio.h>
 #include "node.h"
@@ -22,6 +22,7 @@ static int inlet;
 %token Function
 %token Expression
 %token Parameter
+%token Cons
 
 %token <num> Boolean Char Int
 %token <str> Symbol
@@ -77,6 +78,8 @@ factor	: Symbol	{ if (inlet) $$ = newparameter($1); else
 	| list		{ $$ = newlist($1); }
 	| LET { inlet = 1; } term IN opt_term { inlet = 0; } END
 			{ $$ = newexpression($3, $5); }
+	| Symbol ':' Symbol
+			{ $$ = newcons($1, $3); }
 	;
 
 list	: '[' opt_term ']'	{ $$ = $2; }

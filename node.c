@@ -1,7 +1,7 @@
 /*
     module  : node.c
-    version : 1.10
-    date    : 07/31/18
+    version : 1.11
+    date    : 08/05/18
 */
 #include <stdio.h>
 #include <string.h>
@@ -287,6 +287,51 @@ node_t *newparameter(char *str)
 }
 
 /*
+ * Allocate a cons node.
+ */
+node_t *newcons(char *str, char *ptr)
+{
+    node_t *cur;
+    int sym = -1;
+    symbol_t *tmp;
+
+    if (!theTable)
+	initsym();
+    for (sym = vec_size(theTable) - 1; sym >= 0; sym--) {
+	 tmp = vec_index(theTable, sym);
+	 if (tmp->type == Parameter && !strcmp(tmp->str, str))
+	     break;
+    }
+    if (sym == -1) {
+	tmp = addsym(str);
+	tmp->type = Parameter;
+	sym = vec_size(theTable) - 1;
+    }
+    if ((cur = mem_alloc()) == 0)
+	return 0;
+    if ((cur->ptr = mem_alloc()) == 0)
+	return 0;
+    if ((cur->ptr->next = mem_alloc()) == 0)
+	return 0;
+    cur->type = Cons;
+    cur->ptr->num = sym;
+    cur->ptr->type = Parameter;
+    for (sym = vec_size(theTable) - 1; sym >= 0; sym--) {
+	 tmp = vec_index(theTable, sym);
+	 if (tmp->type == Parameter && !strcmp(tmp->str, ptr))
+	     break;
+    }
+    if (sym == -1) {
+	tmp = addsym(ptr);
+	tmp->type = Parameter;
+	sym = vec_size(theTable) - 1;
+    }
+    cur->ptr->next->num = sym;
+    cur->ptr->next->type = Parameter;
+    return cur;
+}
+
+/*
     Concatenate two lists.
 */
 #if 0
@@ -442,12 +487,26 @@ void writefactor(value_t *cur)
     case Expression:
 	printf("LET");
 	for (ptr = cur->ptr->ptr; ptr; ptr = ptr->next) {
-	    tmp = vec_index(theTable, ptr->num);
-	    printf(" %s", tmp->str);
+	    if (ptr->type == Cons) {
+		tmp = vec_index(theTable, ptr->ptr->num);
+		printf(" %s:", tmp->str);
+		tmp = vec_index(theTable, ptr->ptr->next->num);
+		printf("%s", tmp->str);
+	    } else {
+		tmp = vec_index(theTable, ptr->num);
+		printf(" %s", tmp->str);
+	    }
 	}
 	printf(" IN ");
 	writeterm(cur->ptr->next);
 	printf(" END");
+	break;
+
+    case Cons:
+	tmp = vec_index(theTable, cur->ptr->num);
+	printf("%s:", tmp->str);
+	tmp = vec_index(theTable, cur->ptr->next->num);
+	printf("%s", tmp->str);
 	break;
 
     default:
@@ -517,8 +576,8 @@ void exeterm(node_t *cur)
 {
     short type;
     node_t *ptr;
-    value_t *top;
     symbol_t *tmp;
+    value_t *top, node;
 
     while (cur) {
 	type = cur->type;
@@ -528,9 +587,6 @@ void exeterm(node_t *cur)
 #endif
 again:
 	switch (type) {
-	case 0:
-	    break;
-
 	case Unknown:
 	    tmp = vec_index(theTable, cur->num);
 	    type = tmp->type;
@@ -572,10 +628,19 @@ again:
 	    if (vec_size(theStack) < type)
 		break;
 	    for (ptr = cur->ptr->ptr; ptr; ptr = ptr->next) {
-		tmp = vec_index(theTable, ptr->num);
 		top = vec_pop(theStack);
-		tmp->ptr = top->ptr;
-		tmp->uniq = top->type;
+		if (ptr->type == Cons) {
+		    tmp = vec_index(theTable, ptr->ptr->next->num);
+		    tmp->ptr = top->ptr->next;
+		    tmp->uniq = List;
+		    tmp = vec_index(theTable, ptr->ptr->num);
+		    tmp->ptr = top->ptr->ptr;
+		    tmp->uniq = top->ptr->type;
+		} else {
+		    tmp = vec_index(theTable, ptr->num);
+		    tmp->ptr = top->ptr;
+		    tmp->uniq = top->type;
+		}
 	    }
 	    exeterm(cur->ptr->next);
 	    break;
@@ -585,6 +650,17 @@ again:
 	    top = vec_push(theStack);
 	    top->ptr = tmp->ptr;
 	    top->type = tmp->uniq;
+	    break;
+
+	case Cons:
+	    tmp = vec_index(theTable, cur->ptr->next->num);
+	    top = vec_push(theStack);
+	    top->ptr = tmp->ptr;
+	    tmp = vec_index(theTable, cur->ptr->num);
+	    node.ptr = tmp->ptr;
+	    node.type = tmp->uniq;
+	    top->ptr = cons(&node, top->ptr);
+	    top->type = List;
 	    break;
 
 	default:

@@ -1,7 +1,7 @@
 /*
     module  : main.c
-    version : 1.2
-    date    : 07/22/18
+    version : 1.3
+    date    : 08/05/18
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,7 +21,9 @@ int main(int argc, char *argv[])
 		if (*ptr == 'd')
 		    debugging = 1;
 	    }
-	} else if (!freopen(ptr, "r", stdin)) {
+	    ptr = argv[2];
+	}
+        if (ptr && !freopen(ptr, "r", stdin)) {
 	    fprintf(stderr, "failed to open the file '%s'.\n", ptr);
 	    exit(1);
 	}

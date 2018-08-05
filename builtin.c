@@ -1,7 +1,7 @@
 /*
     module  : builtin.c
-    version : 1.4
-    date    : 07/23/18
+    version : 1.5
+    date    : 08/05/18
 */
 #include <stdio.h>
 #include <string.h>
@@ -50,11 +50,10 @@ void do_eql(void)
     sub->type = Boolean;
 }
 
-/*
- * The assumption is that comparison is between similar datatypes.
- */
 void do_lss(void)
 {
+    node_t *tmp;
+    int error = 0;
     value_t *top, *sub;
     symbol_t *first, *second;
     char *name1, *name2, *body;
@@ -67,32 +66,102 @@ void do_lss(void)
     case Char:
     case Int:
     case List:
-	sub->num = sub->num < top->num;
+	switch (top->type) {
+	case Boolean:
+	case Char:
+	case Int:
+	    sub->num = sub->num < top->num;
+	    break;
+	case List:
+	    tmp = top->ptr;
+	    if (sub->num)
+		tmp = tmp->next;
+	    sub->ptr = tmp->ptr;
+	    sub->type = tmp->type;
+	    break;
+	default:
+	    error = 1;
+	    break;
+	}
 	break;
-
     case Unknown:
     case Builtin:
     case Defined:
 	first = vec_index(theTable, sub->num);
-	second = vec_index(theTable, top->num);
-	sub->num = strcmp(first->str, second->str) < 0;
+	name1 = first->str;
+	switch (top->type) {
+	case Unknown:
+	case Builtin:
+	case Defined:
+	    second = vec_index(theTable, top->num);
+	    name2 = second->str;
+	    break;
+	case Function:
+	    name2 = lookup(top->proc, &body);
+	    break;
+	case Symbol:
+	    name2 = top->str;
+	    break;
+	default:
+	    error = 1;
+	    break;
+	}
+	if (!error)
+	    sub->num = strcmp(name1, name2) < 0;
 	break;
-
     case Function:
 	name1 = lookup(sub->proc, &body);
-	name2 = lookup(top->proc, &body);
-	sub->num = strcmp(name1, name2) < 0;
+	switch (top->type) {
+	case Unknown:
+	case Builtin:
+	case Defined:
+	    second = vec_index(theTable, top->num);
+	    name2 = second->str;
+	    break;
+	case Function:
+	    name2 = lookup(top->proc, &body);
+	    break;
+	case Symbol:
+	    name2 = top->str;
+	    break;
+	default:
+	    error = 1;
+	    break;
+	}
+	if (!error)
+	    sub->num = strcmp(name1, name2) < 0;
 	break;
-
     case Symbol:
-	sub->num = strcmp(sub->str, top->str) < 0;
+	name1 = sub->str;
+	switch (top->type) {
+	case Unknown:
+	case Builtin:
+	case Defined:
+	    second = vec_index(theTable, top->num);
+	    name2 = second->str;
+	    break;
+	case Function:
+	    name2 = lookup(top->proc, &body);
+	    break;
+	case Symbol:
+	    name2 = top->str;
+	    break;
+	default:
+	    error = 1;
+	    break;
+	}
+	if (!error)
+	    sub->num = strcmp(name1, name2) < 0;
 	break;
-
     default:
-	fprintf(stderr, "ERROR: unknown type %d in do_lss\n", sub->type);
+	error = 1;
 	break;
     }
-    sub->type = Boolean;
+    if (error)
+	fprintf(stderr, "ERROR: unknown types %d and %d in lss\n",
+		sub->type, top->type);
+    if (top->type != List)
+	sub->type = Boolean;
 }
 
 void do_swap(void)
@@ -199,10 +268,23 @@ void do_dip(void)
 void do_i(void)
 {
     value_t *top;
+    symbol_t *tmp;
+    char *name, *body;
 
     TRACE;
-    top = vec_pop(theStack);
-    exeterm(top->ptr);
+    top = vec_top(theStack);
+    if (top->type == List) {
+	(void)vec_pop(theStack);
+	exeterm(top->ptr);
+    } else if (top->type == Function) {
+	name = lookup(top->proc, &body);
+	top->ptr = parse(body);
+	top->type = List;
+    } else {
+	tmp = vec_index(theTable, top->num);
+	top->ptr = tmp->ptr;
+	top->type = List;
+    }
 }
 
 void do_dup(void)

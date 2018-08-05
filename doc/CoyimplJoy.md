@@ -11,8 +11,8 @@ this can be reduced a little by defining some builtins with the help of others.
 Reduction
 =========
 
-Starting with the end result, only 10 builtins remain: `+`, `-`, `<`, `cons`, `i`,
-`uncons`, `index`, `put`, `get`, `body`.
+Starting with the end result, only 10 builtins remain: `+`, `-`, `<`, `cons`,
+`i`, `uncons`, `index`, `put`, `get`, `body`.
 
 Subtraction, `-`, can be defined with `+`, but this can only result in positive
 numbers:
@@ -27,9 +27,10 @@ smaller number is equal to the larger number; the accumulator then contains the
 difference. For negative numbers a negate operator would be needed and that
 doesn't help to reduce the number of builtins.
 
-`Cons`, `i`, `uncons`, and `index` all work on lists, whereas `<` is polymorphic, except
-that it does not compare lists. It would be possible then to merge `<` and `index`
-into one operator that performs `index` on lists and `<` in all other cases.
+`Cons`, `i`, `uncons`, and `index` all work on lists, whereas `<` is
+polymorphic, except that it does not compare lists. It would be possible then
+to merge `<` and `index` into one operator that performs `index` on lists and
+`<` in all other cases.
 
 `Put` is not really needed, because there is automatic output of the top of the
 stack at the end of a program. And `get` is not really needed, because all input
@@ -44,3 +45,12 @@ first or the second entry of the indexed table. But as it is, `index` already
 uses other values besides `true` in the tutorial and so another method is needed
 to translate values other than `false` into `true`. This seems too much work for
 too little reward. As it is, 10 builtins is small enough.
+
+Further reduction
+=================
+
+Builtins `cons` and `uncons` are incorporated in the LET-expressions.
+Builtins `<` and `index` have been merged into `<`.
+Builtins `i` and `body` have been merged into `i`.
+This merging was possible, because the unmerged variants use different data
+types as input. This brings the number of builtins down to 6.

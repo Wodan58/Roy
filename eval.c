@@ -1,7 +1,7 @@
 /*
     module  : eval.c
-    version : 1.10
-    date    : 07/31/18
+    version : 1.11
+    date    : 08/05/18
 */
 #include <stdio.h>
 #include <string.h>
@@ -202,6 +202,7 @@ static void printstack(FILE *fp)
  */
 static void printterm(node_t *cur, FILE *fp)
 {
+    char *str;
     short type;
     node_t *ptr;
     value_t *top;
@@ -264,8 +265,24 @@ again:
 		type++;
 	    fprintf(fp, "if (vec_size(theStack) >= %d) {\n", type);
 	    for (ptr = cur->ptr->ptr; ptr; ptr = ptr->next) {
-		tmp = vec_index(theTable, ptr->num);
-		fprintf(fp, "value_t %s = *vec_pop(theStack);\n", tmp->str);
+		if (ptr->type == Cons) {
+		    tmp = vec_index(theTable, ptr->ptr->num);
+		    fprintf(fp, "value_t %s;\n", str = tmp->str);
+		    fprintf(fp, "value_t %s_", str);
+		    tmp = vec_index(theTable, ptr->ptr->next->num);
+		    fprintf(fp, "%s = *vec_pop(theStack);\n", tmp->str);
+		    fprintf(fp, "value_t %s;\n", tmp->str);
+		    fprintf(fp, "%s.ptr = %s_%s.ptr->ptr;\n", str, str,
+			    tmp->str);
+		    fprintf(fp, "%s.type = %s_%s.ptr->type;\n", str, str,
+			    tmp->str);
+		    fprintf(fp, "%s.ptr = %s_%s.ptr->next;\n", tmp->str, str,
+			    tmp->str);
+		    fprintf(fp, "%s.type = List;\n", tmp->str);
+		} else {
+		    tmp = vec_index(theTable, ptr->num);
+		    fprintf(fp, "value_t %s = *vec_pop(theStack);\n", tmp->str);
+		}
 	    }
 	    printterm(cur->ptr->next, fp);
 	    fprintf(fp, "}\n");
@@ -274,6 +291,17 @@ again:
 	case Parameter:
 	    tmp = vec_index(theTable, cur->num);
 	    fprintf(fp, "*vec_push(theStack) = %s;\n", tmp->str);
+	    break;
+
+	case Cons:
+	    tmp = vec_index(theTable, cur->ptr->num);
+	    fprintf(fp, "{ value_t %s_", str = tmp->str);
+	    tmp = vec_index(theTable, cur->ptr->next->num);
+	    fprintf(fp, "%s;\n", tmp->str);
+	    fprintf(fp, "%s_%s.ptr = cons(&%s, %s.ptr);\n", str, tmp->str,
+							    str, tmp->str);
+	    fprintf(fp, "%s_%s.type = List;\n", str, tmp->str);
+	    fprintf(fp, "*vec_push(theStack) = %s_%s; }\n", str, tmp->str);
 	    break;
 
 	default:
@@ -338,8 +366,15 @@ again:
     case Expression:
 	fprintf(fp, "LET");
 	for (ptr = cur->ptr->ptr; ptr; ptr = ptr->next) {
-	    tmp = vec_index(theTable, ptr->num);
-	    fprintf(fp, " %s", tmp->str);
+	    if (ptr->type == Cons) {
+		tmp = vec_index(theTable, ptr->ptr->num);
+		fprintf(fp, " %s:", tmp->str);
+		tmp = vec_index(theTable, ptr->ptr->next->num);
+		fprintf(fp, "%s", tmp->str);
+	    } else {
+		tmp = vec_index(theTable, ptr->num);
+		fprintf(fp, " %s", tmp->str);
+	    }
 	}
 	fprintf(fp, " IN ");
 	printbodyterm(cur->ptr->next, fp);
@@ -348,6 +383,13 @@ again:
 
     case Parameter:
 	tmp = vec_index(theTable, cur->num);
+	fprintf(fp, "%s", tmp->str);
+	break;
+
+    case Cons:
+	tmp = vec_index(theTable, cur->ptr->num);
+	fprintf(fp, " %s:", tmp->str);
+	tmp = vec_index(theTable, cur->ptr->next->num);
 	fprintf(fp, "%s", tmp->str);
 	break;
 
