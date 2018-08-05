@@ -1,7 +1,7 @@
 /*
     module  : factor.c
-    version : 1.1
-    date    : 07/23/18
+    version : 1.2
+    date    : 08/05/18
 */
 #include <stdio.h>
 #include <string.h>
@@ -95,7 +95,7 @@ static node_t *readfactor(char **str, int *type, int *value, char **symbol)
     case Int:
 	return newnode(*type, *value);
     default:
-	break;	/* error */
+	return 0;	/* error */
     }
 }
 

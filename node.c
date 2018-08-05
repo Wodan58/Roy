@@ -1,6 +1,6 @@
 /*
     module  : node.c
-    version : 1.11
+    version : 1.12
     date    : 08/05/18
 */
 #include <stdio.h>
@@ -204,7 +204,6 @@ node_t *newlist(node_t *ptr)
 node_t *newnode(int type, int value)
 {
     node_t *cur;
-    symbol_t *tmp;
 
     if ((cur = mem_alloc()) == 0)
 	return 0;
@@ -574,10 +573,10 @@ void debug1(const char *str)
 */
 void exeterm(node_t *cur)
 {
-    short type;
     node_t *ptr;
     symbol_t *tmp;
     value_t *top, node;
+    unsigned short type;
 
     while (cur) {
 	type = cur->type;

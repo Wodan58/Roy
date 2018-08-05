@@ -1,6 +1,6 @@
 /*
     module  : node.h
-    version : 1.9
+    version : 1.10
     date    : 08/05/18
 */
 #include "joygc.h"
@@ -11,6 +11,7 @@ void debug1(const char *str);
 #ifdef DEBUG
 #ifdef _MSC_VER
 #define __func__	__FUNCTION__
+#pragma warning( disable : 4101 )
 #endif
 #define TRACE		if (debugging) debug1(__func__)
 #else
