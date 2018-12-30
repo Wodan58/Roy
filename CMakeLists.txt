@@ -12,7 +12,7 @@ FLEX_TARGET(MyScanner lexer.l lexer.c COMPILE_FLAGS --wincompat)
 else()
 FLEX_TARGET(MyScanner lexer.l lexer.c)
 endif()
-add_definitions(-DDEBUG -DGC_NOT_DLL -D_CRT_SECURE_NO_WARNINGS -DBIT_32)
+add_definitions(-DGC_NOT_DLL -D_CRT_SECURE_NO_WARNINGS -DBIT_32)
 include_directories(bdwgc/include)
 add_subdirectory(bdwgc)
 add_executable(joy main.c ${BISON_MyParser_OUTPUTS} ${FLEX_MyScanner_OUTPUTS}
