@@ -1,8 +1,11 @@
 /*
     module  : node.h
-    version : 1.10
-    date    : 08/05/18
+    version : 1.11
+    date    : 12/30/18
 */
+#ifndef NODE_H
+#define NODE_H
+
 #include "joygc.h"
 #include "vector.h"
 
@@ -118,3 +121,4 @@ void mem_free(void);
 
 /* factor.c */
 node_t *parse(char *str);
+#endif

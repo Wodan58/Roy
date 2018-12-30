@@ -1,8 +1,11 @@
 /*
     module  : builtin.h
-    version : 1.1
-    date    : 07/22/18
+    version : 1.2
+    date    : 12/30/18
 */
+#ifndef BUILTIN_H
+#define BUILTIN_H
+
 void do_push(short, int);
 void do_add(void);
 void do_mul(void);
@@ -29,3 +32,4 @@ void do_div(void);
 void do_stack(void);
 void do_unstack(void);
 void do_body(void);
+#endif
