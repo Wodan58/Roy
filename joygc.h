@@ -1,17 +1,8 @@
 /*
     module  : joygc.h
-    version : 1.3
-    date    : 07/22/18
+    version : 1.4
+    date    : 03/02/19
 */
-#if 0
-#ifdef DEBUG
-#define MALLOC_DEBUG
-#endif
-
-#include "rmalloc.h"
-#endif
-
-#if 1
 #include "gc.h"
 
 #ifdef strdup
@@ -21,6 +12,5 @@
 #define strdup(x)	GC_strdup(x)
 #define malloc(x)	GC_malloc(x)
 #define calloc(x,y)	GC_malloc((x) * (y))
-#define realloc(x,y)	GC_realloc(x,y)
+#define realloc(x,y)	GC_realloc(x, y)
 #define free(x)
-#endif

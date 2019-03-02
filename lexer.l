@@ -1,8 +1,8 @@
 %{
 /*
     module  : lexer.l
-    version : 1.5
-    date    : 07/31/18
+    version : 1.6
+    date    : 03/02/19
 */
 #include <string.h>
 #include <stdlib.h>
@@ -28,7 +28,7 @@ END		{ return END; }
 '\\[0-9]+	{ yylval.num = atoi(yytext+2); return Char; }
 '.		{ yylval.num = yytext[1]; return Char; }
 [-]?[0-9]+	{ yylval.num = atoi(yytext); return Int; }
-[*+/<=-]	|
+[*+/-]		|
 [<=>]+		|
 {symbol}	{ yylval.str = strdup(yytext); return Symbol; }
 [ \t\n]+	|
