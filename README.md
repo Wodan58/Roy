@@ -13,8 +13,9 @@ Installation
 
 The BDW garbage collector has to be installed as well as CMake. Then run:
 
-    CMake -G "Unix Makefiles" .
-    make
+    ln -s ../bdwgc
+    cmake .
+    cmake --build .
 
 Additions
 ---------
