@@ -1,7 +1,7 @@
 /*
     module  : node.h
-    version : 1.11
-    date    : 12/30/18
+    version : 1.12
+    date    : 04/20/19
 */
 #ifndef NODE_H
 #define NODE_H
@@ -14,7 +14,7 @@ void debug1(const char *str);
 #ifdef DEBUG
 #ifdef _MSC_VER
 #define __func__	__FUNCTION__
-#pragma warning( disable : 4101 )
+#pragma warning( disable : 4101 4146 )
 #endif
 #define TRACE		if (debugging) debug1(__func__)
 #else
