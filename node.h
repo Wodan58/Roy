@@ -1,20 +1,22 @@
 /*
     module  : node.h
-    version : 1.12
+    version : 1.13
     date    : 04/20/19
 */
 #ifndef NODE_H
 #define NODE_H
 
+#ifdef _MSC_VER
+#pragma warning( disable : 4101 4146 )
+#endif
+
 #include "joygc.h"
 #include "vector.h"
 
-void debug1(const char *str);
-
 #ifdef DEBUG
+void debug1(const char *str);
 #ifdef _MSC_VER
 #define __func__	__FUNCTION__
-#pragma warning( disable : 4101 4146 )
 #endif
 #define TRACE		if (debugging) debug1(__func__)
 #else
