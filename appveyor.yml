@@ -12,7 +12,7 @@ environment:
 
 install:
   # install BDWGC and flex/bison
-  - if not exist %BDWGC_ARCHIVE% appveyor DownloadFile "https://github.com/ivmai/bdwgc/archive/master.zip"
+  - if not exist %BDWGC_ARCHIVE% appveyor DownloadFile "https://github.com/ivmai/bdwgc/archive/bdwgc-master.zip"
   - if not exist %WINFLEXBISON_ARCHIVE% appveyor DownloadFile "https://sourceforge.net/projects/winflexbison/files/%WINFLEXBISON_ARCHIVE%"
   - 7z x -y %BDWGC_ARCHIVE%
   - move bdwgc-master bdwgc
