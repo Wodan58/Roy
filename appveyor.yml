@@ -12,11 +12,16 @@ install:
   # install flex/bison
   - if not exist %WINFLEXBISON_ARCHIVE% appveyor DownloadFile "https://sourceforge.net/projects/winflexbison/files/%WINFLEXBISON_ARCHIVE%"
   - 7z x -y %WINFLEXBISON_ARCHIVE%
-  - win_flex --version
-  - win_bison --version
+  - ren win_flex.exe flex.exe
+  - ren win_bison.exe bison.exe
+  - set PATH=.;%PATH%
+  - flex --version
+  - bison --version
  
 build_script:
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"
-  - git clone https://github.com/ivmai/bdwgc.git
-  - cmake -G "NMake Makefiles" . -D FLEX_EXECUTABLE=.\win_flex.exe -D BISON_EXECUTABLE=.\win_bison.exe
+  - wget -O bdwgc.zip "https://github.com/ivmai/bdwgc/archive/master.zip?foo=`date +%s`"
+  - unzip bdwgc.zip
+  - mv bdwgc-master bdwgc
+  - cmake -G "NMake Makefiles" .
   - cmake --build . --config Release
