@@ -3,19 +3,19 @@ version: 1.0.0.{build}
 image: Visual Studio 2017
 
 cache:
-  - bdwgc.zip
+  - gc-8.0.4.tar.gz
   - win_flex_bison-latest.zip
 
 environment:
-  BDWGC_ARCHIVE: bdwgc.zip
+  BDWGC_ARCHIVE: gc-8.0.4.tar.gz
   WINFLEXBISON_ARCHIVE: win_flex_bison-latest.zip
 
 install:
   # install BDWGC and flex/bison
-  - if not exist %BDWGC_ARCHIVE% appveyor DownloadFile "https://github.com/ivmai/bdwgc/archive/bdwgc-master.zip"
+  - if not exist %BDWGC_ARCHIVE% appveyor DownloadFile "https://www.hboehm.info/gc/gc_source/gc-8.0.4.tar.gz"
   - if not exist %WINFLEXBISON_ARCHIVE% appveyor DownloadFile "https://sourceforge.net/projects/winflexbison/files/%WINFLEXBISON_ARCHIVE%"
   - 7z x -y %BDWGC_ARCHIVE%
-  - move bdwgc-master bdwgc
+  - move gc-8.0.4 bdwgc
   - 7z x -y %WINFLEXBISON_ARCHIVE%
   - ren win_flex.exe flex.exe
   - ren win_bison.exe bison.exe
