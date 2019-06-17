@@ -1,3 +1,4 @@
+2do
 cmake_install.cmake
 CMakeCache.txt
 CMakeFiles
@@ -12,3 +13,6 @@ lexer.c
 parse.c
 parse.h
 run.c
+SCCS
+ARCH
+BACKUP
