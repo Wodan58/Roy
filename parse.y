@@ -1,54 +1,52 @@
 %{
 /*
     module  : parse.y
-    version : 1.6
-    date    : 08/05/18
+    version : 1.7
+    date    : 07/08/19
 */
 #include <stdio.h>
-#include "node.h"
+#include "stack.h"
+#include "builtin.h"
 
-static int inlet;
+void initsym(void);		/* symbol.c */
+void enterdef(char *name, Stack *List);
+
+int yylex(void);		/* yylex.c */
+void yyerror(char *str);
+
+void execute(Stack *List);	/* builtin.c */
+void reverse(Stack *List);
 %}
 
 %token PUBLIC
 %token EQUAL
-%token LET
-%token IN
-%token END
-
-%token Unknown
-%token Builtin
-%token Defined
-%token Function
-%token Expression
-%token Parameter
-%token Cons
 
 %token <num> Boolean Char Int
 %token <str> Symbol
 %token <ptr> List
 
-%type <ptr> opt_term term factor list
+%type <num> factor
+%type <ptr> opt_term term list
 
 %union {
-    int num;
     char *str;
-    struct node_t *ptr;
+    Stack *ptr;
+    intptr_t num;
 }
 
 %%
 
 cycle	: cycle def_or_term '.'
-	| /* empty */	{ vec_init(theStack); }
+	| /* empty */	{ initsym(); }
 	;
 
 def_or_term
 	: compound_def
-	| opt_term	{ if (compiling) compile($1); else execute($1); }
+	| opt_term	{ execute($1); do_stop(); }
 	;
 
 compound_def
-	: PUBLIC { definition = 1; } seq_definition { definition = 0; }
+	: PUBLIC seq_definition
 	;
 
 seq_definition
@@ -62,24 +60,19 @@ opt_definition
 	;
 
 opt_term
-	: term		{ $$ = reverse($1); }
+	: term		{ reverse($1); }
 	| /* empty */	{ $$ = 0; }
 	;
 
-term	: term factor	{ $2->next = $1; $$ = $2; }
-	| factor
+term	: term factor	{ vec_add($1, $2); }
+	| factor	{ Stack *List; vec_init(List); vec_add(List, $1); $$ = List; }
 	;
 
-factor	: Symbol	{ if (inlet) $$ = newparameter($1); else
-			  $$ = newnode(Unknown, enterdef($1, 0)); }
-	| Boolean	{ $$ = newnode(Boolean, $1); }
-	| Char		{ $$ = newnode(Char, $1); }
-	| Int		{ $$ = newnode(Int, $1); }
-	| list		{ $$ = newlist($1); }
-	| LET { inlet = 1; } term IN opt_term { inlet = 0; } END
-			{ $$ = newexpression($3, $5); }
-	| Symbol ':' Symbol
-			{ $$ = newcons($1, $3); }
+factor	: Symbol	{ $$ = (intptr_t)$1; }
+	| Boolean
+	| Char
+	| Int
+	| list		{ $$ = (intptr_t)$1; }
 	;
 
 list	: '[' opt_term ']'	{ $$ = $2; }

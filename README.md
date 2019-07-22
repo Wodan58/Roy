@@ -27,11 +27,9 @@ Two output files are created, demo1.txt and demo2.txt; the build process checks
 that they are identical.
 
 Adding a builtin, e.g. SELECT requires modification of the program in 3
-separate locations: builtin.c, builtin.h, and node.c
+separate locations: builtin.c, builtin.h, and symbol.c
 
-Some builtins are not supported: nothing, sametype, and select.
+Some builtins from 42minjoy are not supported: getch, nothing, sametype, and select.
 
-After redoing dup, swap, pop, cons, and uncons with LET expressions, only 5
-builtins are used in the tutorial: -, <, i, get, and put.
-
-Down the Turing tarpit ? See [Underload](https://esolangs.org/wiki/Underload).
+It is possible to reduce the number of builtins further, but that path leads down
+into the Turing tarpit. See [Underload](https://esolangs.org/wiki/Underload).
