@@ -25,7 +25,9 @@ typedef float real_t;
 #error "one of BIT_64 and BIT_32 must be defined"
 #endif
 
+#ifndef _MSC_VER
 _Static_assert(sizeof(real_t) == sizeof(intptr_t), "real_t != intptr_t");
+#endif
 
 #define JLAP_INVALID	1
 #define MAXSTR		128
