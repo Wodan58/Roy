@@ -634,12 +634,13 @@ void do_put_str(void)
 #ifdef COMPILING
 void dumpstack(void)
 {
-    intptr_t Value, Index;
+    intptr_t Value, Index, Limit;
 
-    for (Index = 0; Index < vec_size(theStack); Index++) {
+    Limit = vec_size(theStack);
+    for (Index = 0; Index < Limit; Index++) {
 	Value = vec_at(theStack, Index);
 	writefactor(Value);
-	if (Index < vec_size(theStack) - 1)
+	if (Index < Limit - 1)
 	    putchar(' ');
     }
 }

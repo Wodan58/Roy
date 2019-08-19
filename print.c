@@ -55,7 +55,7 @@ void init_heap(void)
 #endif
 #ifdef _MSC_VER
     start_of_text &= DOWN_64K;
-    ptr = (int *)start;
+    ptr = (int *)start_of_text;
     ptr += ptr[PEPOINTER] / 4;
     start_of_text = ptr[IMAGE_BASE] + ptr[BASE_OF_CODE];
     start_of_data = start_of_text + ptr[SIZE_OF_CODE];
