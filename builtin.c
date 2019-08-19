@@ -536,6 +536,7 @@ void do_sub(void)
     CHECK2;
 }
 
+#if 0
 void do_div(void)
 {
     BINARY;
@@ -543,6 +544,7 @@ void do_div(void)
     do_zap();
     CHECK2;
 }
+#endif
 
 void do_stack(void)
 {
@@ -621,11 +623,13 @@ void do_put_int(void)
     printf("%" PRIdPTR, do_pop());
 }
 
+#if 0
 void do_put_str(void)
 {
     COMPILE;
     printf("%s", (char *)do_pop());
 }
+#endif
 
 #ifdef COMPILING
 void dumpstack(void)

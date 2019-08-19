@@ -6,10 +6,10 @@
 #include <stdio.h>
 #include "stack.h"
 #include "builtin.h"
-#define kcalloc(N,Z)	GC_MALLOC((N)*(Z))
-#define kmalloc(Z)	GC_MALLOC(Z)
-#define krealloc(P,Z)	GC_REALLOC(P,Z)
-#define kfree(P)
+#define calloc(N,Z)	GC_MALLOC((N)*(Z))
+#define malloc(Z)	GC_MALLOC(Z)
+#define realloc(P,Z)	GC_REALLOC(P,Z)
+#define free(P)
 #include "khash.h"
 
 				/* builtin.c */
