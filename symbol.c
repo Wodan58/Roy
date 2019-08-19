@@ -66,14 +66,16 @@ void initsym(void)
     enter("putch", do_putch);
     enter("get", do_get);
     enter("-", do_sub);
-    enter("/", do_div);
     enter("stack", do_stack);
     enter("unstack", do_unstack);
     enter("body", do_body);
     enter("lt", do_lt);
     enter("put_bool", do_put_bool);
     enter("put_int", do_put_int);
+#if 0
+    enter("/", do_div);
     enter("put_str", do_put_str);
+#endif
 }
 
 void enterdef(char *Name, Stack *List)
