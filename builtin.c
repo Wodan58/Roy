@@ -12,7 +12,7 @@
 #include "parse.h"
 
 #ifdef COMPILING
-#define kcalloc(N,Z)	GC_malloc((N)*(Z))
+#define kcalloc(N,Z)	GC_MALLOC((N)*(Z))
 #include "khash.h"
 
 #define STACK(n)	(vec_size(theStack) < (n))

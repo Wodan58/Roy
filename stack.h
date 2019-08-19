@@ -5,8 +5,8 @@
 */
 #include <stdint.h>
 #include <gc.h>
-#define malloc(Z)	GC_malloc(Z)
-#define realloc(P,Z)	GC_realloc(P,Z)
+#define malloc(Z)	GC_MALLOC(Z)
+#define realloc(P,Z)	GC_REALLOC(P,Z)
 #define free(P)
 #include "vector.h"
 

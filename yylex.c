@@ -102,5 +102,5 @@ symbol2:
 void yyerror(char *str)
 {
     fprintf(stderr, "ERROR: %s\n", str);
-    exit(1);
+    exit(0);
 }

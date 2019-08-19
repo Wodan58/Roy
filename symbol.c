@@ -6,9 +6,9 @@
 #include <stdio.h>
 #include "stack.h"
 #include "builtin.h"
-#define kcalloc(N,Z)	GC_malloc((N)*(Z))
-#define kmalloc(Z)	GC_malloc(Z)
-#define krealloc(P,Z)	GC_realloc(P,Z)
+#define kcalloc(N,Z)	GC_MALLOC((N)*(Z))
+#define kmalloc(Z)	GC_MALLOC(Z)
+#define krealloc(P,Z)	GC_REALLOC(P,Z)
 #define kfree(P)
 #include "khash.h"
 

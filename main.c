@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 	    rv--;
         else if (!freopen(ptr, "r", stdin)) {
 	    fprintf(stderr, "failed to open the file '%s'.\n", ptr);
-	    return 1;
+	    return 0;
 	}
     }
     g_argc = argc - rv;

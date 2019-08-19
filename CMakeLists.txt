@@ -31,7 +31,14 @@ add_custom_target(compare ALL
 		  COMMAND diff demo1.txt demo2.txt
 		  DEPENDS demo1.txt demo2.txt)
 add_custom_target(demo3.txt ALL
-		  COMMAND joy -d fib.joy >demo3.txt)
+		  COMMAND joy -d fib.joy >demo3.txt
+		  DEPENDS joy fib.joy)
+add_custom_target(demo4.txt ALL
+		  COMMAND joy nonexist.joy >demo4.txt
+		  DEPENDS joy)
+add_custom_target(demo5.txt ALL
+		  COMMAND joy exist.joy >demo5.txt
+		  DEPENDS joy exist.joy)
 
 macro(exe1 src)
 add_custom_command(OUTPUT ${src}1.c
