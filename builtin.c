@@ -588,6 +588,7 @@ void do_unstack(void)
 
 void do_body(void)
 {
+#ifdef COMPILING
     const char *Name;
 
     UNARY;
@@ -597,6 +598,7 @@ void do_body(void)
     Name = (const char *)stack[-1];
 #endif
     stack[-1] = lookup(Name);
+#endif
 }
 
 void do_lt(void)

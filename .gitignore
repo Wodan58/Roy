@@ -9,6 +9,7 @@ Makefile
 parse.c
 parse.h
 run*
+fib1*
 SCCS
 ARCH
 BACKUP*

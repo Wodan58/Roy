@@ -31,42 +31,6 @@ static intptr_t start_of_text,
 		start_of_bss,
 		start_of_heap;
 
-int is_boolean(intptr_t Value)
-{
-    return !Value || Value == 1;
-}
-
-int is_char(intptr_t Value)
-{
-    return Value >= ' ' && Value <= '~';
-}
-
-int is_integer(intptr_t Value)
-{
-    return Value >= 0 && Value <= SMALLINT;
-}
-
-int is_code(intptr_t Value)
-{
-    return Value > start_of_text && Value < start_of_data;
-}
-
-int is_string(intptr_t Value)
-{
-    int i;
-
-    for (i = 0; i < g_argc; i++)
-	if (Value == (intptr_t)g_argv[i])
-	    return 1;
-    return (Value > start_of_data && Value < start_of_bss) ||
-	   (Value > start_of_heap && (Value & ~JLAP_INVALID));
-}
-
-int is_list(intptr_t Value)
-{
-    return Value > start_of_heap && !(Value & ~JLAP_INVALID);
-}
-
 void init_heap(void)
 {
     int *ptr;

@@ -16,17 +16,26 @@ include_directories(bdwgc/include)
 add_subdirectory(bdwgc)
 add_executable(joy main.c ${BISON_MyParser_OUTPUTS} yylex.c symbol.c builtin.c print.c)
 target_link_libraries(joy gc-lib)
-add_executable(run main.c run.c print.c lookup.c)
+add_executable(run main.c run.c print.c)
 target_link_libraries(run gc-lib)
 add_custom_command(OUTPUT run.c
 		   COMMAND joy -c <tutorial.joy | clang-format >run.c
 		   DEPENDS joy tutorial.joy)
 add_custom_target(demo1.txt ALL
-		  COMMAND joy <tutorial.joy >demo1.txt
-		  DEPENDS joy tutorial.joy)
+		  COMMAND joy <tutorial.joy >demo1.txt)
 add_custom_target(demo2.txt ALL
-		  COMMAND run >demo2.txt
-		  DEPENDS run)
+		  COMMAND run >demo2.txt)
 add_custom_target(compare ALL
-		  COMMAND diff demo1.txt demo2.txt
-		  DEPENDS demo1.txt demo2.txt)
+		  COMMAND diff demo1.txt demo2.txt)
+add_custom_target(demo3.txt ALL
+		  COMMAND joy -d fib.joy >demo3.txt)
+
+macro(exe1 src)
+add_custom_command(OUTPUT ${src}1.c
+		   DEPENDS joy ${src}.joy
+		   COMMAND joy -c ${src}.joy | clang-format >${src}1.c)
+add_executable(${src}1 main.c ${src}1.c print.c)
+target_link_libraries(${src}1 gc-lib m)
+endmacro(exe1)
+
+exe1(fib)
