@@ -18,6 +18,8 @@ add_executable(joy main.c ${BISON_MyParser_OUTPUTS} yylex.c symbol.c builtin.c p
 target_link_libraries(joy gc-lib)
 add_executable(run main.c run.c print.c)
 target_link_libraries(run gc-lib)
+if(WIN32)
+else()
 add_custom_command(OUTPUT run.c
 		   COMMAND joy -c <tutorial.joy | clang-format >run.c
 		   DEPENDS joy tutorial.joy)
@@ -49,3 +51,4 @@ target_link_libraries(${src}1 gc-lib m)
 endmacro(exe1)
 
 exe1(fib)
+endif()
