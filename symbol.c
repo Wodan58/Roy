@@ -4,12 +4,15 @@
     date    : 07/19/19
 */
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <limits.h>
 #include "stack.h"
 #include "builtin.h"
-#define calloc(N,Z)	GC_MALLOC((N)*(Z))
-#define malloc(Z)	GC_MALLOC(Z)
-#define realloc(P,Z)	GC_REALLOC(P,Z)
-#define free(P)
+#define kcalloc(N,Z)	GC_MALLOC((N)*(Z))
+#define kmalloc(Z)	GC_MALLOC(Z)
+#define krealloc(P,Z)	GC_REALLOC(P,Z)
+#define kfree(P)
 #include "khash.h"
 
 				/* builtin.c */
