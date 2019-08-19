@@ -22,11 +22,14 @@ add_custom_command(OUTPUT run.c
 		   COMMAND joy -c <tutorial.joy | clang-format >run.c
 		   DEPENDS joy tutorial.joy)
 add_custom_target(demo1.txt ALL
-		  COMMAND joy <tutorial.joy >demo1.txt)
+		  COMMAND joy <tutorial.joy >demo1.txt
+		  DEPENDS joy tutorial.joy)
 add_custom_target(demo2.txt ALL
-		  COMMAND run >demo2.txt)
+		  COMMAND run >demo2.txt
+		  DEPENDS run)
 add_custom_target(compare ALL
-		  COMMAND diff demo1.txt demo2.txt)
+		  COMMAND diff demo1.txt demo2.txt
+		  DEPENDS demo1.txt demo2.txt)
 add_custom_target(demo3.txt ALL
 		  COMMAND joy -d fib.joy >demo3.txt)
 
