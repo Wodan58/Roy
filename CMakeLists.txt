@@ -16,10 +16,10 @@ include_directories(bdwgc/include)
 add_subdirectory(bdwgc)
 add_executable(joy main.c ${BISON_MyParser_OUTPUTS} yylex.c symbol.c builtin.c print.c)
 target_link_libraries(joy gc-lib)
-add_executable(run main.c run.c print.c)
-target_link_libraries(run gc-lib)
 if(WIN32)
 else()
+add_executable(run main.c run.c print.c)
+target_link_libraries(run gc-lib)
 add_custom_command(OUTPUT run.c
 		   COMMAND joy -c <tutorial.joy | clang-format >run.c
 		   DEPENDS joy tutorial.joy)
