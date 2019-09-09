@@ -139,7 +139,9 @@ const char *identifier(const char *str)
 		  return "leq";
 	      return "lss";
     case '-': return "sub";
+#if 0
     case '/': return "div";
+#endif
     case '>': if (str[1] == '=')
 		  return "geq";
 	      return "gtr";

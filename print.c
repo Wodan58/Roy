@@ -96,11 +96,13 @@ void writefactor(intptr_t Value)
 {
     int i;
 
+#if 0
     for (i = 0; i < g_argc; i++)
 	if (Value == (intptr_t)g_argv[i]) {
 	    printf("%s", g_argv[i]);
 	    return;
 	}
+#endif
     if (Value >= 0 && Value <= SMALLINT)
 	printf("%" PRIdPTR, Value);
 #if !defined(__linux__) && !defined(__APPLE__) && !defined(_MSC_VER)

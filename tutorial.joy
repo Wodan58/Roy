@@ -15,8 +15,7 @@ DEFINE	reverse == [] swap shunt ;
 	cnos == swap cons .
 [1 2 3 4 5] reverse .
 DEFINE	concat == [reverse] c shunt ;
-	c == [swap] dip i ;
-	space == 32 putch .
+	c == [swap] dip i .
 [peter paul] [mary jane] concat .
 DEFINE	last == dup rest null [first] [rest last] branch ;
 	rest == uncons swap pop ;
