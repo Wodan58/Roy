@@ -1,12 +1,15 @@
 /*
     module  : builtin.c
-    version : 1.28
-    date    : 03/15/20
+    version : 1.29
+    date    : 05/04/20
 */
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
+#ifdef _MSC_VER
+#include <malloc.h>
+#endif
 #include <limits.h>
 #include <math.h>
 #include <inttypes.h>
