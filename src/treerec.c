@@ -1,7 +1,7 @@
 /*
     module  : treerec.c
-    version : 1.11
-    date    : 01/19/20
+    version : 1.12
+    date    : 05/04/20
 */
 #ifndef TREEREC_C
 #define TREEREC_C
@@ -31,7 +31,7 @@ void put_treerec(void)
     static int ident;
     int ch;
     FILE *fp, *old;
-    Stack *prog;
+    Stack *prog = (Stack *)do_pop();
 
     printf("void treerec_%d(void);", ++ident);
     fprintf(old = program, "treerec_%d();", ident);
