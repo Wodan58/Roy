@@ -1,7 +1,7 @@
 /*
     module  : yylex.c
-    version : 1.15
-    date    : 01/19/20
+    version : 1.16
+    date    : 05/04/20
 */
 #include <stdio.h>
 #include <string.h>
@@ -419,4 +419,5 @@ int yyerror(char *str)
 {
     printf("%s in file %s, line %d\n", str, infile[ilevel].name, lineno);
     execerror(0, 0);
+    return 0;
 }
