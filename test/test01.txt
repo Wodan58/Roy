@@ -1,0 +1,26 @@
+   4	$ echo use shell escape
+use shell escape
+   5	"\07" .
+digit expected in file test01.joy, line 5
+   6	"\b\r\f\'\"\v\\\a" .
+   7	2 setautoput .
+   8	0xFF
+   9	0377
+  10	2.55e+2 .
+  11	# main.c
+  12	1 setautoput .
+  13	# utils.c
+  14	gc .
+  15	__memoryindex .
+  16	"dummy.txt" "r" fopen .
+  17	stdin .
+  18	stdout .
+  19	stderr .
+  20	"test01.joy" "r" fopen .
+  21	# interp.c
+  22	[ true false (* maxint *) test01 undefined ] helpdetail .
+  23	undefs .
+  24	manual .
+  25	__html_manual .
+  26	__latex_manual .
+  27	__manual_list .

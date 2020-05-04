@@ -1,0 +1,4 @@
+syntax error in file test09.joy, line 1
+syntax error in file test09.joy, line 2
+run time error: valid file name needed for include
+3

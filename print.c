@@ -1,9 +1,10 @@
 /*
     module  : print.c
-    version : 1.10
-    date    : 07/19/19
+    version : 1.15
+    date    : 01/19/20
 */
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #ifdef __APPLE__
 #include <mach-o/getsect.h>
@@ -21,21 +22,75 @@
 #define SIZE_OF_BSS	9
 #endif
 
-extern int g_argc;
-extern char **g_argv;
+extern YYTABLE yytable[];
 
-void writefactor(intptr_t Value);
+real_t unpack(intptr_t num);		/* builtin.c */
+
+void writefactor(intptr_t Value);	/* print.c */
 
 static intptr_t start_of_text,
 	        start_of_data,
 		start_of_bss,
 		start_of_heap;
 
+int is_set(intptr_t Value)
+{
+    return Value >= MIN_INT && Value <= MAX_INT;
+}
+
+int is_boolean(intptr_t Value)
+{
+    return !Value || Value == 1;
+}
+
+int is_char(intptr_t Value)
+{
+    return (Value >= ' ' && Value <= '~') || Value == '\t' || Value == '\n';
+}
+
+int is_integer(intptr_t Value)
+{
+    return Value >= MIN_INT && Value <= MAX_INT;
+}
+
+int is_code(intptr_t Value)
+{
+    return Value > start_of_text && Value < start_of_data;
+}
+
+int is_string(intptr_t Value)
+{
+    int i;
+
+    for (i = 0; i < g_argc; i++)
+	if (Value == (intptr_t)g_argv[i])
+	    return 1;
+    return (Value > start_of_data && Value < start_of_bss) ||
+	   (Value > start_of_heap && (Value & JLAP_INVALID));
+}
+
+int is_float(intptr_t Value)
+{
+    return Value > start_of_heap && !(Value & JLAP_INVALID) &&
+				     (Value & JLAP_PACKAGE);
+}
+
+int is_list(intptr_t Value)
+{
+    return Value > start_of_heap && !(Value & (JLAP_INVALID | JLAP_PACKAGE));
+}
+
+int is_file(intptr_t Value)
+{
+    return Value >= (intptr_t)stdin && Value < (intptr_t)(stdin + MAXFIL);
+}
+
 void init_heap(void)
 {
     int *ptr;
     extern int main();
 
+    start_of_text = (intptr_t)main;
 #ifdef __linux__
     extern char etext, edata, end;
 
@@ -49,13 +104,12 @@ void init_heap(void)
     start_of_heap = (intptr_t)get_end();
 #endif
 #if !defined(__linux__) && !defined(__APPLE__) && !defined(_MSC_VER)
-    start_of_text = (intptr_t)main;
     if ((ptr = malloc(1)) != 0)
 	start_of_data = start_of_bss = start_of_heap = (intptr_t)ptr;
 #endif
 #ifdef _MSC_VER
     start_of_text &= DOWN_64K;
-    ptr = (int *)start_of_text;
+    ptr = (int *)start;
     ptr += ptr[PEPOINTER] / 4;
     start_of_text = ptr[IMAGE_BASE] + ptr[BASE_OF_CODE];
     start_of_data = start_of_text + ptr[SIZE_OF_CODE];
@@ -84,26 +138,49 @@ int writeproc(intptr_t Value)
     void (*proc)(void);
 
     proc = (void (*)(void))(Value & ~JLAP_INVALID);
-    for (i = 0; table[i].proc; i++)
-	if (proc == table[i].proc) {
-	    printf("%s", table[i].name);
+    for (i = 0; yytable[i].proc; i++)
+	if (proc == yytable[i].proc) {
+	    printf("%s", yytable[i].name);
 	    return 1;
 	}
     return 0;
 }
 
-void writefactor(intptr_t Value)
+void (*findproc(char *name))(void)
 {
     int i;
 
-#if 0
+    for (i = 0; yytable[i].proc; i++)
+	if (!strcmp(name, yytable[i].name))
+	    return yytable[i].proc;
+    return 0;
+}
+
+void writestring(char *str)
+{
+    putchar('"');
+    while (*++str) {
+	if (*str == '"' || *str == '\\' || *str == '\n')
+	    putchar('\\');
+	if (*str == '\n')
+	    putchar('n');
+	else
+	    putchar(*str);
+    }
+    putchar('"');
+}
+
+void writefactor(intptr_t Value)
+{
+    int i;
+    char *str;
+
     for (i = 0; i < g_argc; i++)
 	if (Value == (intptr_t)g_argv[i]) {
-	    printf("%s", g_argv[i]);
+	    printf("\"%s\"", g_argv[i]);
 	    return;
 	}
-#endif
-    if (Value >= 0 && Value <= SMALLINT)
+    if (Value >= MIN_INT && Value <= MAX_INT)
 	printf("%" PRIdPTR, Value);
 #if !defined(__linux__) && !defined(__APPLE__) && !defined(_MSC_VER)
     else if (Value > start_of_text && Value < start_of_heap) {
@@ -116,10 +193,26 @@ void writefactor(intptr_t Value)
 	if (!writeproc(Value))
 	    printf("%" PRIdPTR, Value);
 #endif
-    } else if ((Value & JLAP_INVALID) == 0) {
+    } else if (Value & JLAP_INVALID) {
+	str = (char *)(Value & ~JLAP_INVALID);
+	if (*str == '"')
+	    writestring(str);
+	else
+	    printf("%s", str);
+    } else if (Value & JLAP_PACKAGE)
+	printf("%g", unpack(Value));
+    else if (is_file(Value)) {
+	if (Value == (intptr_t)stdin)
+	    printf("file:stdin");
+	else if (Value == (intptr_t)stdout)
+	    printf("file:stdout");
+	else if (Value == (intptr_t)stderr)
+	    printf("file:stderr");
+	else
+	    printf("file:%p", (void *)Value);
+    } else {
 	printf("[");
 	writeterm((Stack *)Value, -1);
 	printf("]");
-    } else
-	printf("%s", (char *)(Value & ~JLAP_INVALID));
+    }
 }

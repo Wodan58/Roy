@@ -1,0 +1,11 @@
+run time error: one of: d i o x X needed for format
+run time error: one of: e E f g G needed for formatf
+1.5
+10
+[]
+[]
+test@
+syntax error in file stdin, line 10
+syntax error in file stdin, line 12
+syntax error in file stdin, line 12
+49

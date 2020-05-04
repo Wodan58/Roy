@@ -1,0 +1,177 @@
+true
+false
+64
+9223372036854775807
+512
+1
+0
+0
+315
+1804289383
+0
+1
+0
+683
+[0]
+"stack"
+"/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/sbin:/usr/sbin"
+0
+4
+1
+3
+2
+4
+1
+2
+3
+65
+'A
+1
+1.5
+1
+1.5
+1
+0
+0
+1
+-1
+-1
+-1
+-1.5
+1
+1.5
+2
+run time error: non-zero divisor needed for /
+0
+2
+1
+"0000000001"
+"1.5000000000"
+"Thu Jan  1 01:00:00 1970"
+-3598
+nan
+nan
+0.982794
+2
+2.35241
+4.48169
+1
+0.405465
+2.12928
+1.22474
+0.905148
+0.54042
+2.75568
+1
+1
+run time error: integer needed for ldexp
+6
+12
+1
+2.5
+1.5
+true
+-1
+-1
+true
+'t
+1
+"est"
+{2 3}
+{2 3}
+1
+1
+{2 3}
+'t
+"est"
+1.5
+2.5
+{2 3}
+"est"
+[2 3]
+{1}
+"t"
+[1]
+{1 2 3 4 5 6}
+false
+false
+false
+false
+false
+false
+false
+3
+4
+false
+true
+true
+true
+true
+true
+ma  4 mei 2020 10:21:37 CEST
+app11 app12 ps binary condlinrec logical fold floor clock size maxint 
+string in_str iffile put_bool exp enconcat_set first_str cons_str pick 
+at_str echo pred ifset binrec * + fmin - putchars / app1 app2 app3 app4 
+at cleave popd treerec primrec fputstring getch < = > != tailrec rand 
+succ casting step_str dupd put_list_str in_set filetime stdout fabs 
+iflogical ifte quit pop min first_set cons_set at_set pow primrec_int 
+xor float fflush linrec setautoput set log10 treegenrec stderr some_str 
+i fremove rotated step_set system abs put_list_set x take_str put_dbl 
+concat_str put_char stack stdin take dip name unswons_str sinh div 
+atan2 all_str fputchars some_set has opcase primrec_str rem list 
+rolldown sametype setundeferror strftime unswons include take_set eq 
+chr first gmtime concat_set localtime small_int unswons_set undeferror 
+put_list_chr put_list_bool put_int all_set not_str step argc map_str 
+primrec_set helpdetail index over feof asin sin not ternary gc ge argv 
+drop_str ord unary2 compare unary4 tanh fput filter_str put_list_sym gt 
+unary3 drop time size_str some not_set small_str fread enconcat map_set 
+autoput put_str put1 swons_str ceil space small get_data has_str fputch 
+put drop_set intern concat ftell srand split filter_set id sqrt cond 
+false frename in fsign size_set undefs small_set put_list_char unary 
+abort case cons fget equal put_set swons_set swapd fwrite iflist 
+has_set fmax integer genrec help fgets log rest_str times uncons while 
+formatf fclose char get rotate map leaf iffloat ferror setsize max fneg 
+mktime treestep ifstring rest_set filter le null_str strtod file strtol 
+conts <= ifinteger acos cos lt null nullary rollupd setecho round 
+split_str neg swons unstack swap true fgetch put_sym get1 atan all body 
+branch choice ldexp rolldownd modf null_set tan in1 trunc fopen putch 
+ne .* .+ sign .- >= cosh ./ split_set nl fcompare manual put_list_dbl 
+of_str uncons_str user put_list .> frexp infra rest condnestrec and 
+construct rollup getenv of fseek or uncons_set enconcat_str ifchar 
+format of_set put_list_int dup 
+__settracegc _help __symtabindex __memoryindex __memorymax 
+__html_manual __symtabmax __manual_list __dump __latex_manual 
+5
+5
+5
+5
+5
+4
+3
+6
+5
+4
+3
+8
+"uftu"
+{2 3 4}
+6
+integer
+1
+char
+'A
+logical
+true
+string
+"test"
+set
+{1 2 3}
+float
+1.5
+file
+file:stdin
+{1}
+"es"
+{2 3}
+{1}
+false

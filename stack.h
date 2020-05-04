@@ -1,53 +1,71 @@
 /*
     module  : stack.h
-    version : 1.14
-    date    : 07/19/19
+    version : 1.21
+    date    : 01/20/20
 */
+#ifdef _MSC_VER
+#include <io.h>
+#else
+#include <unistd.h>
+#endif
 #include <stdint.h>
+#include <time.h>
 #include <gc.h>
-#define malloc(Z)	GC_MALLOC(Z)
-#define realloc(P,Z)	GC_REALLOC(P,Z)
+#define mem_malloc(Z)		GC_malloc(Z)
+#define mem_realloc(P,Z)	GC_realloc(P,Z)
+#define chk_malloc(Z)		GC_malloc(Z)
+#define chk_realloc(P,Z)	GC_realloc(P,Z)
 #define free(P)
-#include "vector.h"
+#include "decl.h"
+#include "kvec.h"
 
-#define VECTOR
+// #define VECTOR
 #define BIT_64
 
+#ifndef RUNTIME
+#define VECTOR
+#define COMPILING
+#endif
+
 #ifdef BIT_64
+#define SETSIZE_	64
+#define MAXINT_		9223372036854775807LL
 typedef double real_t;
 #endif
 
 #ifdef BIT_32
+#define SETSIZE_	32
+#define MAXINT_		2147483647
 typedef float real_t;
 #endif
 
 #if !defined(BIT_64) && !defined(BIT_32)
-#error "one of BIT_64 and BIT_32 must be defined"
+#error "either BIT_64 or BIT_32 must be defined"
 #endif
 
 #ifndef _MSC_VER
 _Static_assert(sizeof(real_t) == sizeof(intptr_t), "real_t != intptr_t");
 #endif
 
-#define JLAP_INVALID	1
-#define MAXSTR		128
-#define SMALLINT	99999
-
 typedef vector(intptr_t) Stack;
 
 typedef struct {
     char *name;
     void (*proc)(void);
+#if 0
     char *repl;
+#endif
 } YYTABLE;
 
-extern YYTABLE table[];
+/* optable.c */
+typedef struct optable_t {
+    char *name, *messg1, *messg2;
+} optable_t;
 
-#ifndef RUNTIME
-#ifndef VECTOR
-#define VECTOR
-#endif
-#define COMPILING
+extern optable_t optable[];
 
-extern int compiling, debugging;
-#endif
+/* main.c */
+extern int g_argc, compiling, debugging, autoput, tracegc, undeferror;
+extern char **g_argv, *filename;
+extern clock_t startclock;
+void execerror(char *msg, const char *op);

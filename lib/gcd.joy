@@ -1,0 +1,6 @@
+DEFINE	> == swap < ;
+	rollup == swap [swap] dip ;
+	gcd == [dup 0 >] [dup rollup rem] while pop ;
+	rest == uncons swap pop .
+
+argv rest [10 strtol] map uncons uncons pop gcd .

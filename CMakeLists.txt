@@ -1,8 +1,10 @@
 #
-#  Makefile for Coy
+#   module  : CMakeLists.txt
+#   version : 1.1
+#   date    : 03/28/20
 #
 cmake_minimum_required(VERSION 3.0)
-project(Coy)
+project(Coy VERSION 1.0)
 set(CMAKE_BUILD_TYPE Release)
 find_package(BISON)
 BISON_TARGET(MyParser parse.y parse.c)
@@ -12,43 +14,41 @@ else()
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 --coverage -fprofile-arcs -ftest-coverage") # debug, no optimization
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage") # enabling coverage
 endif()
-include_directories(bdwgc/include)
-add_subdirectory(bdwgc)
-add_executable(joy main.c ${BISON_MyParser_OUTPUTS} yylex.c symbol.c builtin.c print.c)
-target_link_libraries(joy gc-lib)
-if(WIN32)
-else()
-add_executable(run main.c run.c print.c)
-target_link_libraries(run gc-lib)
+include_directories(. bdwgc/include)
+add_executable(joy main.c ${BISON_MyParser_OUTPUTS} print.c builtin.c symbol.c
+	       yylex.c factor.c module.c optable.c)
+target_link_libraries(joy gc-lib m)
+add_dependencies(joy always)
+add_custom_target(always
+		  COMMAND sh banner.sh ${PROJECT_NAME} ${PROJECT_VERSION}
+		  COMMAND sh prims.sh
+		  COMMAND sh trans.sh
+		  COMMAND sh table.sh)
+#
+#  Standard tests
+#
+add_executable(run main.c run.c print.c yylex.c factor.c module.c lookup.c)
+target_link_libraries(run gc-lib m)
 add_custom_command(OUTPUT run.c
-		   COMMAND joy -c <tutorial.joy | clang-format >run.c
-		   DEPENDS joy tutorial.joy)
+		  COMMAND joy -c <tutorial.joy 2>runtime.h | clang-format >run.c
+		  DEPENDS joy tutorial.joy)
 add_custom_target(demo1.txt ALL
 		  COMMAND joy <tutorial.joy >demo1.txt
 		  DEPENDS joy tutorial.joy)
 add_custom_target(demo2.txt ALL
-		  COMMAND run >demo2.txt
-		  DEPENDS run)
+		  COMMAND run <input.txt >demo2.txt
+		  DEPENDS run runtime.h)
 add_custom_target(compare ALL
 		  COMMAND diff demo1.txt demo2.txt
 		  DEPENDS demo1.txt demo2.txt)
-add_custom_target(demo3.txt ALL
-		  COMMAND joy -d fib.joy >demo3.txt
-		  DEPENDS joy fib.joy)
-add_custom_target(demo4.txt ALL
-		  COMMAND joy nonexist.joy >demo4.txt
-		  DEPENDS joy)
-add_custom_target(demo5.txt ALL
-		  COMMAND joy exist.joy >demo5.txt
-		  DEPENDS joy exist.joy)
-
-macro(exe1 src)
-add_custom_command(OUTPUT ${src}1.c
-		   DEPENDS joy ${src}.joy
-		   COMMAND joy -c ${src}.joy | clang-format >${src}1.c)
-add_executable(${src}1 main.c ${src}1.c print.c)
-target_link_libraries(${src}1 gc-lib m)
-endmacro(exe1)
-
-exe1(fib)
-endif()
+#
+#  Fibonacci benchmark
+#
+add_executable(fib1a main.c fib1a.c print.c)
+target_link_libraries(fib1a gc-lib m)
+add_custom_command(OUTPUT fib1a.c
+		   COMMAND joy -c <fib1a.joy 2>runtime.h | clang-format >fib1a.c
+		   DEPENDS joy fib1a.joy runtime.h)
+add_subdirectory(bdwgc)
+add_subdirectory(lib)
+add_subdirectory(test)

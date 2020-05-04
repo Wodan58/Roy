@@ -1,0 +1,85 @@
+DEFINE 	nl == 10 putch .
+
+MODULE m2
+PRIVATE
+  b == "B" ;				# 1.b
+  a == "A" ;				# 1.a
+PUBLIC
+  ab == a b concat_str ;		# m2.ab
+  ba == b a concat_str ;		# m2.ba
+  HIDE
+    d == "D" ;				# 2.d
+    c == "C" ;				# 2.c
+  IN
+    cd == c d concat_str ;		# m2.cd
+  END ;
+  abba == ab ba concat_str ;		# m2.abba
+  HIDE
+    d == "D" ;				# 3.d
+    c == "C" ;				# 3.c
+  IN
+    abc == a b concat_str c concat_str ;	# m2.abc
+  END ;
+  bcd == b cd concat_str ;		# m2.bcd
+END
+MODULE m1
+PRIVATE
+  b == "b" ;				# 4.b
+  a == "a" ;				# 4.a
+PUBLIC
+  ab == a b concat_str ;		# m1.ab
+  ba == b a concat_str ;		# m1.ba
+  abba == ab ba concat_str ;		# m1.abba
+END
+DEFINE
+  zero == 0 0 pop ;
+  one == zero 1 + ;
+  four == two three + one - ;
+END
+HIDE
+  un == one ;				# 5.un
+  deux == zero one un + + ;		# 5.deux
+IN
+  two == deux ;
+  three == zero un + deux + ;
+END
+HIDE
+  trois == two succ ;			# 6.trois
+IN
+  six == trois three + ;
+  seven == trois drei + succ ;
+  five == cinq ;
+  cinq == two trois + ;
+END
+HIDE
+  twenty == 20 ;			# 7.twenty
+  thirty == 30 ;			# 7.thirty
+IN
+  fifty == twenty thirty + ;
+END
+
+zero .
+one .
+two .
+three .
+four .
+five .
+six .
+seven .
+fifty .
+thirty .
+m1.ab put_str nl .
+m1.ba put_str nl .
+m1.abba put_str nl .
+m1.a put_str nl .
+m1.b put_str nl .
+m2.ab put_str nl .
+m2.ba put_str nl .
+m2.abba put_str nl .
+m2.cd put_str nl .
+m2.abc put_str nl .
+m2.bcd put_str nl .
+m2.a put_str nl .
+m2.b put_str nl .
+m2.c put_str nl .
+m2.d put_str nl .
