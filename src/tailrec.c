@@ -1,7 +1,7 @@
 /*
     module  : tailrec.c
-    version : 1.16
-    date    : 01/19/20
+    version : 1.17
+    date    : 05/04/20
 */
 #ifndef TAILREC_C
 #define TAILREC_C
@@ -19,7 +19,7 @@ void tailrec(Stack *prog[])
 }
 
 #ifdef COMPILING
-int put_tailrec(Stack *prog[])
+void put_tailrec(Stack *prog[])
 {
     static int ident;
     FILE *fp, *old;

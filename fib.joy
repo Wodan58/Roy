@@ -1,4 +1,0 @@
-DEFINE	fib == dup 2 < [[1 - dup fib swap 1 - fib +] []] index i;
-	nl == 10 putch.
-
-10 fib put_int nl.

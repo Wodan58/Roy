@@ -1,0 +1,23 @@
+(* This program calculates the nth fibonacci number
+ * using algorithm 1A: naive binary recursion.
+ *
+ * compiled: N/A
+ * executed: joy fib1a.joy n
+ *)
+DEFINE second == rest first;
+       negative == 0 <;
+       odd == even not;
+       even == 2 rem null;
+       nl == '\n putch.
+(* fib : n -> n returns N'th Fibonacci number: F(n) = F(n-1) + F(n-2) *)
+DEFINE fib == [dup small_int] [] [pred dup pred] [+] binrec .
+(* f : n -> n handles negative arguments: F(-n) = F(n)*(-1)^(n+1) *)
+DEFINE f == [dup negative] [dup [neg fib] dip odd [] [neg] branch] [fib] ifte .
+(* fprint : n -> - calculates and prints F(n) *)
+DEFINE fprint == dup 'd 3 0 format "th Fibonacci number is " concat_str
+		 putchars f put_int nl .
+(* main : - -> - checks the command line arguments and calls fprint *)
+DEFINE main == [argc 2 =]
+               [argv second 10 strtol fprint]
+               ["Usage: joy fib1a.joy\n" putchars] ifte.
+main .
