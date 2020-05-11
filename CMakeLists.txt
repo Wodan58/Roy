@@ -1,6 +1,6 @@
 #
 #   module  : CMakeLists.txt
-#   version : 1.1
+#   version : 1.2
 #   date    : 05/11/20
 #
 cmake_minimum_required(VERSION 3.0)
@@ -32,7 +32,11 @@ add_custom_target(always
 #  Standard tests
 #
 add_executable(run main.c run.c print.c yylex.c factor.c module.c lookup.c)
+if(WIN32)
+target_link_libraries(run gc-lib)
+else()
 target_link_libraries(run gc-lib m)
+endif()
 add_custom_command(OUTPUT run.c
 		  COMMAND joy -c <tutorial.joy 2>runtime.h | clang-format >run.c
 		  DEPENDS joy tutorial.joy)
@@ -49,7 +53,11 @@ add_custom_target(compare ALL
 #  Fibonacci benchmark
 #
 add_executable(fib1a main.c fib1a.c print.c)
+if(WIN32)
+target_link_libraries(fib1a gc-lib)
+else()
 target_link_libraries(fib1a gc-lib m)
+endif()
 add_custom_command(OUTPUT fib1a.c
 		   COMMAND joy -c <fib1a.joy 2>runtime.h | clang-format >fib1a.c
 		   DEPENDS joy fib1a.joy runtime.h)
