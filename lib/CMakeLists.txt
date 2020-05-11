@@ -1,7 +1,7 @@
 #
-#   module  : %M%
-#   version : %I%
-#   date    : %G%
+#   module  : CMakeLists.txt
+#   version : 1.1
+#   date    : 05/11/20
 #
 
 #
@@ -18,7 +18,11 @@ add_custom_command(OUTPUT ${src}.c
 		   COMMAND joy -c ${src}.joy 2>../runtime.h |
 			   clang-format >${src}.c)
 add_executable(${src} ../main.c ${src}.c ../print.c)
+if(WIN32)
+target_link_libraries(${src} gc-lib)
+else()
 target_link_libraries(${src} gc-lib m)
+endif()
 endmacro(exe1)
 
 #
@@ -31,7 +35,11 @@ add_custom_command(OUTPUT ${src}.c
 			   clang-format >${src}.c)
 add_executable(${src} ../main.c ${src}.c ../print.c ../yylex.c ../factor.c
 	       ../module.c ../lookup.c)
+if(WIN32)
+target_link_libraries(${src} gc-lib)
+else()
 target_link_libraries(${src} gc-lib m)
+endif()
 endmacro(exe2)
 
 exe1(fib)
