@@ -1,7 +1,7 @@
 #
 #   module  : CMakeLists.txt
 #   version : 1.1
-#   date    : 03/28/20
+#   date    : 05/11/20
 #
 cmake_minimum_required(VERSION 3.0)
 project(Coy VERSION 1.0)
@@ -17,7 +17,11 @@ endif()
 include_directories(. bdwgc/include)
 add_executable(joy main.c ${BISON_MyParser_OUTPUTS} print.c builtin.c symbol.c
 	       yylex.c factor.c module.c optable.c)
+if(WIN32)
+target_link_libraries(joy gc-lib)
+else()
 target_link_libraries(joy gc-lib m)
+endif()
 add_dependencies(joy always)
 add_custom_target(always
 		  COMMAND sh banner.sh ${PROJECT_NAME} ${PROJECT_VERSION}
