@@ -11,7 +11,7 @@ false
 0
 1
 0
-683
+917
 [0]
 "stack"
 "/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/sbin:/usr/sbin"
@@ -108,7 +108,7 @@ true
 true
 true
 true
-ma  4 mei 2020 10:21:37 CEST
+ma 11 mei 2020  8:14:40 CEST
 app11 app12 ps binary condlinrec logical fold floor clock size maxint 
 string in_str iffile put_bool exp enconcat_set first_str cons_str pick 
 at_str echo pred ifset binrec * + fmin - putchars / app1 app2 app3 app4 

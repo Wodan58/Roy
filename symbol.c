@@ -1,10 +1,13 @@
 /*
     module  : symbol.c
-    version : 1.21
-    date    : 01/19/20
+    version : 1.22
+    date    : 05/05/20
 */
 #include <stdio.h>
+#include <string.h>
 #include <ctype.h>
+#include <stdlib.h>
+#include <limits.h>
 #include "stack.h"
 #include "builtin.h"
 #define kcalloc(N,Z)	GC_malloc((N)*(Z))

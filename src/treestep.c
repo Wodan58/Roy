@@ -1,7 +1,7 @@
 /*
     module  : treestep.c
-    version : 1.11
-    date    : 01/19/20
+    version : 1.12
+    date    : 05/05/20
 */
 #ifndef TREESTEP_C
 #define TREESTEP_C
@@ -26,7 +26,7 @@ void treestep(Stack *prog)
 void put_treestep(Stack *prog)
 {
     static int ident;
-    int i, ch;
+    int ch;
     FILE *fp, *old;
 
     printf("void treestep_%d();", ++ident);

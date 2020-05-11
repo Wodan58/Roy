@@ -1,7 +1,7 @@
 /*
     module  : treerec.c
-    version : 1.12
-    date    : 05/04/20
+    version : 1.13
+    date    : 05/05/20
 */
 #ifndef TREEREC_C
 #define TREEREC_C
@@ -64,8 +64,6 @@ T is a tree. If T is a leaf, executes O. Else executes [[[O] C] treerec] C.
 */
 void do_treerec(void)
 {
-    Stack *prog;
-
     BINARY;
     if (!_treerec) {
 	do_push((intptr_t)GC_strdup("_treerec") | JLAP_INVALID);

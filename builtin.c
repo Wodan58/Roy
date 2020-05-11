@@ -1,19 +1,12 @@
 /*
     module  : builtin.c
-    version : 1.30
-    date    : 05/04/20
+    version : 1.31
+    date    : 05/05/20
 */
-#ifdef _MSC_VER
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#endif
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
-#ifdef _MSC_VER
-#include <malloc.h>
-#endif
 #include <limits.h>
 #include <math.h>
 #include <inttypes.h>
