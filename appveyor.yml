@@ -7,15 +7,16 @@ cache:
   - win_flex_bison-latest.zip
 
 environment:
-  BDWGC_ARCHIVE: gc-8.0.4.tar.gz
+  BDWGC_VERSION: 8.0.4
+  BDWGC_ARCHIVE: gc-%BDWGC_VERSION%.tar.gz
   WINFLEXBISON_ARCHIVE: win_flex_bison-latest.zip
 
 install:
   # install BDWGC and flex/bison
-  - if not exist %BDWGC_ARCHIVE% appveyor DownloadFile "https://www.hboehm.info/gc/gc_source/gc-8.0.4.tar.gz"
+  - if not exist %BDWGC_ARCHIVE% appveyor DownloadFile "https://github.com/ivmai/bdwgc/releases/download/v%BDWGC_VERSION%/%BDWGC_ARCHIVE%"
   - if not exist %WINFLEXBISON_ARCHIVE% appveyor DownloadFile "https://sourceforge.net/projects/winflexbison/files/%WINFLEXBISON_ARCHIVE%"
-  - tar xf gc-8.0.4.tar.gz
-  - move gc-8.0.4 bdwgc
+  - tar xf %BDWGC_ARCHIVE%
+  - move gc-%BDWGC_VERSION% bdwgc
   - 7z x -y %WINFLEXBISON_ARCHIVE%
   - ren win_bison.exe bison.exe
   - set PATH=.;%PATH%

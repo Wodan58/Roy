@@ -2,7 +2,7 @@ language: c
 compiler: gcc
 
 install:
-  - wget "https://www.hboehm.info/gc/gc_source/gc-8.0.4.tar.gz"
+  - wget "https://github.com/ivmai/bdwgc/releases/download/v8.0.4/gc-8.0.4.tar.gz"
   - tar xf gc-8.0.4.tar.gz
   - mv gc-8.0.4 bdwgc
   - wget https://sourceforge.net/projects/ltp/files/Coverage%20Analysis/LCOV-1.14/lcov-1.14.tar.gz
