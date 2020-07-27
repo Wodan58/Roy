@@ -1,7 +1,7 @@
 /*
     module  : in_str.c
-    version : 1.1
-    date    : 03/15/20
+    version : 1.2
+    date    : 07/23/20
 */
 #ifndef IN_STR_C
 #define IN_STR_C
@@ -18,6 +18,6 @@ void do_in_str(void)
     for (str = (char *)stack[-1]; str && *str && *str != stack[-2]; str++)
 	;
     stack[-2] = str && *str != 0;
-    do_zap();
+    do_pop();
 }
 #endif

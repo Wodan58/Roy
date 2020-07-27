@@ -1,13 +1,20 @@
 #
 #   module  : CMakeLists.txt
-#   version : 1.2
-#   date    : 06/15/20
+#   version : 1.3
+#   date    : 06/21/20
 #
 
 #
 #   C version
 #
 add_executable(fib0 fib0.c)
+
+#
+#   Regression test
+#
+add_custom_target(test00.txt ALL
+		  DEPENDS joy
+		  COMMAND make -f regres.mak)
 
 #
 #   Minimal version
@@ -22,7 +29,7 @@ target_link_libraries(${src} gc-lib m)
 endmacro(exe1)
 
 #
-#   Normal version
+#   Normal version: yylex.c, factor.c, module.c, lookup.c added.
 #
 macro(exe2 src)
 add_custom_command(OUTPUT ${src}.c
@@ -33,6 +40,19 @@ add_executable(${src} ../main.c ${src}.c ../print.c ../yylex.c ../factor.c
 	       ../module.c ../lookup.c)
 target_link_libraries(${src} gc-lib m)
 endmacro(exe2)
+
+#
+#   Special version: Normal and Long version
+#
+macro(exe3 src)
+add_custom_command(OUTPUT ${src}.c
+		   DEPENDS joy ${src}.joy
+		   COMMAND joy -l ${src}.joy 2>../runtime.h |
+			   clang-format >${src}.c)
+add_executable(${src} ../main.c ${src}.c ../print.c ../yylex.c ../factor.c
+	       ../module.c ../lookup.c)
+target_link_libraries(${src} gc-lib m)
+endmacro(exe3)
 
 exe1(fib)
 exe1(gcd)
@@ -50,3 +70,5 @@ exe1(reptst)
 exe1(symtst)
 exe1(plgtst)
 exe2(tutorial)
+exe2(joytut)
+exe3(lsptst)

@@ -1,7 +1,7 @@
 /*
     module  : divide.c
-    version : 1.10
-    date    : 01/19/20
+    version : 1.11
+    date    : 07/23/20
 */
 #ifndef DIVIDE_C
 #define DIVIDE_C
@@ -17,6 +17,6 @@ void do_divide(void)
 	stack[-2] /= stack[-1];
     else
 	execerror("non-zero divisor", "/");
-    do_zap();
+    do_pop();
 }
 #endif

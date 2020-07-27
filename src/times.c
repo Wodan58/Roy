@@ -1,7 +1,7 @@
 /*
     module  : times.c
-    version : 1.11
-    date    : 01/19/20
+    version : 1.12
+    date    : 06/23/20
 */
 #ifndef TIMES_C
 #define TIMES_C
@@ -36,7 +36,7 @@ void do_times(void)
     UNARY;
     Prog = (Stack *)do_pop();
 #ifdef COMPILING
-    if (compiling && stack_empty())
+    if (compiling && STACK(1))
 	put_times(Prog);
     else
 #endif

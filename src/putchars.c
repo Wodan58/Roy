@@ -1,7 +1,7 @@
 /*
     module  : putchars.c
-    version : 1.10
-    date    : 01/19/20
+    version : 1.11
+    date    : 06/23/20
 */
 #ifndef PUTCHARS_C
 #define PUTCHARS_C
@@ -14,7 +14,7 @@ void do_putchars(void)
 {
     intptr_t Value;
 
-    COMPILE1;
+    COMPILE;
     if ((Value = do_pop()) != 0)
 	printf("%s", (char *)Value);
 }

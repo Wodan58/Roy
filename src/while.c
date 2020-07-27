@@ -1,7 +1,7 @@
 /*
     module  : while.c
-    version : 1.16
-    date    : 01/19/20
+    version : 1.17
+    date    : 06/23/20
 */
 #ifndef WHILE_C
 #define WHILE_C
@@ -39,7 +39,7 @@ void do_while(void)
     prog[1] = (Stack *)do_pop();
     prog[0] = (Stack *)do_pop();
 #ifdef COMPILING
-    if (compiling && stack_empty())
+    if (compiling && STACK(1))
 	put_while(prog);
     else
 #endif

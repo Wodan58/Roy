@@ -1,7 +1,7 @@
 /*
     module  : app12.c
-    version : 1.9
-    date    : 01/19/20
+    version : 1.10
+    date    : 07/23/20
 */
 #ifndef APP12_C
 #define APP12_C
@@ -26,6 +26,6 @@ void do_app12(void)
 {
     do_unary2();
     do_rolldown();
-    do_zap();
+    do_pop();
 }
 #endif

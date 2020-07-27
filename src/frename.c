@@ -1,7 +1,7 @@
 /*
     module  : frename.c
-    version : 1.9
-    date    : 01/19/20
+    version : 1.10
+    date    : 07/23/20
 */
 #ifndef FRENAME_C
 #define FRENAME_C
@@ -15,6 +15,6 @@ void do_frename(void)
 {
     COMPILE;
     stack[-2] = !rename((char *)stack[-2], (char *)stack[-1]);
-    do_zap();
+    do_pop();
 }
 #endif

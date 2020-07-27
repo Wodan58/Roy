@@ -1,6 +1,6 @@
 #
 #   module  : tutorial.joy
-#   version : 1.6.
+#   version : 1.6
 #   date    : 01/04/20
 #
 %INCLUDE lib/stdlib.joy

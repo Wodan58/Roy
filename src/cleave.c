@@ -1,7 +1,7 @@
 /*
     module  : cleave.c
-    version : 1.15
-    date    : 01/19/20
+    version : 1.16
+    date    : 06/23/20
 */
 #ifndef CLEAVE_C
 #define CLEAVE_C
@@ -44,7 +44,7 @@ void do_cleave(void)
     prog[1] = (Stack *)do_pop();
     prog[0] = (Stack *)do_pop();
 #ifdef COMPILING
-    if (compiling && stack_empty())
+    if (compiling && STACK(1))
 	put_cleave(prog);
     else
 #endif

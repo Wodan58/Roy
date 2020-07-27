@@ -1,7 +1,7 @@
 /*
     module  : fremove.c
-    version : 1.9
-    date    : 01/19/20
+    version : 1.10
+    date    : 07/23/20
 */
 #ifndef FREMOVE_C
 #define FREMOVE_C
@@ -15,6 +15,6 @@ void do_fremove(void)
 {
     COMPILE;
     stack[-2] = !remove((char *)stack[-1]);
-    do_zap();
+    do_pop();
 }
 #endif

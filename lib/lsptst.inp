@@ -19,6 +19,6 @@ false
 [ > 3 4 ]
 [ and [ NULL [ QUOTE [ ] ] ] [ NULL [ QUOTE [ Bob ] ] ] ]
 [ map [ QUOTE [ 10 11 12 13 14 15 16 ] ] [ QUOTE [ prime ] ] ]
-#[ filter [ QUOTE [ 10 11 12 13 14 15 16 ] ] [ QUOTE [ prime ] ] ]
+[ filter [ QUOTE [ 10 11 12 13 14 15 16 ] ] [ QUOTE [ prime ] ] ]
 [ include "OK" "lsptst.lsp" ]
 EXIT

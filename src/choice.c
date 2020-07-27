@@ -1,7 +1,7 @@
 /*
     module  : choice.c
-    version : 1.10
-    date    : 01/19/20
+    version : 1.11
+    date    : 07/23/20
 */
 #ifndef CHOICE_C
 #define CHOICE_C
@@ -14,7 +14,7 @@ void do_choice(void)
 {
     TERNARY;
     stack[-3] = stack[-3] ? stack[-2] : stack[-1];
-    do_zap();
-    do_zap();
+    do_pop();
+    do_pop();
 }
 #endif

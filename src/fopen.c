@@ -1,7 +1,7 @@
 /*
     module  : fopen.c
-    version : 1.9
-    date    : 01/19/20
+    version : 1.10
+    date    : 07/23/20
 */
 #ifndef FOPEN_C
 #define FOPEN_C
@@ -15,6 +15,6 @@ void do_fopen(void)
 {
     COMPILE;
     stack[-2] = (intptr_t)fopen((char *)stack[-2], (char *)stack[-1]);
-    do_zap();
+    do_pop();
 }
 #endif

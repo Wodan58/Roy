@@ -1,7 +1,7 @@
 /*
     module  : treerec.c
-    version : 1.13
-    date    : 05/05/20
+    version : 1.14
+    date    : 06/23/20
 */
 #ifndef TREEREC_C
 #define TREEREC_C
@@ -74,7 +74,7 @@ void do_treerec(void)
     }
     do_cons();
 #ifdef COMPILING
-    if (compiling && stack_empty())
+    if (compiling && STACK(1))
 	put_treerec();
     else
 #endif

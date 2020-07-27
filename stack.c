@@ -1,7 +1,7 @@
 /*
     module  : stack.c
-    version : 1.2
-    date    : 01/20/20
+    version : 1.4
+    date    : 06/24/20
 */
 #ifdef VECTOR
 /* declare data stack */
@@ -70,13 +70,20 @@ intptr_t stack_top(void)
 void write_stack(void)
 {
 #ifdef VECTOR
-    writeterm(theStack, -1);
+    int Index, Limit;
+
+    for (Index = 0, Limit = vec_size(theStack) - 1; Index <= Limit; Index++) {
+	writefactor(vec_at(theStack, Index));
+	if (Index < Limit)
+	    putchar(' ');
+    }
 #else
     intptr_t *mem;
 
-    for (mem = stack; mem > memory; mem--) {
-	writefactor(mem[-1]);
-	putchar(' ');
+    for (mem = memory; mem < stack; mem++) {
+	writefactor(*mem);
+	if (mem < stack)
+	    putchar(' ');
     }
 #endif
 }
@@ -105,17 +112,7 @@ void do_push(intptr_t Value)
 #endif
 }
 
-void do_zap(void)
-{
-    if (!stack_empty())
-#ifdef VECTOR
-	vec_pop(theStack);
-#else
-	--stack;
-#endif
-}
-
-intptr_t do_pop_val(void)
+intptr_t stack_pop(void)
 {
     if (!stack_empty())
 #ifdef VECTOR

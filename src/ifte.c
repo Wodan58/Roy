@@ -1,7 +1,7 @@
 /*
     module  : ifte.c
-    version : 1.19
-    date    : 03/06/20
+    version : 1.20
+    date    : 06/23/20
 */
 #ifndef IFTE_C
 #define IFTE_C
@@ -37,7 +37,7 @@ void do_ifte(void)
     prog[1] = (Stack *)do_pop();
     prog[0] = (Stack *)do_pop();
 #ifdef COMPILING
-    if (compiling && stack_empty())
+    if (compiling && STACK(1))	// depends on arity of condition
 	put_ifte(prog);
     else
 #endif

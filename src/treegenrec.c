@@ -1,7 +1,7 @@
 /*
     module  : treegenrec.c
-    version : 1.12
-    date    : 01/19/20
+    version : 1.13
+    date    : 06/23/20
 */
 #ifndef TREEGENREC_C
 #define TREEGENREC_C
@@ -71,7 +71,7 @@ void do_treegenrec(void)
     do_cons();
     do_cons();
 #ifdef COMPILING
-    if (compiling && stack_empty())
+    if (compiling && STACK(1))
 	put_treegenrec();
     else
 #endif

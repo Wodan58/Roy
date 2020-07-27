@@ -1,7 +1,7 @@
 /*
     module  : construct.c
-    version : 1.15
-    date    : 01/20/20
+    version : 1.16
+    date    : 06/23/20
 */
 #ifndef CONSTRUCT_C
 #define CONSTRUCT_C
@@ -56,7 +56,7 @@ void do_construct(void)
     prog[1] = (Stack *)do_pop();
     prog[0] = (Stack *)do_pop();
 #ifdef COMPILING
-    if (compiling && stack_empty())
+    if (compiling && STACK(1))
 	put_construct(prog);
     else
 #endif

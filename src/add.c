@@ -1,7 +1,7 @@
 /*
     module  : add.c
-    version : 1.8
-    date    : 01/19/20
+    version : 1.9
+    date    : 07/23/20
 */
 #ifndef ADD_C
 #define ADD_C
@@ -14,7 +14,7 @@ void do_add(void)
 {
     BINARY;
     stack[-2] += stack[-1];
-    do_zap();
+    do_pop();
     CHECK2;
 }
 #endif

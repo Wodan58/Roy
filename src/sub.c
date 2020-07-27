@@ -1,7 +1,7 @@
 /*
     module  : sub.c
-    version : 1.8
-    date    : 01/19/20
+    version : 1.9
+    date    : 07/23/20
 */
 #ifndef SUB_C
 #define SUB_C
@@ -14,6 +14,6 @@ void do_sub(void)
 {
     BINARY;
     stack[-2] -= stack[-1];
-    do_zap();
+    do_pop();
 }
 #endif

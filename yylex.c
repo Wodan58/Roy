@@ -1,7 +1,7 @@
 /*
     module  : yylex.c
-    version : 1.16
-    date    : 05/04/20
+    version : 1.17
+    date    : 06/21/20
 */
 #include <stdio.h>
 #include <string.h>
@@ -37,6 +37,8 @@ void inilinebuffer(char *str)
 
 void redirect(FILE *fp)
 {
+    if (infile[ilevel].fp == fp)
+	return;
     infile[ilevel].lineno = lineno;
     if (ilevel + 1 == INPSTACKMAX)
 	execerror("fewer include files", "redirect");
@@ -112,7 +114,7 @@ static int getch(void)
 	yyin = stdin;
     if (!line[linepos]) {
 again:
-	while (!fgets(line, INPLINEMAX, yyin))
+	if (!fgets(line, INPLINEMAX, yyin))
 	    yywrap();
 	lineno++;
 	linepos = 0;

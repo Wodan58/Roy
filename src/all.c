@@ -1,7 +1,7 @@
 /*
     module  : all.c
-    version : 1.8
-    date    : 01/19/20
+    version : 1.10
+    date    : 07/23/20
 */
 #ifndef ALL_C
 #define ALL_C
@@ -17,7 +17,7 @@ void all(Stack *prog)
 	do_push(vec_at(list, i));
 	execute(prog);
 	num = do_pop();
-	do_zap();	// TODO
+	do_pop();
 	if (!num)
 	    break;
     }
@@ -32,7 +32,7 @@ void put_all(Stack *prog)
     fprintf(program, "for (i = vec_size(list) - 1; i >= 0; i--) {");
     fprintf(program, "do_push(vec_at(list, i));");
     execute(prog);
-    fprintf(program, "num = do_pop(); do_zap();");
+    fprintf(program, "num = do_pop(); do_pop();");
     fprintf(program, "if (!num) break; }");
     fprintf(program, "do_push(num); }");
 }
@@ -49,7 +49,7 @@ void do_all(void)
     UNARY;
     prog = (Stack *)do_pop();
 #ifdef COMPILING
-    if (compiling && stack_empty())
+    if (compiling && STACK(1))
 	put_all(prog);
     else
 #endif

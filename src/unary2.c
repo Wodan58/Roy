@@ -1,7 +1,7 @@
 /*
     module  : unary2.c
-    version : 1.17
-    date    : 01/19/20
+    version : 1.18
+    date    : 06/23/20
 */
 #ifndef UNARY2_C
 #define UNARY2_C
@@ -44,7 +44,7 @@ void do_unary2(void)
     UNARY;
     prog = (Stack *)do_pop();
 #ifdef COMPILING
-    if (compiling && stack_empty())
+    if (compiling && STACK(1))
 	put_unary2(prog);
     else
 #endif

@@ -1,7 +1,7 @@
 /*
     module  : step_set.c
-    version : 1.1
-    date    : 01/19/20
+    version : 1.2
+    date    : 06/23/20
 */
 #ifndef STEP_SET_C
 #define STEP_SET_C
@@ -42,7 +42,7 @@ void do_step_set(void)
     UNARY;
     Prog = (Stack *)do_pop();
 #ifdef COMPILING
-    if (compiling && stack_empty())
+    if (compiling && STACK(1))
 	put_step_set(Prog);
     else
 #endif

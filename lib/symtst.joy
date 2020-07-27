@@ -20,30 +20,30 @@ bin1ops == [ = < > ] ;
 END
 HIDE
 new-infra == cons [ ] swap infra ;
-X2Y == unswons [ [ [ dup unops in1 ] [ X2Y ] dip swap ] [ [ dup binops in1 ] [
+X2Y == unswons [ [ [ dup unops in ] [ X2Y ] dip swap ] [ [ dup binops in ] [
 X2Y X2Y ] dip swap ] [ swap ] ] cond ;
-R2T == [ [ [ [ dup unops in1 ] [ [ ] cons ] dip swons ] [ [ dup binops in1 ] [
+R2T == [ [ [ [ dup unops in ] [ [ ] cons ] dip swons ] [ [ dup binops in ] [
 [ ] cons cons ] dip swons ] [ [ dup list ] [ ] cons [ QUOTE ] swoncat ] [ [ ]
 cons ] ] cond ] step ;
-R2I == [ [ [ [ dup unops in1 ] swons ] [ [ dup binops in1 ] swons concat [ ]
+R2I == [ [ [ [ dup unops in ] swons ] [ [ dup binops in ] swons concat [ ]
 cons ] [ [ dup list ] [ ] cons [ QUOTE ] swoncat ] [ [ ] cons ] ] cond ] step ;
-R2C == [ [ [ [ dup unops in1 ] [ [ ] cons ] dip swons ] [ [ dup binops in1 ] [
+R2C == [ [ [ [ dup unops in ] [ [ ] cons ] dip swons ] [ [ dup binops in ] [
 [ ] cons cons ] dip swons ] [ [ dup list ] [ ] cons [ QUOTE ] swoncat ] [ ] ]
 cond ] step ;
-I2C == unswons [ [ [ dup unops in1 ] [ I2C [ ] cons ] dip swons ] [ [ dup [
-QUOTE ] in1 ] [ unswons [ ] cons ] dip swons ] [ [ dup list ] I2C swap uncons
+I2C == unswons [ [ [ dup unops in ] [ I2C [ ] cons ] dip swons ] [ [ dup [
+QUOTE ] in ] [ unswons [ ] cons ] dip swons ] [ [ dup list ] I2C swap uncons
 swapd I2C swons cons cons ] [ ] ] cond ;
-C2T == [ dup list ] [ unswons [ [ [ dup unops in1 ] [ first C2T [ ] cons ] dip
-swons ] [ [ dup [ QUOTE ] in1 ] swons ] [ [ uncons first [ C2T ] dip C2T [ ]
+C2T == [ dup list ] [ unswons [ [ [ dup unops in ] [ first C2T [ ] cons ] dip
+swons ] [ [ dup [ QUOTE ] in ] swons ] [ [ uncons first [ C2T ] dip C2T [ ]
 cons cons ] dip swons ] ] cond ] [ [ ] cons ] ifte ;
-C2R == [ dup list ] [ unswons [ [ [ dup unops in1 ] swap first C2R ] [ [ dup [
-QUOTE ] in1 ] pop first ] [ swap uncons first swap [ C2R ] dip C2R ] ] cond ] [
+C2R == [ dup list ] [ unswons [ [ [ dup unops in ] swap first C2R ] [ [ dup [
+QUOTE ] in ] pop first ] [ swap uncons first swap [ C2R ] dip C2R ] ] cond ] [
 ] ifte ;
-C2P == [ dup list ] [ unswons [ [ [ dup unops in1 ] [ first C2P ] dip ] [ [ dup
-[ QUOTE ] in1 ] pop first ] [ [ uncons first swap [ C2P ] dip C2P ] dip ] ]
+C2P == [ dup list ] [ unswons [ [ [ dup unops in ] [ first C2P ] dip ] [ [ dup
+[ QUOTE ] in ] pop first ] [ [ uncons first swap [ C2P ] dip C2P ] dip ] ]
 cond ] [ ] ifte ;
-C2I == [ dup list ] [ unswons [ [ [ dup unops in1 ] [ first C2I ] dip swons ] [
-[ dup [ QUOTE ] in1 ] swons ] [ [ uncons first [ C2I ] dip C2I ] dip swons
+C2I == [ dup list ] [ unswons [ [ [ dup unops in ] [ first C2I ] dip swons ] [
+[ dup [ QUOTE ] in ] swons ] [ [ uncons first [ C2I ] dip C2I ] dip swons
 concat [ ] cons ] ] cond ] [ [ ] cons ] ifte ;
 IN
 Rev2Tre == R2T ;
@@ -56,23 +56,23 @@ Min2Rev == Min2Cam Cam2Rev ;
 Min2Pol == Min2Cam Cam2Pol ;
 Min2Inf == Min2Cam Cam2Inf ;
 Min2Cam == unswons M12C popd ;
-M42T == [ [ [ dup unops in1 ] [ unswons M42T [ ] cons ] dip swons ] [ [ dup [
-QUOTE ] in1 ] [ unswons [ ] cons ] dip swons ] [ [ dup list ] unswons M12T popd
+M42T == [ [ [ dup unops in ] [ unswons M42T [ ] cons ] dip swons ] [ [ dup [
+QUOTE ] in ] [ unswons [ ] cons ] dip swons ] [ [ dup list ] unswons M12T popd
 ] [ [ ] cons ] ] cond ;
-M42C == [ [ [ dup unops in1 ] [ unswons M42C [ ] cons ] dip swons ] [ [ dup [
-QUOTE ] in1 ] [ unswons [ ] cons ] dip swons ] [ [ dup list ] unswons M12C popd
+M42C == [ [ [ dup unops in ] [ unswons M42C [ ] cons ] dip swons ] [ [ dup [
+QUOTE ] in ] [ unswons [ ] cons ] dip swons ] [ [ dup list ] unswons M12C popd
 ] [ ] ] cond ;
-M32T == M42T [ over [ dup null not ] [ first bin3ops in1 ] sequand ] [ swap
+M32T == M42T [ over [ dup null not ] [ first bin3ops in ] sequand ] [ swap
 uncons swapd unswons M32T rollupd [ ] cons cons cons ] [ ] ifte ;
-M32C == M42C [ over [ dup null not ] [ first bin3ops in1 ] sequand ] [ swap
+M32C == M42C [ over [ dup null not ] [ first bin3ops in ] sequand ] [ swap
 uncons swapd unswons M32C rollupd [ ] cons cons cons ] [ ] ifte ;
-M22T == M32T [ over [ dup null not ] [ first bin2ops in1 ] sequand ] [ swap
+M22T == M32T [ over [ dup null not ] [ first bin2ops in ] sequand ] [ swap
 uncons swapd unswons M22T rollupd [ ] cons cons cons ] [ ] ifte ;
-M22C == M32C [ over [ dup null not ] [ first bin2ops in1 ] sequand ] [ swap
+M22C == M32C [ over [ dup null not ] [ first bin2ops in ] sequand ] [ swap
 uncons swapd unswons M22C rollupd [ ] cons cons cons ] [ ] ifte ;
-M12T == M22T [ over [ dup null not ] [ first binops in1 ] sequand ] [ swap
+M12T == M22T [ over [ dup null not ] [ first binops in ] sequand ] [ swap
 uncons swapd unswons M12T rollupd [ ] cons cons cons ] [ ] ifte ;
-M12C == M22C [ over [ dup null not ] [ first binops in1 ] sequand ] [ swap
+M12C == M22C [ over [ dup null not ] [ first binops in ] sequand ] [ swap
 uncons swapd unswons M12C rollupd [ ] cons cons cons ] [ ] ifte ;
 Inf2Rev == Inf2Cam Cam2Rev ;
 Inf2Pol == Inf2Cam Cam2Pol ;

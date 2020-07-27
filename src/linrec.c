@@ -1,7 +1,7 @@
 /*
     module  : linrec.c
-    version : 1.16
-    date    : 01/19/20
+    version : 1.17
+    date    : 06/23/20
 */
 #ifndef LINREC_C
 #define LINREC_C
@@ -61,7 +61,7 @@ void do_linrec(void)
     prog[1] = (Stack *)do_pop();
     prog[0] = (Stack *)do_pop();
 #ifdef COMPILING
-    if (compiling && stack_empty())
+    if (compiling && STACK(1))
 	put_linrec(prog);
     else
 #endif

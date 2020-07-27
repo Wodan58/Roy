@@ -1,7 +1,7 @@
 /*
     module  : stack.h
-    version : 1.21
-    date    : 01/20/20
+    version : 1.22
+    date    : 06/21/20
 */
 #ifdef _MSC_VER
 #include <io.h>
@@ -65,7 +65,7 @@ typedef struct optable_t {
 extern optable_t optable[];
 
 /* main.c */
-extern int g_argc, compiling, debugging, autoput, tracegc, undeferror;
+extern int g_argc, library, compiling, debugging, autoput, tracegc, undeferror;
 extern char **g_argv, *filename;
 extern clock_t startclock;
 void execerror(char *msg, const char *op);

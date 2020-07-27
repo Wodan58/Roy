@@ -1,5 +1,5 @@
 (* This program calculates the nth fibonacci number
- * using algorithm 1A: naive binary recursion.
+ * using algorithm 1A: naive binary recursion
  *
  * compiled: N/A
  * executed: joy fib1a.joy n

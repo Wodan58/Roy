@@ -21,6 +21,8 @@ typedef vector(Node) NodeList;
 /* declare node list */
 static NodeList *theList;
 
+void printvalue(FILE *fp, intptr_t Value);
+
 void init_decl(void)
 {
     declTab = kh_init(Decl);
@@ -206,6 +208,16 @@ int PrintNode(FILE *fp)
     return changed;
 }
 
+void printlib(FILE *fp)
+{
+    intptr_t Index, Limit;
+
+    Limit = vec_size(theStack);
+    for (Index = 0; Index < Limit; Index++)
+	printvalue(fp, vec_at(theStack, Index));
+    vec_setsize(theStack, 0);
+}
+
 void compilelib(void)
 {
     khiter_t key;
@@ -227,6 +239,7 @@ void compilelib(void)
 				    identifier(Name));
 			    vec_setsize(theStack, 0);
 			    execute((Stack *)Value);
+			    printlib(program);
 			    fprintf(program, "}");
 			}
 		    }
@@ -343,23 +356,4 @@ void print1(FILE *fp, const char *str)
 	printvalue(fp, do_pop());
     if (str)
 	fprintf(fp, "%s();", str);
-}
-
-void dumpstack(void)
-{
-    int Index, Limit;
-
-    for (Index = 0, Limit = vec_size(theStack) - 1; Index <= Limit; Index++) {
-	writefactor(vec_at(theStack, Index));
-	if (Index < Limit)
-	    putchar(' ');
-    }
-}
-
-void trace(Stack *List, int Index)
-{
-    dumpstack();
-    printf(" : ");
-    writeterm(List, Index);
-    printf(" ;\n");
 }

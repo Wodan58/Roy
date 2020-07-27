@@ -1,7 +1,7 @@
 /*
     module  : has_str.c
-    version : 1.1
-    date    : 01/19/20
+    version : 1.2
+    date    : 07/23/20
 */
 #ifndef HAS_STR_C
 #define HAS_STR_C
@@ -18,6 +18,6 @@ void do_has_str(void)
     for (str = (char *)stack[-2]; str && *str && *str != stack[-1]; str++)
 	;
     stack[-2] = str && *str != 0;
-    do_zap();
+    do_pop();
 }
 #endif

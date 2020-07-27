@@ -1,7 +1,7 @@
 /*
     module  : genrec.c
-    version : 1.17
-    date    : 01/19/20
+    version : 1.18
+    date    : 06/23/20
 */
 #ifndef GENREC_C
 #define GENREC_C
@@ -75,7 +75,7 @@ void do_genrec(void)
     do_cons();
     do_cons();
 #ifdef COMPILING
-    if (compiling && stack_empty())
+    if (compiling && STACK(1))
 	put_genrec();
     else
 #endif

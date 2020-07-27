@@ -1,7 +1,7 @@
 /*
     module  : all_set.c
-    version : 1.1
-    date    : 03/15/20
+    version : 1.3
+    date    : 07/23/20
 */
 #ifndef ALL_SET_C
 #define ALL_SET_C
@@ -17,7 +17,7 @@ void all_set(Stack *prog)
 	    do_push(i);
 	    execute(prog);
 	    num = do_pop();
-	    do_zap();
+	    do_pop();
 	    if (!num)
 		break;
 	}
@@ -33,7 +33,7 @@ void put_all_set(Stack *prog)
     fprintf(program, "if (set & ((intptr_t)1 << i)) {");
     fprintf(program, "do_push(i);");
     execute(prog);
-    fprintf(program, "num = do_pop(); do_zap();");
+    fprintf(program, "num = do_pop(); do_pop();");
     fprintf(program, "if (!num) break; }");
     fprintf(program, "do_push(num); }");
 }
@@ -50,7 +50,7 @@ void do_all_set(void)
     UNARY;
     prog = (Stack *)do_pop();
 #ifdef COMPILING
-    if (compiling && stack_empty())
+    if (compiling && STACK(1))
 	put_all_set(prog);
     else
 #endif

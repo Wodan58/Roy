@@ -1,7 +1,7 @@
 /*
     module  : dip.c
-    version : 1.11
-    date    : 01/19/20
+    version : 1.12
+    date    : 06/23/20
 */
 #ifndef DIP_C
 #define DIP_C
@@ -35,7 +35,7 @@ void do_dip(void)
     UNARY;
     Prog = (Stack *)do_pop();
 #ifdef COMPILING
-    if (compiling && stack_empty())
+    if (compiling && STACK(1))
 	put_dip(Prog);
     else
 #endif

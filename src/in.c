@@ -1,10 +1,17 @@
 /*
     module  : in.c
-    version : 1.11
-    date    : 03/15/20
+    version : 1.12
+    date    : 06/23/20
 */
 #ifndef IN_C
 #define IN_C
+
+#ifdef EQUAL_X
+#undef EQUAL_X
+#undef EQUAL_C
+#endif
+
+#include "equal.c"
 
 /**
 in  :  X A  ->  B
@@ -14,17 +21,12 @@ void do_in(void)
 {
     int i;
     Stack *List;
-    char *str, *ptr;
 
     BINARY;
     List = (Stack *)do_pop();
-    if ((str = (char *)stack[-1]) == 0)
-	return;
-    for (i = vec_size(List) - 1; i >= 0; i--) {
-	ptr = (char *)vec_at(List, i);
-	if (!strcmp(ptr - 1, str - 1))
+    for (i = vec_size(List) - 1; i >= 0; i--)
+	if (is_equal_item(stack[-1], vec_at(List,i)))
 	    break;
-    }
     stack[-1] = i >= 0;
 }
 #endif

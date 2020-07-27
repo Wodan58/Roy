@@ -1,9 +1,9 @@
 #
-#  module  : %M%
-#  version : %I%
-#  date    : %G%
+#   module  : trans.sh
+#   version : 1.1
+#   date    : 07/23/20
 #
-#  Generate trans.c
+#   Generate trans.c
 #
 echo checking trans.c
 todo=0

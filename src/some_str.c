@@ -1,7 +1,7 @@
 /*
     module  : some_str.c
-    version : 1.1
-    date    : 03/15/20
+    version : 1.3
+    date    : 07/23/20
 */
 #ifndef SOME_STR_C
 #define SOME_STR_C
@@ -16,7 +16,7 @@ void some_str(Stack *prog)
 	do_push(*str);
 	execute(prog);
 	num = do_pop();
-	do_zap();
+	do_pop();
 	if (num)
 	    break;
     }
@@ -31,7 +31,7 @@ void put_some_str(Stack *prog)
     fprintf(program, "for (i = vec_size(list) - 1; i >= 0; i--) {");
     fprintf(program, "do_push(vec_at(list, i));");
     execute(prog);
-    fprintf(program, "num = do_pop(); do_zap();");
+    fprintf(program, "num = do_pop(); do_pop();");
     fprintf(program, "if (num) break; }");
     fprintf(program, "do_push(num); }");
 }
@@ -48,7 +48,7 @@ void do_some_str(void)
     UNARY;
     prog = (Stack *)do_pop();
 #ifdef COMPILING
-    if (compiling && stack_empty())
+    if (compiling && STACK(1))
 	put_some_str(prog);
     else
 #endif

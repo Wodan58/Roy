@@ -1,7 +1,7 @@
 /*
     module  : of_set.c
-    version : 1.1
-    date    : 03/15/20
+    version : 1.2
+    date    : 07/23/20
 */
 #ifndef OF_SET_C
 #define OF_SET_C
@@ -20,7 +20,7 @@ void do_of_set(void)
 	if (stack[-1] & ((intptr_t)1 << i)) {
 	    if (!index) {
 		stack[-2] = i;
-		do_zap();
+		do_pop();
 		return;
 	    }
 	}

@@ -1,7 +1,7 @@
 /*
     module  : branch.c
-    version : 1.9
-    date    : 01/19/20
+    version : 1.10
+    date    : 06/23/20
 */
 #ifndef BRANCH_C
 #define BRANCH_C
@@ -29,7 +29,7 @@ void do_branch(void)
     prog[1] = (Stack *)do_pop();
     prog[0] = (Stack *)do_pop();
 #ifdef COMPILING
-    if (compiling && stack_empty())
+    if (compiling && STACK(1))
 	put_branch(prog);
     else
 #endif

@@ -1,10 +1,12 @@
 /*
     module  : decl.h
-    version : 1.5
-    date    : 01/19/20
+    version : 1.7
+    date    : 06/21/20
 */
+#define MAXOUT		10
 #define MAXNUM		20
 #define MAXFIL		20
+#define ALEN		22
 #define MAXSTR		128
 #define LINEWIDTH	72
 #define SHELLESCAPE	'$'	/* configure */
@@ -16,7 +18,7 @@
 #define INIAUTOPUT	1
 #define INITRACEGC	1
 #define INIUNDEFERR	0
-#define JLAP_INVALID	1
-#define JLAP_PACKAGE	2
+#define JLAP_INVALID	(intptr_t)1
+#define JLAP_PACKAGE	(intptr_t)2
 #define MIN_INT		-1000000
 #define MAX_INT		0x400000

@@ -1,7 +1,7 @@
 /*
     module  : primrec_int.c
-    version : 1.1
-    date    : 01/19/20
+    version : 1.2
+    date    : 06/23/20
 */
 #ifndef PRIMREC_INT_C
 #define PRIMREC_INT_C
@@ -44,7 +44,7 @@ void do_primrec_int(void)
     prog[1] = (Stack *)do_pop();
     prog[0] = (Stack *)do_pop();
 #ifdef COMPILING
-    if (compiling && stack_empty())
+    if (compiling && STACK(1))
 	put_primrec_int(prog);
     else
 #endif

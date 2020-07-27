@@ -1,7 +1,7 @@
 /*
     module  : xor.c
-    version : 1.8
-    date    : 01/19/20
+    version : 1.9
+    date    : 07/23/20
 */
 #ifndef XOR_C
 #define XOR_C
@@ -15,6 +15,6 @@ void do_xor(void)
 {
     BINARY;
     stack[-2] ^= stack[-1];
-    do_zap();
+    do_pop();
 }
 #endif

@@ -1,7 +1,7 @@
 /*
     module  : print.c
-    version : 1.16
-    date    : 05/04/20
+    version : 1.18
+    date    : 06/21/20
 */
 #include <stdio.h>
 #include <string.h>
@@ -11,6 +11,7 @@
 #endif
 #include <inttypes.h>
 #include "stack.h"
+#include "parse.h"
 
 #ifdef _MSC_VER
 #define DOWN_64K	~0xFFFF
@@ -22,9 +23,8 @@
 #define SIZE_OF_BSS	9
 #endif
 
-extern YYTABLE yytable[];
-
 real_t unpack(intptr_t num);		/* builtin.c */
+char *procname(intptr_t Value);
 
 void writefactor(intptr_t Value);	/* print.c */
 
@@ -32,11 +32,6 @@ static intptr_t start_of_text,
 	        start_of_data,
 		start_of_bss,
 		start_of_heap;
-
-int is_set(intptr_t Value)
-{
-    return Value >= MIN_INT && Value <= MAX_INT;
-}
 
 int is_boolean(intptr_t Value)
 {
@@ -53,20 +48,34 @@ int is_integer(intptr_t Value)
     return Value >= MIN_INT && Value <= MAX_INT;
 }
 
+int is_set(intptr_t Value)
+{
+    return Value >= MIN_INT && Value <= MAX_INT;
+}
+
+int is_file(intptr_t Value)
+{
+    return Value >= (intptr_t)stdin && Value < (intptr_t)(stdin + MAXFIL);
+}
+
 int is_code(intptr_t Value)
 {
     return Value > start_of_text && Value < start_of_data;
 }
 
-int is_string(intptr_t Value)
+int is_usr(intptr_t Value)
 {
     int i;
 
     for (i = 0; i < g_argc; i++)
 	if (Value == (intptr_t)g_argv[i])
 	    return 1;
-    return (Value > start_of_data && Value < start_of_bss) ||
-	   (Value > start_of_heap && (Value & JLAP_INVALID));
+    return Value > start_of_data && Value < start_of_bss;
+}
+
+int is_string(intptr_t Value)
+{
+    return Value > start_of_heap && (Value & JLAP_INVALID);
 }
 
 int is_float(intptr_t Value)
@@ -80,9 +89,31 @@ int is_list(intptr_t Value)
     return Value > start_of_heap && !(Value & (JLAP_INVALID | JLAP_PACKAGE));
 }
 
-int is_file(intptr_t Value)
+int get_type(intptr_t temp)
 {
-    return Value >= (intptr_t)stdin && Value < (intptr_t)(stdin + MAXFIL);
+    int type;
+
+    if (is_boolean(temp))
+	type = BOOLEAN_;	// 4
+    else if (is_char(temp))
+	type = CHAR_;		// 5
+    else if (is_integer(temp))
+	type = INTEGER_;	// 6, or SET_, 7
+    else if (is_file(temp))
+	type = FILE_;		// 11
+    else if (is_code(temp))
+	type = ANON_FUNCT_;	// 3
+    else if (is_usr(temp))
+	type = USR_;		// 2
+    else if (is_string(temp))
+	type = STRING_;		// 8
+    else if (is_float(temp))
+	type = FLOAT_;		// 10
+    else if (is_list(temp))
+	type = LIST_;		// 9
+    else
+	type = UNKNOWN_;	// 1
+    return type;
 }
 
 void init_heap(void)
@@ -134,74 +165,46 @@ void writeterm(Stack *List, int i)
 
 int writeproc(intptr_t Value)
 {
-    int i;
-    void (*proc)(void);
+    char *name;
 
-    proc = (void (*)(void))(Value & ~JLAP_INVALID);
-    for (i = 0; yytable[i].proc; i++)
-	if (proc == yytable[i].proc) {
-	    printf("%s", yytable[i].name);
-	    return 1;
-	}
+    if ((name = procname(Value)) != 0) {
+	printf("%s", name);
+	return 1;
+    }
     return 0;
 }
 
-void (*findproc(char *name))(void)
+void writestring(FILE *fp, char *str)
 {
-    int i;
-
-    for (i = 0; yytable[i].proc; i++)
-	if (!strcmp(name, yytable[i].name))
-	    return yytable[i].proc;
-    return 0;
-}
-
-void writestring(char *str)
-{
-    putchar('"');
+    fputc('"', fp);
     while (*++str) {
 	if (*str == '"' || *str == '\\' || *str == '\n')
-	    putchar('\\');
+	    fputc('\\', fp);
 	if (*str == '\n')
-	    putchar('n');
+	    fputc('n', fp);
 	else
-	    putchar(*str);
+	    fputc(*str, fp);
     }
-    putchar('"');
+    fputc('"', fp);
 }
 
 void writefactor(intptr_t Value)
 {
-    int i;
     char *str;
 
-    for (i = 0; i < g_argc; i++)
-	if (Value == (intptr_t)g_argv[i]) {
-	    printf("\"%s\"", g_argv[i]);
-	    return;
-	}
-    if (Value >= MIN_INT && Value <= MAX_INT)
-	printf("%" PRIdPTR, Value);
-#if !defined(__linux__) && !defined(__APPLE__) && !defined(_MSC_VER)
-    else if (Value > start_of_text && Value < start_of_heap) {
-	if (!writeproc(Value))
-	    printf("%s", (char *)Value);
-#else
-    else if (Value > start_of_data && Value < start_of_bss)
+    switch (get_type(Value)) {
+    case USR_:
 	printf("%s", (char *)Value);
-    else if (Value > start_of_text && Value < start_of_data) {
-	if (!writeproc(Value))
-	    printf("%" PRIdPTR, Value);
-#endif
-    } else if (Value & JLAP_INVALID) {
-	str = (char *)(Value & ~JLAP_INVALID);
-	if (*str == '"')
-	    writestring(str);
-	else
-	    printf("%s", str);
-    } else if (Value & JLAP_PACKAGE)
-	printf("%g", unpack(Value));
-    else if (is_file(Value)) {
+	break;
+    case ANON_FUNCT_:
+	if (writeproc(Value))
+	    return;
+    case BOOLEAN_:
+    case CHAR_:
+    case INTEGER_:
+	printf("%" PRIdPTR, Value);
+	break;
+    case FILE_:
 	if (Value == (intptr_t)stdin)
 	    printf("file:stdin");
 	else if (Value == (intptr_t)stdout)
@@ -210,9 +213,23 @@ void writefactor(intptr_t Value)
 	    printf("file:stderr");
 	else
 	    printf("file:%p", (void *)Value);
-    } else {
+	break;
+    case STRING_:
+	str = (char *)(Value & ~JLAP_INVALID);
+	if (*str == '"')
+	    writestring(stdout, str);
+	else
+	    printf("%s", str);
+	break;
+    case FLOAT_:
+	printf("%g", unpack(Value));
+	break;
+    case LIST_:
 	printf("[");
 	writeterm((Stack *)Value, -1);
 	printf("]");
+	break;
+    default:
+	break;
     }
 }

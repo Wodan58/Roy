@@ -1,7 +1,7 @@
 /*
     module  : map.c
-    version : 1.24
-    date    : 01/20/20
+    version : 1.25
+    date    : 06/23/20
 */
 #ifndef MAP_C
 #define MAP_C
@@ -45,7 +45,7 @@ void do_map(void)
     BINARY;
     prog = (Stack *)do_pop();
 #ifdef COMPILING
-    if (compiling && stack_empty())
+    if (compiling && STACK(1))
 	put_map(prog);
     else
 #endif

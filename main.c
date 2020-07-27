@@ -1,7 +1,7 @@
 /*
     module  : main.c
-    version : 1.15
-    date    : 01/19/20
+    version : 1.16
+    date    : 06/21/20
 */
 #include <stdio.h>
 #include <string.h>
@@ -21,7 +21,7 @@ void init_decl(void);		/* compile.c */
 int yyparse(void);		/* parse.c */
 
 int autoput = INIAUTOPUT, tracegc = INITRACEGC, undeferror = INIUNDEFERR;
-int g_argc, compiling, debugging;
+int g_argc, library, compiling, debugging;
 char **g_argv, *filename;
 clock_t startclock;
 static jmp_buf begin;
@@ -49,6 +49,8 @@ int main(int argc, char *argv[])
 	if (*ptr == '-') {
 	    rv = 2;
 	    while (*++ptr) {
+		if (*ptr == 'l')
+		    compiling = library = 1;
 		if (*ptr == 'c')
 		    compiling = 1;
 		if (*ptr == 'd')

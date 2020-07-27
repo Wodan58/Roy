@@ -1,9 +1,9 @@
 #
-#  module  : table.sh
-#  version : 1.2
-#  date    : 04/20/19
+#   module  : table.sh
+#   version : 1.1
+#   date    : 07/23/20
 #
-#  Generate table.c
+#   Generate table.c
 #
 echo checking table.c
 todo=0

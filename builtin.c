@@ -1,7 +1,7 @@
 /*
     module  : builtin.c
-    version : 1.31
-    date    : 05/05/20
+    version : 1.32
+    date    : 06/21/20
 */
 #include <stdio.h>
 #include <string.h>
@@ -10,6 +10,7 @@
 #include <limits.h>
 #include <math.h>
 #include <inttypes.h>
+#include <assert.h>
 #include "stack.h"
 #include "parse.h"
 #include "builtin.h"
@@ -25,11 +26,9 @@
 
 // #define REPORT
 
-#ifdef COMPILING
 extern YYTABLE yytable[];
 
-static int library;
-
+#ifdef COMPILING
 #define STACK(n)	(library || vec_size(theStack) < (n))
 #define COMPILE		if (compiling            ) { print(program, __func__); \
 			return; }
@@ -51,6 +50,7 @@ static int library;
 			vec_back(theStack) > MAX_INT)) print(program, 0)
 #define SYNCING		if (compiling) fprintf(program, "clear_stack();")
 #else
+#define STACK(n)
 #define COMPILE
 #define COMPILE1
 #define UNARY
@@ -58,6 +58,7 @@ static int library;
 #define BINARY
 #define TERNARY
 #define QUATERN
+#define QUINARY
 #define CHECK2
 #define SYNCING
 
@@ -87,6 +88,34 @@ real_t unpack(intptr_t num)
     return dbl;
 }
 
+/*
+ * translate function address to symbol name
+ */
+char *procname(intptr_t Value)
+{
+    int i;
+    void (*proc)(void);
+
+    proc = (void (*)(void))(Value & ~JLAP_INVALID);
+    for (i = 0; yytable[i].proc; i++)
+	if (proc == yytable[i].proc)
+	    return yytable[i].name;
+    return 0;
+}
+
+/*
+ * translate symbol name to function address
+ */
+void (*nameproc(const char *name))(void)
+{
+    int i;
+
+    for (i = 0; yytable[i].proc; i++)
+	if (!strcmp(name, yytable[i].name))
+	    return yytable[i].proc;
+    return 0;
+}
+
 #include "stack.c"
 
 #ifdef COMPILING
@@ -112,10 +141,21 @@ void report_execute(void)
 }
 #endif
 
+void trace(Stack *List, int Index)
+{
+    write_stack();
+    printf(": ");
+    writeterm(List, Index);
+    printf(" ;\n");
+}
+
 void execute_rest(Stack *List, int i)
 {
     intptr_t Value;
     const char *Name;
+#ifndef COMPILING
+    void (*proc)(void);
+#endif
 
 #ifdef REPORT
     static int first;
@@ -133,28 +173,28 @@ void execute_rest(Stack *List, int i)
     if (i == -1)
 	i += vec_size(List);
     for (; i >= 0; i--) {
-#ifdef COMPILING
 	if (debugging)
 	    trace(List, i);
-#endif
 	Value = vec_at(List, i);
 	if ((Value >= MIN_INT && Value <= MAX_INT) || !(Value & JLAP_INVALID))
 	    do_push(Value);
 	else {
-#ifdef COMPILING
 	    Name = (const char *)(Value & ~JLAP_INVALID);
 	    if (*Name == '"')
 		do_push(Value);
 	    else {
+#ifdef COMPILING
 		Value = lookup(Name);
 		if (!(Value & JLAP_INVALID))
 		    execute((Stack *)Value);
 		else
+		    ((void (*)(void))(Value & ~JLAP_INVALID))();
+#else
+		if ((proc = nameproc(Name)) == 0)
+		    proc = (void (*)(void))Name;
+		(*proc)();
 #endif
-		    (*(void (*)(void))(Value & ~JLAP_INVALID))();
-#ifdef COMPILING
 	    }
-#endif
 	}
     }
 }

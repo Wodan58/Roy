@@ -1,7 +1,7 @@
 /*
     module  : filter.c
-    version : 1.23
-    date    : 01/20/20
+    version : 1.24
+    date    : 06/23/20
 */
 #ifndef FILTER_C
 #define FILTER_C
@@ -46,7 +46,7 @@ void do_filter(void)
 
     prog = (Stack *)do_pop();
 #ifdef COMPILING
-    if (compiling && stack_empty())
+    if (compiling && STACK(1))
 	put_filter(prog);
     else
 #endif

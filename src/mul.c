@@ -1,7 +1,7 @@
 /*
     module  : mul.c
-    version : 1.10
-    date    : 01/19/20
+    version : 1.11
+    date    : 07/23/20
 */
 #ifndef MUL_C
 #define MUL_C
@@ -14,7 +14,7 @@ void do_mul(void)
 {
     BINARY;
     stack[-2] *= stack[-1];
-    do_zap();
+    do_pop();
     CHECK2;
 }
 #endif

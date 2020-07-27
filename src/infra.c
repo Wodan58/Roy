@@ -1,7 +1,7 @@
 /*
     module  : infra.c
-    version : 1.15
-    date    : 01/19/20
+    version : 1.16
+    date    : 06/23/20
 */
 #ifndef INFRA_C
 #define INFRA_C
@@ -57,7 +57,7 @@ void do_infra(void)
     UNARY;
     prog = (Stack *)do_pop();
 #ifdef COMPILING
-    if (compiling && stack_empty())
+    if (compiling && STACK(1))
 	put_infra(prog);
     else
 #endif

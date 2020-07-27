@@ -1,7 +1,7 @@
 /*
     module  : step_str.c
-    version : 1.4
-    date    : 01/19/20
+    version : 1.5
+    date    : 06/23/20
 */
 #ifndef STEP_STR_C
 #define STEP_STR_C
@@ -42,7 +42,7 @@ void do_step_str(void)
     UNARY;
     Prog = (Stack *)do_pop();
 #ifdef COMPILING
-    if (compiling && stack_empty())
+    if (compiling && STACK(1))
 	put_step_str(Prog);
     else
 #endif

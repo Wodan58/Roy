@@ -1,7 +1,7 @@
 /*
     module  : casting.c
-    version : 1.9
-    date    : 01/19/20
+    version : 1.10
+    date    : 07/23/20
 */
 #ifndef CASTING_C
 #define CASTING_C
@@ -13,6 +13,6 @@ Z takes the value from X and the type from Y.
 void do_casting(void)
 {
     UNARY;
-    do_zap();
+    do_pop();
 }
 #endif

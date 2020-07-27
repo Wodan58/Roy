@@ -1,7 +1,7 @@
 /*
     module  : tailrec.c
-    version : 1.17
-    date    : 05/04/20
+    version : 1.18
+    date    : 06/23/20
 */
 #ifndef TAILREC_C
 #define TAILREC_C
@@ -54,7 +54,7 @@ void do_tailrec(void)
     prog[1] = (Stack *)do_pop();
     prog[0] = (Stack *)do_pop();
 #ifdef COMPILING
-    if (compiling && stack_empty())
+    if (compiling && STACK(1))
 	put_tailrec(prog);
     else
 #endif

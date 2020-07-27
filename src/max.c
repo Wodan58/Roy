@@ -1,7 +1,7 @@
 /*
     module  : max.c
-    version : 1.7
-    date    : 01/19/20
+    version : 1.8
+    date    : 07/23/20
 */
 #ifndef MAX_C
 #define MAX_C
@@ -15,6 +15,6 @@ void do_max(void)
     BINARY;
     if (stack[-2] < stack[-1])
 	stack[-2] = stack[-1];
-    do_zap();
+    do_pop();
 }
 #endif

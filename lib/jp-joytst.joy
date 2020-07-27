@@ -1,7 +1,7 @@
 DEFINE
 newline == 10 putch ;
 joy0s == newline "joy0s :" putchars newline
-	 [ [ [ joy0s body joy0s ]
+	 [ [ # [ joy0s body joy0s ]
 	     [ [ ] ]
 	     [ pop pop pop ]
 	     [ cons pop cons ]
@@ -12,7 +12,7 @@ joy0s == newline "joy0s :" putchars newline
 	     [ [ ] cons i ] ] opcase i ] step ;
 joy0l == newline "joy0l :" putchars newline
 	 [ dup put1
-	   [ [ joy0l body joy0l ]
+	   [ # [ joy0l body joy0l ]
 	     [ [ ] ]
 	     [ pop pop pop ]
 	     [ cons pop cons ]
@@ -21,7 +21,7 @@ joy0l == newline "joy0l :" putchars newline
 	     [ i pop joy0l ]
 	     [ step pop [ joy0 ] cons step ]
 	     [ [ ] cons i ] ] opcase i ] step ;
-joy0 == [ [ [ joy0 body joy0 ]
+joy0 == [ [ # [ joy0 body joy0 ]
 	    [ [ ] ]
 	    [ pop pop pop ]
 	    [ cons pop cons ]

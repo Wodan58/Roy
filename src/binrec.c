@@ -1,7 +1,7 @@
 /*
     module  : binrec.c
-    version : 1.16
-    date    : 01/19/20
+    version : 1.17
+    date    : 06/23/20
 */
 #ifndef BINREC_C
 #define BINREC_C
@@ -71,7 +71,7 @@ void do_binrec(void)
     prog[1] = (Stack *)do_pop();
     prog[0] = (Stack *)do_pop();
 #ifdef COMPILING
-    if (compiling && stack_empty())
+    if (compiling && STACK(1))
 	put_binrec(prog);
     else
 #endif

@@ -1,7 +1,7 @@
 /*
     module  : stop.c
-    version : 1.10
-    date    : 01/19/20
+    version : 1.11
+    date    : 06/23/20
 */
 #ifndef STOP_C
 #define STOP_C

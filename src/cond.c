@@ -1,7 +1,7 @@
 /*
     module  : cond.c
-    version : 1.17
-    date    : 01/20/20
+    version : 1.18
+    date    : 06/23/20
 */
 #ifndef COND_C
 #define COND_C
@@ -59,7 +59,7 @@ void do_cond(void)
     UNARY;
     list = (Stack *)do_pop();
 #ifdef COMPILING
-    if (compiling && stack_empty())
+    if (compiling && STACK(1))
 	put_cond(list);
     else
 #endif

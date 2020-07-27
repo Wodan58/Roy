@@ -1,7 +1,7 @@
 /*
     module  : ifchar.c
-    version : 1.7
-    date    : 01/19/20
+    version : 1.8
+    date    : 06/23/20
 */
 #ifndef IFCHAR_C
 #define IFCHAR_C
@@ -37,7 +37,7 @@ void do_ifchar(void)
     prog[1] = (Stack *)do_pop();
     prog[0] = (Stack *)do_pop();
 #ifdef COMPILING
-    if (compiling && stack_empty())
+    if (compiling && STACK(1))
 	put_ifchar(prog);
     else
 #endif

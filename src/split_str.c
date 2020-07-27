@@ -1,7 +1,7 @@
 /*
     module  : split_str.c
-    version : 1.6
-    date    : 01/19/20
+    version : 1.8
+    date    : 07/23/20
 */
 #ifndef SPLIT_STR_C
 #define SPLIT_STR_C
@@ -23,7 +23,7 @@ void split_str(Stack *prog)
 	    yesstring[yesptr++] = str[i];
 	else
 	    nostring[noptr++] = str[i];
-	do_zap();	// TODO
+	do_pop();
     }
     yesstring[yesptr] = nostring[noptr] = 0;
     stack[-1] = (intptr_t)yesstring | JLAP_INVALID;
@@ -59,7 +59,7 @@ void do_split_str(void)
 
     prog = (Stack *)do_pop();
 #ifdef COMPILING
-    if (compiling && stack_empty())
+    if (compiling && STACK(1))
 	put_split_str(prog);
     else
 #endif

@@ -1,7 +1,7 @@
 /*
     module  : swons_set.c
-    version : 1.5
-    date    : 01/19/20
+    version : 1.6
+    date    : 07/23/20
 */
 #ifndef SWONS_SET_C
 #define SWONS_SET_C
@@ -14,6 +14,6 @@ void do_swons_set(void)
 {
     BINARY;
     stack[-2] |= (intptr_t)1 << stack[-1];
-    do_zap();
+    do_pop();
 }
 #endif

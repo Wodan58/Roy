@@ -1,7 +1,7 @@
 /*
     module  : compare.c
-    version : 1.8
-    date    : 01/19/20
+    version : 1.9
+    date    : 07/23/20
 */
 #ifndef COMPARE_C
 #define COMPARE_C
@@ -20,6 +20,6 @@ void do_compare(void)
 	stack[-2] = 1;
     else
 	stack[-2] = 0;
-    do_zap();
+    do_pop();
 }
 #endif

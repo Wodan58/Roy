@@ -1,7 +1,7 @@
 /*
     module  : split.c
-    version : 1.23
-    date    : 01/20/20
+    version : 1.25
+    date    : 07/23/20
 */
 #ifndef SPLIT_C
 #define SPLIT_C
@@ -22,7 +22,7 @@ void split(Stack *prog)
 	    vec_push(result[0], Value);
 	else
 	    vec_push(result[1], Value);
-	do_zap();
+	do_pop();
     }
     do_push((intptr_t)result[0]);
     do_push((intptr_t)result[1]);
@@ -37,7 +37,7 @@ void put_split(Stack *prog)
     fprintf(program, "Value = vec_at(list, i); do_push(Value);");
     execute(prog);
     fprintf(program, "if (do_pop()) vec_push(result[0], Value);");
-    fprintf(program, "else vec_push(result[1], Value); do_zap(); }");
+    fprintf(program, "else vec_push(result[1], Value); do_pop(); }");
     fprintf(program, "do_push((intptr_t)result[0]);");
     fprintf(program, "do_push((intptr_t)result[1]); } }");
 }
@@ -53,7 +53,7 @@ void do_split(void)
 
     prog = (Stack *)do_pop();
 #ifdef COMPILING
-    if (compiling && stack_empty())
+    if (compiling && STACK(1))
 	put_split(prog);
     else
 #endif

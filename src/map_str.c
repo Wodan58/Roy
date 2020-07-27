@@ -1,7 +1,7 @@
 /*
     module  : map_str.c
-    version : 1.1
-    date    : 01/19/20
+    version : 1.2
+    date    : 06/23/20
 */
 #ifndef MAP_STR_C
 #define MAP_STR_C
@@ -49,7 +49,7 @@ void do_map_str(void)
     BINARY;
     prog = (Stack *)do_pop();
 #ifdef COMPILING
-    if (compiling && stack_empty())
+    if (compiling && STACK(1))
 	put_map_str(prog);
     else
 #endif
