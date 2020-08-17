@@ -1,11 +1,12 @@
 #
 #   module  : CMakeLists.txt
-#   version : 1.5
-#   date    : 06/15/20
+#   version : 1.6
+#   date    : 08/11/20
 #
 cmake_minimum_required(VERSION 3.0)
 project(Coy VERSION 1.0)
 set(CMAKE_BUILD_TYPE Release)
+option(RUN_TESTS "Run standard tests" OFF)
 find_package(BISON)
 BISON_TARGET(MyParser parse.y parse.c)
 if(WIN32)
@@ -31,8 +32,7 @@ add_custom_target(always
 #
 #  Standard tests
 #
-if(WIN32)
-else()
+if(RUN_TESTS)
 add_executable(run main.c run.c print.c yylex.c factor.c module.c lookup.c)
 target_link_libraries(run gc-lib m)
 add_custom_command(OUTPUT run.c
@@ -51,8 +51,7 @@ endif()
 #
 #  Fibonacci benchmark
 #
-if(WIN32)
-else()
+if(RUN_TESTS)
 add_executable(fib1a main.c fib1a.c print.c)
 target_link_libraries(fib1a gc-lib m)
 add_custom_command(OUTPUT fib1a.c
