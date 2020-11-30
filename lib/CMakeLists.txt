@@ -1,7 +1,7 @@
 #
-#   module  : %M%
-#   version : %I%
-#   date    : %G%
+#   module  : CMakeLists.txt
+#   version : 1.4
+#   date    : 08/17/20
 #
 
 #

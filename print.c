@@ -1,7 +1,7 @@
 /*
     module  : print.c
-    version : 1.18
-    date    : 06/21/20
+    version : 1.19
+    date    : 11/30/20
 */
 #include <stdio.h>
 #include <string.h>
@@ -25,6 +25,8 @@
 
 real_t unpack(intptr_t num);		/* builtin.c */
 char *procname(intptr_t Value);
+
+int main();				/* main.c */
 
 void writefactor(intptr_t Value);	/* print.c */
 
@@ -119,7 +121,6 @@ int get_type(intptr_t temp)
 void init_heap(void)
 {
     int *ptr;
-    extern int main();
 
     start_of_text = (intptr_t)main;
 #ifdef __linux__

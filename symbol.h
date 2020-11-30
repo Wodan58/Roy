@@ -1,8 +1,11 @@
 /*
     module  : symbol.h
-    version : 1.1
-    date    : 01/19/20
+    version : 1.2
+    date    : 11/30/20
 */
+#ifndef SYMBOL_H
+#define SYMBOL_H
+
 int symtabmax(void);
 int symtabindex(void);
 int inuse(const char *str);
@@ -14,3 +17,4 @@ char *strupr(const char *str);
 void dump(void);
 const char *dump1(int start, khiter_t *key);
 const char *dump2(int start, khiter_t *key);
+#endif

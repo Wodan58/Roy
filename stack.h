@@ -1,8 +1,11 @@
 /*
     module  : stack.h
-    version : 1.22
-    date    : 06/21/20
+    version : 1.23
+    date    : 11/30/20
 */
+#ifndef STACK_H
+#define STACK_H
+
 #ifdef _MSC_VER
 #include <io.h>
 #else
@@ -69,3 +72,4 @@ extern int g_argc, library, compiling, debugging, autoput, tracegc, undeferror;
 extern char **g_argv, *filename;
 extern clock_t startclock;
 void execerror(char *msg, const char *op);
+#endif
