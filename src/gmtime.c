@@ -1,10 +1,17 @@
 /*
     module  : gmtime.c
-    version : 1.9
-    date    : 11/30/20
+    version : 1.10
+    date    : 12/28/20
 */
 #ifndef GMTIME_C
 #define GMTIME_C
+
+#ifdef _MSC_VER
+void gmtime_r(time_t *t, struct tm *tm)
+{
+    *tm = *gmtime(t);
+}
+#endif
 
 /**
 gmtime  :  I  ->  T

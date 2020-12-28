@@ -1,10 +1,17 @@
 /*
     module  : localtime.c
-    version : 1.9
-    date    : 11/30/20
+    version : 1.10
+    date    : 12/28/20
 */
 #ifndef LOCALTIME_C
 #define LOCALTIME_C
+
+#ifdef _MSC_VER
+void localtime_r(time_t *t, struct tm *tm)
+{
+    *tm = *localtime(t);
+}
+#endif
 
 /**
 localtime  :  I  ->  T
