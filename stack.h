@@ -1,6 +1,6 @@
 /*
     module  : stack.h
-    version : 1.25
+    version : 1.26
     date    : 01/04/21
 */
 #ifndef STACK_H
@@ -32,13 +32,13 @@
 
 #ifdef BIT_64
 #define SETSIZE_	64
-#define MAXINT_		9223372036854775807LL
+#define MAXINT_		(intptr_t)9223372036854775807
 typedef double real_t;
 #endif
 
 #ifdef BIT_32
 #define SETSIZE_	32
-#define MAXINT_		2147483647
+#define MAXINT_		(intptr_t)2147483647
 typedef float real_t;
 #endif
 

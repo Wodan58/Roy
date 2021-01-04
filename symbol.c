@@ -1,6 +1,6 @@
 /*
     module  : symbol.c
-    version : 1.23
+    version : 1.24
     date    : 01/04/21
 */
 #include <stdio.h>
@@ -97,7 +97,7 @@ void enterdef(char *Name, Stack *List)
     kh_value(theTable, key) = (intptr_t)List;
 }
 
-char *strupr(char *str)
+char *my_strupr(char *str)
 {
     int i;
     char *ptr;
@@ -124,7 +124,7 @@ void dump(void)
 	    if (Value & JLAP_INVALID) {
 		Name = kh_key(theTable, key);
 		if (!inuse(Name)) {
-		    if ((ptr = strupr(identifier(Name))) != 0) {
+		    if ((ptr = my_strupr(identifier(Name))) != 0) {
 			fprintf(stderr, "#define %s_X\n", ptr);
 			fprintf(stderr, "#define %s_C\n", ptr);
 		    }
