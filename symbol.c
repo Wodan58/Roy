@@ -1,6 +1,6 @@
 /*
     module  : symbol.c
-    version : 1.24
+    version : 1.25
     date    : 01/04/21
 */
 #include <stdio.h>
@@ -16,7 +16,7 @@
 #define kfree(P)
 #include "khash.h"
 				/* builtin.c */
-const char *identifier(const char *str);
+char *identifier(const char *str);
 
 void inilinebuffer(char *str);	/* yylex.c */
 
