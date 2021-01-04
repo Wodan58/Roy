@@ -1,7 +1,7 @@
 #
 #   module  : trans.sh
-#   version : 1.1
-#   date    : 07/23/20
+#   version : 1.2
+#   date    : 01/04/21
 #
 #   Generate trans.c
 #
@@ -37,4 +37,4 @@ do
 	s/.*\n\(^[^ ]*\).*/enter("\1", do_'$name');\n/
 	P
   }' <$i
-done | sort | sed 's/do_pop)/(void (*)())do_pop)/' >trans.c
+done | sort | sed 's/do_pop)/(void (*)(void))do_pop)/' >trans.c

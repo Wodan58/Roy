@@ -1,7 +1,7 @@
 /*
     module  : opcase.c
-    version : 1.13
-    date    : 06/23/20
+    version : 1.14
+    date    : 01/04/21
 */
 #ifndef OPCASE_C
 #define OPCASE_C
@@ -21,7 +21,6 @@ void do_opcase(void)
 {
     int i;
     intptr_t Value;
-    char *str, *ptr;
     Stack *List, *Quot = 0;
 
     BINARY;

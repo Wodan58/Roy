@@ -1,7 +1,7 @@
 /*
     module  : has.c
-    version : 1.10
-    date    : 06/23/20
+    version : 1.11
+    date    : 01/04/21
 */
 #ifndef HAS_C
 #define HAS_C
@@ -22,7 +22,6 @@ void do_has(void)
     int i;
     Stack *List;
     intptr_t Second;
-    char *str, *ptr;
 
     BINARY;
     Second = do_pop();

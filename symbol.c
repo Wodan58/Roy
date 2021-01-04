@@ -1,7 +1,7 @@
 /*
     module  : symbol.c
-    version : 1.22
-    date    : 05/05/20
+    version : 1.23
+    date    : 01/04/21
 */
 #include <stdio.h>
 #include <string.h>
@@ -97,7 +97,7 @@ void enterdef(char *Name, Stack *List)
     kh_value(theTable, key) = (intptr_t)List;
 }
 
-char *strupr(const char *str)
+char *strupr(char *str)
 {
     int i;
     char *ptr;

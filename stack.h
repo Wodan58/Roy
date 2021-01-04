@@ -1,7 +1,7 @@
 /*
     module  : stack.h
-    version : 1.23
-    date    : 11/30/20
+    version : 1.24
+    date    : 01/04/21
 */
 #ifndef STACK_H
 #define STACK_H
@@ -44,6 +44,10 @@ typedef float real_t;
 
 #if !defined(BIT_64) && !defined(BIT_32)
 #error "either BIT_64 or BIT_32 must be defined"
+#endif
+
+#ifdef _MSC_VER
+#pragma warning(disable : 4244, 4996)
 #endif
 
 #ifndef _MSC_VER
