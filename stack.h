@@ -1,6 +1,6 @@
 /*
     module  : stack.h
-    version : 1.24
+    version : 1.25
     date    : 01/04/21
 */
 #ifndef STACK_H
@@ -47,7 +47,8 @@ typedef float real_t;
 #endif
 
 #ifdef _MSC_VER
-#pragma warning(disable : 4244, 4996)
+#pragma warning(disable : 4244)
+#pragma warning(disable : 4996)
 #endif
 
 #ifndef _MSC_VER
