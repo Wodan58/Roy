@@ -1,12 +1,12 @@
 #
 #   module  : CMakeLists.txt
-#   version : 1.8
+#   version : 1.9
 #   date    : 03/01/21
 #
 cmake_minimum_required(VERSION 3.0)
 project(Coy VERSION 1.0)
 set(CMAKE_BUILD_TYPE Release)
-option(RUN_TESTS "Run standard tests" ON)
+option(RUN_TESTS "Run standard tests" OFF)
 find_package(BISON)
 BISON_TARGET(MyParser parse.y parse.c)
 if(WIN32)
@@ -18,7 +18,11 @@ endif()
 include_directories(. bdwgc/include)
 add_executable(joy main.c ${BISON_MyParser_OUTPUTS} print.c builtin.c symbol.c
 	       yylex.c factor.c module.c optable.c srand.c rand.c tmpfile.c)
+if(WIN32)
+target_link_libraries(joy gc-lib)
+else()
 target_link_libraries(joy gc-lib m)
+endif()
 add_dependencies(joy always)
 add_custom_target(always
 		  COMMAND sh banner.sh ${PROJECT_NAME} ${PROJECT_VERSION}
