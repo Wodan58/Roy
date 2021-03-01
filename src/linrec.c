@@ -1,7 +1,7 @@
 /*
     module  : linrec.c
-    version : 1.17
-    date    : 06/23/20
+    version : 1.18
+    date    : 03/01/21
 */
 #ifndef LINREC_C
 #define LINREC_C
@@ -23,25 +23,25 @@ void put_linrec(Stack *prog[])
 {
     static int ident;
     int ch;
-    FILE *fp, *old;
+    FILE *old;
 
     printf("void linrec_%d(void);", ++ident);
     fprintf(old = program, "linrec_%d();", ident);
-    if ((fp = tmpfile()) == 0)
+    if ((program = my_tmpfile()) == 0)
 	yyerror("linrec");
-    fprintf(program = fp, "void linrec_%d(void) {", ident);
+    fprintf(program, "void linrec_%d(void) {", ident);
     execute(prog[0]);
-    fprintf(fp, "if (do_pop()) {");
+    fprintf(program, "if (do_pop()) {");
     execute(prog[1]);
-    fprintf(fp, "} else {");
+    fprintf(program, "} else {");
     execute(prog[2]);
-    fprintf(fp, "linrec_%d();", ident);
+    fprintf(program, "linrec_%d();", ident);
     execute(prog[3]);
-    fprintf(fp, "} }\n");
-    rewind(fp);
-    while ((ch = getc(fp)) != EOF)
+    fprintf(program, "} }\n");
+    rewind(program);
+    while ((ch = getc(program)) != EOF)
 	putchar(ch);
-    fclose(fp);
+    fclose(program);
     program = old;
 }
 #endif

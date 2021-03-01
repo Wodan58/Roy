@@ -1,7 +1,7 @@
 /*
     module  : compile.c
-    version : 1.2
-    date    : 01/20/20
+    version : 1.3
+    date    : 03/01/21
 */
 static FILE *program;
 
@@ -296,7 +296,7 @@ void initcompile(void)
     printf("/*\n * generated %s */\n", ctime(&t));
     printf("#define RUNTIME\n");
     printf("#include \"builtin.c\"\n");
-    program = tmpfile();
+    program = my_tmpfile();
 }
 
 void printvalue(FILE *fp, intptr_t Value)

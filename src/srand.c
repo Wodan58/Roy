@@ -1,10 +1,12 @@
 /*
     module  : srand.c
-    version : 1.9
-    date    : 01/19/20
+    version : 1.10
+    date    : 03/01/21
 */
 #ifndef SRAND_C
 #define SRAND_C
+
+void my_srand(unsigned num);
 
 /**
 srand  :  I  ->
@@ -13,6 +15,6 @@ Sets the random integer seed to integer I.
 void do_srand(void)
 {
     UNARY;
-    srand(do_pop());
+    my_srand(do_pop());
 }
 #endif

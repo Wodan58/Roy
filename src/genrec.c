@@ -1,7 +1,7 @@
 /*
     module  : genrec.c
-    version : 1.18
-    date    : 06/23/20
+    version : 1.19
+    date    : 03/01/21
 */
 #ifndef GENREC_C
 #define GENREC_C
@@ -30,28 +30,28 @@ void put_genrec(void)
 {
     static int ident;
     int ch;
-    FILE *fp, *old;
+    FILE *old;
     Stack *prog = (Stack *)do_pop();
 
     printf("void genrec_%d(void);", ++ident);
     fprintf(old = program, "genrec_%d();", ident);
-    if ((fp = tmpfile()) == 0)
+    if ((program = my_tmpfile()) == 0)
 	yyerror("genrec");
-    fprintf(program = fp, "void genrec_%d(void) {", ident);
+    fprintf(program, "void genrec_%d(void) {", ident);
     execute((Stack *)vec_at(prog, vec_size(prog) - 1));
-    fprintf(fp, "if (do_pop()) {");
+    fprintf(program, "if (do_pop()) {");
     execute((Stack *)vec_at(prog, vec_size(prog) - 2));
-    fprintf(fp, "} else {");
+    fprintf(program, "} else {");
     execute((Stack *)vec_at(prog, vec_size(prog) - 3));
-    fprintf(fp, "do_list_%d();", FindNode(prog));
-    fprintf(fp, "do_push((intptr_t)genrec | JLAP_INVALID);");
-    fprintf(fp, "do_push(0); do_cons(); do_cons();");
+    fprintf(program, "do_list_%d();", FindNode(prog));
+    fprintf(program, "do_push((intptr_t)genrec | JLAP_INVALID);");
+    fprintf(program, "do_push(0); do_cons(); do_cons();");
     execute_rest(prog, vec_size(prog) - 4);
-    fprintf(fp, "} }");
-    rewind(fp);
-    while ((ch = getc(fp)) != EOF)
+    fprintf(program, "} }");
+    rewind(program);
+    while ((ch = getc(program)) != EOF)
 	putchar(ch);
-    fclose(fp);
+    fclose(program);
     program = old;
 }
 #endif

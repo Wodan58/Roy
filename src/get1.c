@@ -1,7 +1,7 @@
 /*
     module  : get1.c
-    version : 1.2
-    date    : 01/20/20
+    version : 1.3
+    date    : 03/01/21
 */
 #ifndef GET1_C
 #define GET1_C
@@ -13,8 +13,8 @@ Reads a factor from input and pushes it onto stack.
 void do_get1(void)
 {
     int type;
-    intptr_t Value;
     Stack *List = 0;
+    intptr_t Value = 0;
 
     vec_push(List, type = yylex());
     switch (type) {
@@ -23,6 +23,7 @@ void do_get1(void)
     case JPUBLIC:
     case JEQUAL:
     case END:
+    default:
 	Value = 0;
 	break;
     case USR_:

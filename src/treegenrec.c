@@ -1,7 +1,7 @@
 /*
     module  : treegenrec.c
-    version : 1.13
-    date    : 06/23/20
+    version : 1.14
+    date    : 03/01/21
 */
 #ifndef TREEGENREC_C
 #define TREEGENREC_C
@@ -28,27 +28,27 @@ void put_treegenrec(void)
 {
     static int ident;
     int ch;
-    FILE *fp, *old;
+    FILE *old;
     Stack *prog = (Stack *)do_pop();
 
     printf("void treegenrec_%d(void);", ++ident);
     fprintf(old = program, "treegenrec_%d();", ident);
-    if ((fp = tmpfile()) == 0)
+    if ((program = my_tmpfile()) == 0)
 	yyerror("treegenrec");
-    fprintf(program = fp, "void treegenrec_%d(void) {", ident);
-    fprintf(fp, "if (is_list(stack[-1])) {");
+    fprintf(program, "void treegenrec_%d(void) {", ident);
+    fprintf(program, "if (is_list(stack[-1])) {");
     execute((Stack *)vec_at(prog, vec_size(prog) - 2));
-    fprintf(fp, "do_list_%d();", FindNode(prog));
-    fprintf(fp, "do_push((intptr_t)treegenrec | JLAP_INVALID);");
-    fprintf(fp, "do_push(0); do_cons(); do_cons();");
+    fprintf(program, "do_list_%d();", FindNode(prog));
+    fprintf(program, "do_push((intptr_t)treegenrec | JLAP_INVALID);");
+    fprintf(program, "do_push(0); do_cons(); do_cons();");
     execute_rest(prog, vec_size(prog) - 3);
-    fprintf(fp, "} else {");
+    fprintf(program, "} else {");
     execute((Stack *)vec_at(prog, vec_size(prog) - 1));
-    fprintf(fp, "} }");
-    rewind(fp);
-    while ((ch = getc(fp)) != EOF)
+    fprintf(program, "} }");
+    rewind(program);
+    while ((ch = getc(program)) != EOF)
 	putchar(ch);
-    fclose(fp);
+    fclose(program);
     program = old;
 }
 #endif

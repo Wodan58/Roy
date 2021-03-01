@@ -1,7 +1,7 @@
 /*
     module  : condlinrec.c
-    version : 1.19
-    date    : 06/23/20
+    version : 1.20
+    date    : 03/01/21
 */
 #ifndef CONDLINREC_C
 #define CONDLINREC_C
@@ -35,14 +35,14 @@ void put_condnestrec(Stack *list)
 {
     static int ident;
     int i, ch;
-    FILE *fp, *old;
+    FILE *old;
     Stack *quot, *next;
 
     printf("void condnestrec_%d(void);", ++ident);
     fprintf(old = program, "condnestrec_%d();", ident);
-    if ((fp = tmpfile()) == 0)
+    if ((program = my_tmpfile()) == 0)
 	yyerror("condnestrec");
-    fprintf(program = fp, "void condnestrec_%d(void) {", ident);
+    fprintf(program, "void condnestrec_%d(void) {", ident);
     for (i = vec_size(list) - 1; i > 0; i--) {
 	quot = (Stack *)vec_at(list, i);
 	execute((Stack *)vec_back(quot));
@@ -65,10 +65,10 @@ void put_condnestrec(Stack *list)
 	    execute(quot);
     }
     fprintf(program, "}");
-    rewind(fp);
-    while ((ch = getc(fp)) != EOF)
+    rewind(program);
+    while ((ch = getc(program)) != EOF)
 	putchar(ch);
-    fclose(fp);
+    fclose(program);
     program = old;
 }
 #endif

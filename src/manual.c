@@ -1,7 +1,7 @@
 /*
     module  : manual.c
-    version : 1.10
-    date    : 01/19/20
+    version : 1.11
+    date    : 03/01/21
 */
 #ifndef MANUAL_C
 #define MANUAL_C
@@ -10,15 +10,14 @@
 #define HTML  (style == 1)
 #define LATEX (style == 2)
 
-#define HEADER(N,NAME,HEAD)					\
-    if (strcmp(N,NAME) == 0) {					\
+#define HEADER(HEAD)						\
 	printf("\n\n");						\
 	if (HTML) printf("<DT><BR><B>");			\
 	if (LATEX) printf("\\item[--- \\BX{");			\
 	printf("%s",HEAD);					\
 	if (LATEX) printf("} ---] \\verb# #");			\
 	if (HTML) printf("</B><BR><BR>");			\
-	printf("\n\n"); }
+	printf("\n\n");
 
 #ifdef COMPILING
 void make_manual(int style /* 0=plain, 1=HTML, 2=Latex */)
@@ -29,12 +28,14 @@ void make_manual(int style /* 0=plain, 1=HTML, 2=Latex */)
     if (HTML)
 	printf("<HTML>\n<DL>\n");
     for (i = 0; (name = optable[i].name) != 0; i++) {
-	HEADER(name, " truth value type", "literal");
+	if (!strcmp(name, " truth value type")) {
+	    HEADER("literal");
+	}
 	if (!j && isspace(name[0]))
 	    j = 1;
 	else if (j == 1 && !isspace(name[0])) {
 	    j = 2;
-	    HEADER(name, name, "operator");
+	    HEADER("operator");
 	}
 	if (name[0] != '_') {
 	    if (HTML)

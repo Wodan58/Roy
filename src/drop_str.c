@@ -1,7 +1,7 @@
 /*
     module  : drop_str.c
-    version : 1.1
-    date    : 01/19/20
+    version : 1.2
+    date    : 03/01/21
 */
 #ifndef DROP_STR_C
 #define DROP_STR_C
@@ -21,9 +21,7 @@ void do_drop_str(void)
     while (Value-- > 0 && *str)
 	str++;
     result = GC_malloc_atomic(strlen(str) + 2);
-    strcpy(result, "\"");
-    if (str)
-	strcpy(result + 1, str);
+    sprintf(result, "\"%s", str);
     stack[-1] = (intptr_t)result | JLAP_INVALID;
 }
 #endif

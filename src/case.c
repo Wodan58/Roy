@@ -1,7 +1,7 @@
 /*
     module  : case.c
-    version : 1.17
-    date    : 07/23/20
+    version : 1.18
+    date    : 03/01/21
 */
 #ifndef CASE_C
 #define CASE_C
@@ -42,7 +42,7 @@ void put_case(Stack *list)
     intptr_t Second;
     Stack *quot, *next;
 
-    fprintf(program, "{ int num = 0; intptr_t First = stack[-1]; for (;;) {");
+    fprintf(program, "{ int num = 0; intptr_t First = stack[-1]; do {");
     for (i = vec_size(list) - 1; i > 0; i--) {
 	quot = (Stack *)vec_at(list, i);
 	Second = vec_back(quot);
@@ -57,7 +57,7 @@ void put_case(Stack *list)
 	execute(next);
 	fprintf(program, "num = 1; break; }");
     }
-    fprintf(program, "break; } if (!num) {");
+    fprintf(program, "break; } while(0); if (!num) {");
     execute((Stack *)vec_at(list, 0));
     fprintf(program, "} }");
 }

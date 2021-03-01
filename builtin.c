@@ -1,7 +1,7 @@
 /*
     module  : builtin.c
-    version : 1.32
-    date    : 06/21/20
+    version : 1.33
+    date    : 03/01/21
 */
 #include <stdio.h>
 #include <string.h>
@@ -23,6 +23,8 @@
 #include "khash.h"
 #include "symbol.h"
 #include "factor.h"
+
+FILE *my_tmpfile(void);
 
 // #define REPORT
 

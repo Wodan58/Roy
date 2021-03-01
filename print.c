@@ -1,7 +1,7 @@
 /*
     module  : print.c
-    version : 1.19
-    date    : 11/30/20
+    version : 1.20
+    date    : 03/01/21
 */
 #include <stdio.h>
 #include <string.h>
@@ -198,8 +198,9 @@ void writefactor(intptr_t Value)
 	printf("%s", (char *)Value);
 	break;
     case ANON_FUNCT_:
-	if (writeproc(Value))
-	    return;
+	if (!writeproc(Value))
+	    printf("%" PRIdPTR, Value);
+	break;
     case BOOLEAN_:
     case CHAR_:
     case INTEGER_:

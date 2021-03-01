@@ -1,7 +1,7 @@
 /*
     module  : tailrec.c
-    version : 1.18
-    date    : 06/23/20
+    version : 1.19
+    date    : 03/01/21
 */
 #ifndef TAILREC_C
 #define TAILREC_C
@@ -22,13 +22,14 @@ void tailrec(Stack *prog[])
 void put_tailrec(Stack *prog[])
 {
     static int ident;
-    FILE *fp, *old;
+    int ch;
+    FILE *old;
 
     printf("void tailrec_%d(void);", ++ident);
     fprintf(old = program, "tailrec_%d();", ident);
-    if ((fp = tmpfile()) == 0)
+    if ((program = my_tmpfile()) == 0)
 	yyerror("tailrec");
-    fprintf(program = fp, "void tailrec_%d(void) {", ident);
+    fprintf(program, "void tailrec_%d(void) {", ident);
     fprintf(program, "for (;;) {");
     execute(prog[0]);
     fprintf(program, "if (do_pop()) {");
@@ -36,6 +37,10 @@ void put_tailrec(Stack *prog[])
     fprintf(program, "break; }");
     execute(prog[2]);
     fprintf(program, "} }\n");
+    rewind(program);
+    while ((ch = getc(program)) != EOF)
+	putchar(ch);
+    fclose(program);
     program = old;
 }
 #endif

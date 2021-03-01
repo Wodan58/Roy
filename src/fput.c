@@ -1,7 +1,7 @@
 /*
     module  : fput.c
-    version : 1.9
-    date    : 01/19/20
+    version : 1.10
+    date    : 03/01/21
 */
 #ifndef FPUT_C
 #define FPUT_C
@@ -19,10 +19,12 @@ void do_fput(void)
     COMPILE;
     temp = do_pop();
     fp = (FILE *)stack[-1];
-    stdout_dup = dup(1);
-    dup2(fileno(fp), 1);
+    if ((stdout_dup = dup(1)) != -1)
+	dup2(fileno(fp), 1);
     writefactor(temp);
-    dup2(stdout_dup, 1);
-    close(stdout_dup);
+    if (stdout_dup != -1) {
+	dup2(stdout_dup, 1);
+	close(stdout_dup);
+    }
 }
 #endif
