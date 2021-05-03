@@ -1,13 +1,13 @@
 /*
     module  : yylex.c
-    version : 1.17
-    date    : 06/21/20
+    version : 1.18
+    date    : 04/27/21
 */
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
-#include "stack.h"
+#include "joy.h"
 #include "parse.h"
 
 void writefactor(intptr_t Value);	/* print.c */
@@ -114,9 +114,12 @@ static int getch(void)
 	yyin = stdin;
     if (!line[linepos]) {
 again:
-	if (!fgets(line, INPLINEMAX, yyin))
+	if (fgets(line, INPLINEMAX, yyin))
+	    lineno++;
+	else {
 	    yywrap();
-	lineno++;
+	    goto again;
+	}
 	linepos = 0;
 	if (echoflag)
 	    putline();

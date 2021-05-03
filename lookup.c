@@ -1,13 +1,13 @@
 /*
     module  : lookup.c
-    version : 1.11
-    date    : 01/20/20
+    version : 1.12
+    date    : 04/27/21
 */
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
-#include "stack.h"
+#include "joy.h"
 #include "parse.h"
 
 extern YYTABLE yytable[];

@@ -1,19 +1,19 @@
 #
 #   module  : prims.sh
-#   version : 1.1
-#   date    : 07/23/20
+#   version : 1.2
+#   date    : 04/27/21
 #
 #   Generate runtime.c and builtin.h
 #
 echo checking runtime.c and builtin.h
 todo=0
-ls -1Q src/*.c | sed 's/^/#include /' >prims.tmp
+ls -1Q src/*.c gui/*.c | sed 's/^/#include /' >prims.tmp
 if [ ! -f runtime.c -o ! -f builtin.h ]
 then
   echo creating runtime.c and builtin.h
   todo=1
 else
-  diff runtime.c prims.tmp
+  diff prims.tmp runtime.c
   if [ $? -eq 0 ]
   then
     echo runtime.c and builtin.h are up-to-date
@@ -21,7 +21,6 @@ else
   else
     echo updating runtime.c and builtin.h
     todo=1
-    rm -f trans.c table.c
   fi
 fi
 if [ $todo -eq 1 ]

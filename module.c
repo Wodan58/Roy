@@ -1,12 +1,12 @@
 /*
     module  : module.c
-    version : 1.19
-    date    : 01/19/20
+    version : 1.20
+    date    : 04/27/21
 */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "stack.h"
+#include "joy.h"
 
 intptr_t lookup(const char *str);	/* symbol.c */
 

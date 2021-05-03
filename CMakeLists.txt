@@ -1,7 +1,7 @@
 #
 #   module  : CMakeLists.txt
-#   version : 1.9
-#   date    : 03/01/21
+#   version : 1.11
+#   date    : 04/27/21
 #
 cmake_minimum_required(VERSION 3.0)
 project(Coy VERSION 1.0)
@@ -17,7 +17,8 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage") # enabling co
 endif()
 include_directories(. bdwgc/include)
 add_executable(joy main.c ${BISON_MyParser_OUTPUTS} print.c builtin.c symbol.c
-	       yylex.c factor.c module.c optable.c srand.c rand.c tmpfile.c)
+	       yylex.c factor.c module.c optable.c srand.c rand.c tmpfile.c
+	       japi4c.c japilib.c imageio.c fileselect.c)
 if(WIN32)
 target_link_libraries(joy gc-lib)
 else()
@@ -33,7 +34,8 @@ add_custom_target(always
 #  Standard tests
 #
 if(RUN_TESTS)
-add_executable(run main.c run.c print.c yylex.c factor.c module.c lookup.c)
+add_executable(run main.c run.c print.c yylex.c factor.c module.c lookup.c
+	       japi4c.c japilib.c imageio.c fileselect.c)
 target_link_libraries(run gc-lib m)
 add_custom_command(OUTPUT run.c
 		  COMMAND joy -c <tutorial.joy 2>runtime.h | clang-format >run.c
@@ -52,7 +54,8 @@ endif()
 #  Fibonacci benchmark
 #
 if(RUN_TESTS)
-add_executable(fib1a main.c fib1a.c print.c)
+add_executable(fib1a main.c fib1a.c print.c
+	       japi4c.c japilib.c imageio.c fileselect.c)
 target_link_libraries(fib1a gc-lib m)
 add_custom_command(OUTPUT fib1a.c
 		   COMMAND joy -c <fib1a.joy 2>runtime.h | clang-format >fib1a.c

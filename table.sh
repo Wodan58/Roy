@@ -1,7 +1,7 @@
 #
 #   module  : table.sh
-#   version : 1.1
-#   date    : 07/23/20
+#   version : 1.2
+#   date    : 04/27/21
 #
 #   Generate table.c
 #
@@ -12,7 +12,7 @@ then
   echo creating table.c
   todo=1
 else
-  for i in src/*.c
+  for i in src/*.c gui/*.c
   do
     if [ $i -nt table.c ]
     then
@@ -28,7 +28,7 @@ then
   exit
 fi
 rm -f table.c
-for i in src/*.c
+for i in src/*.c gui/*.c
 do
   sed -n '/\/\*\*/ {
 	N

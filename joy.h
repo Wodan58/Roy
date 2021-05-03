@@ -1,7 +1,7 @@
 /*
-    module  : stack.h
-    version : 1.26
-    date    : 01/04/21
+    module  : joy.h
+    version : 1.28
+    date    : 04/27/21
 */
 #ifndef STACK_H
 #define STACK_H
@@ -14,16 +14,14 @@
 #include <stdint.h>
 #include <time.h>
 #include <gc.h>
-#define mem_malloc(Z)		GC_malloc(Z)
-#define mem_realloc(P,Z)	GC_realloc(P,Z)
-#define chk_malloc(Z)		GC_malloc(Z)
-#define chk_realloc(P,Z)	GC_realloc(P,Z)
 #define free(P)
 #include "decl.h"
 #include "kvec.h"
+#include "japi.h"
 
 // #define VECTOR
 #define BIT_64
+#define PRIVATE
 
 #ifndef RUNTIME
 #define VECTOR
@@ -47,11 +45,8 @@ typedef float real_t;
 #endif
 
 #ifdef _MSC_VER
-#pragma warning(disable : 4244)
-#pragma warning(disable : 4996)
-#endif
-
-#ifndef _MSC_VER
+#pragma warning(disable : 4244 4996)
+#else
 _Static_assert(sizeof(real_t) == sizeof(intptr_t), "real_t != intptr_t");
 #endif
 

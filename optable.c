@@ -1,9 +1,9 @@
 /*
     module  : optable.c
-    version : 1.18
-    date    : 07/21/19
+    version : 1.19
+    date    : 04/27/21
 */
-#include "stack.h"
+#include "joy.h"
 
 struct optable_t optable[] = {
 	/* THESE MUST BE DEFINED IN THE ORDER OF THEIR VALUES */

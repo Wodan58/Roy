@@ -1,7 +1,7 @@
 #
 #   module  : CMakeLists.txt
-#   version : 1.4
-#   date    : 08/17/20
+#   version : 1.5
+#   date    : 04/27/21
 #
 
 #
@@ -24,7 +24,8 @@ add_custom_command(OUTPUT ${src}.c
 		   DEPENDS joy ${src}.joy
 		   COMMAND joy -c ${src}.joy 2>../runtime.h |
 			   clang-format >${src}.c)
-add_executable(${src} ../main.c ${src}.c ../print.c)
+add_executable(${src} ../main.c ${src}.c ../print.c
+	       ../japi4c.c ../japilib.c ../imageio.c ../fileselect.c)
 target_link_libraries(${src} gc-lib m)
 endmacro(exe1)
 
@@ -37,7 +38,8 @@ add_custom_command(OUTPUT ${src}.c
 		   COMMAND joy -c ${src}.joy 2>../runtime.h |
 			   clang-format >${src}.c)
 add_executable(${src} ../main.c ${src}.c ../print.c ../yylex.c ../factor.c
-	       ../module.c ../lookup.c)
+	       ../module.c ../lookup.c
+	       ../japi4c.c ../japilib.c ../imageio.c ../fileselect.c)
 target_link_libraries(${src} gc-lib m)
 endmacro(exe2)
 
@@ -50,7 +52,8 @@ add_custom_command(OUTPUT ${src}.c
 		   COMMAND joy -l ${src}.joy 2>../runtime.h |
 			   clang-format >${src}.c)
 add_executable(${src} ../main.c ${src}.c ../print.c ../yylex.c ../factor.c
-	       ../module.c ../lookup.c)
+	       ../module.c ../lookup.c
+	       ../japi4c.c ../japilib.c ../imageio.c ../fileselect.c)
 target_link_libraries(${src} gc-lib m)
 endmacro(exe3)
 

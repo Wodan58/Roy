@@ -7,16 +7,28 @@ status|[![Travis CI build status](https://travis-ci.com/Wodan58/Coy.svg?branch=m
 
 This is an experimental, unsafe, vector only, reimplementation of
 [Moy](https://github.com/Wodan58/Moy). This project depends on the
-[BDW garbage collector](https://github.com/ivmai/bdwgc).
+[BDW garbage collector](https://github.com/ivmai/bdwgc) and
+[JAPI](https://github.com/maxstrauch/japi2-kernel).
+JAPI is under the LGPL license, see LICENSE.txt
 
 Installation
 ------------
 
 The BDW garbage collector has to be installed as well as CMake. Then run:
 
-    ln -s ../bdwgc
     cmake .
     cmake --build .
+
+And:
+
+    java -jar JAPI.jar
+    ./joy mandel.joy
+
+This last test results in:
+
+<img src="doc/mandel.jpg"/>
+
+Mandelbrot in full Swing.
 
 Additions
 ---------

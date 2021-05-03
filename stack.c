@@ -1,7 +1,7 @@
 /*
     module  : stack.c
-    version : 1.4
-    date    : 06/24/20
+    version : 1.5
+    date    : 03/16/21
 */
 #ifdef VECTOR
 /* declare data stack */
@@ -16,7 +16,7 @@ intptr_t memory[MEMORYMAX], *stack;
 void init_stack(void)
 {
 #ifdef VECTOR
-    stk_init(theStack);
+    vec_init(theStack);
 #else
     stack = memory;
 #endif
@@ -106,7 +106,7 @@ Stack *copy_stack(void)
 void do_push(intptr_t Value)
 {
 #ifdef VECTOR
-    stk_push(theStack, Value);
+    vec_push(theStack, Value);
 #else
     *stack++ = Value;
 #endif

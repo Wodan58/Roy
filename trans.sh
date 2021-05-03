@@ -1,7 +1,7 @@
 #
 #   module  : trans.sh
-#   version : 1.2
-#   date    : 01/04/21
+#   version : 1.3
+#   date    : 04/27/21
 #
 #   Generate trans.c
 #
@@ -12,7 +12,7 @@ then
   echo creating trans.c
   todo=1
 else
-  for i in src/*.c
+  for i in src/*.c gui/*.c
   do
     if [ $i -nt trans.c ]
     then
@@ -28,7 +28,7 @@ then
   exit
 fi
 rm -f trans.c
-for i in src/*.c
+for i in src/*.c gui/*.c
 do
   file=`basename $i`
   name=`expr $file : '\(.*\)\.c'`
