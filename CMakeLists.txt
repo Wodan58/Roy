@@ -1,7 +1,7 @@
 #
 #   module  : CMakeLists.txt
-#   version : 1.11
-#   date    : 04/27/21
+#   version : 1.13
+#   date    : 05/03/21
 #
 cmake_minimum_required(VERSION 3.0)
 project(Coy VERSION 1.0)
@@ -20,7 +20,7 @@ add_executable(joy main.c ${BISON_MyParser_OUTPUTS} print.c builtin.c symbol.c
 	       yylex.c factor.c module.c optable.c srand.c rand.c tmpfile.c
 	       japi4c.c japilib.c imageio.c fileselect.c)
 if(WIN32)
-target_link_libraries(joy gc-lib)
+target_link_libraries(joy gc-lib ws2_32)
 else()
 target_link_libraries(joy gc-lib m)
 endif()

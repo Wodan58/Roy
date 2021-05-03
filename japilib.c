@@ -1,7 +1,7 @@
 /*
  *  module  : japilib.c
- *  version : 1.2
- *  date    : 04/27/21
+ *  version : 1.3
+ *  date    : 05/03/21
  */
 #include <stdio.h>
 #include <string.h>
@@ -33,10 +33,10 @@ extern int __write_image(FILE *, char *, char *, char *, int, int, int);
 #include <netinet/tcp.h>
 #endif
 
-#ifdef  _MSC_VER
+#ifdef _MSC_VER
 #include <process.h>
 #include <direct.h>
-#include <winsock.h>
+#include <winsock2.h>
 #endif
 
 #ifndef TCP_NODELAY

@@ -21,7 +21,7 @@ The BDW garbage collector has to be installed as well as CMake. Then run:
 
 And:
 
-    java -jar JAPI.jar
+    java -jar JAPI.jar &
     ./joy mandel.joy
 
 This last test results in:
