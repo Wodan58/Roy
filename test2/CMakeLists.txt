@@ -1,6 +1,6 @@
 #
 #   module  : CMakeLists.txt
-#   version : 1.1
+#   version : 1.4
 #   date    : 07/04/22
 #
 
@@ -12,10 +12,17 @@ add_custom_command(OUTPUT ${src}.c
 		   DEPENDS joy ${src}.joy
 		   COMMAND joy -c ${CMAKE_SOURCE_DIR}/test2/${src}.joy |
                            clang-format >${src}.c)
+if(REAL_BDW)
 add_executable(${src} ${CMAKE_SOURCE_DIR}/main.c ${src}.c
                ${CMAKE_SOURCE_DIR}/print.c ${CMAKE_SOURCE_DIR}/lookup.c
                ${CMAKE_SOURCE_DIR}/compare.c)
 target_link_libraries(${src} gc-lib m)
+else()
+add_executable(${src} ${CMAKE_SOURCE_DIR}/main.c ${src}.c
+               ${CMAKE_SOURCE_DIR}/print.c ${CMAKE_SOURCE_DIR}/lookup.c
+               ${CMAKE_SOURCE_DIR}/compare.c ${CMAKE_SOURCE_DIR}/gc.c)
+target_link_libraries(${src} m)
+endif()
 endmacro(exe8)
 
 #

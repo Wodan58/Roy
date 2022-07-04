@@ -1,7 +1,7 @@
 /*
     module  : compile.c
-    version : 1.4
-    date    : 06/21/22
+    version : 1.5
+    date    : 07/04/22
 */
 #include "joy.h"
 
@@ -115,18 +115,19 @@ static void printlist(FILE *fp, Stack *list, int seqnr)
             fprintf(fp, "vec_push(list, MAKE_ANON_FUNCT(do_%s));", name);
             break;
         case BOOLEAN_:
-            fprintf(
-                fp, "vec_push(list, MAKE_BOOLEAN(%d));", GET_AS_BOOLEAN(value));
+            fprintf(fp,
+                "vec_push(list, MAKE_BOOLEAN(%d));", GET_AS_BOOLEAN(value));
             break;
         case CHAR_:
-            fprintf(fp, "vec_push(list, MAKE_CHAR(%d));", GET_AS_CHAR(value));
+            fprintf(fp,
+                "vec_push(list, MAKE_CHAR(%d));", (int)GET_AS_CHAR(value));
             break;
         case INTEGER_:
-            fprintf(
-                fp, "vec_push(list, MAKE_INTEGER(%d));", GET_AS_INTEGER(value));
+            fprintf(fp,
+                "vec_push(list, MAKE_INTEGER(%ld));", GET_AS_INTEGER(value));
             break;
         case SET_:
-            fprintf(fp, "vec_push(list, MAKE_SET(%d));", GET_AS_SET(value));
+            fprintf(fp, "vec_push(list, MAKE_SET(%ld));", GET_AS_SET(value));
             break;
         case STRING_:
             fprintf(fp, "vec_push(list, MAKE_USR_STRING(GC_strdup(");
@@ -342,13 +343,13 @@ void printvalue(value_t value)
         fprintf(program, "do_push(MAKE_BOOLEAN(%d));", GET_AS_BOOLEAN(value));
         break;
     case CHAR_:
-        fprintf(program, "do_push(MAKE_CHAR(%d));", GET_AS_CHAR(value));
+        fprintf(program, "do_push(MAKE_CHAR(%d));", (int)GET_AS_CHAR(value));
         break;
     case INTEGER_:
-        fprintf(program, "do_push(MAKE_INTEGER(%d));", GET_AS_INTEGER(value));
+        fprintf(program, "do_push(MAKE_INTEGER(%ld));", GET_AS_INTEGER(value));
         break;
     case SET_:
-        fprintf(program, "do_push(MAKE_SET(%d));", GET_AS_SET(value));
+        fprintf(program, "do_push(MAKE_SET(%ld));", GET_AS_SET(value));
         break;
     case STRING_:
         fprintf(program, "do_push(MAKE_USR_STRING(GC_strdup(");

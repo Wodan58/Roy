@@ -1,7 +1,7 @@
 /*
     module  : gc.c
-    version : 1.30
-    date    : 06/23/22
+    version : 1.31
+    date    : 07/04/22
 */
 #ifndef COSMO
 #include <stdio.h>
@@ -106,7 +106,9 @@ static void mem_fatal(void)
 static void init_heap(void)
 {
     extern int main(int argc, char **argv);
-
+#ifdef _MSC_VER
+    int *ptr;
+#endif
     start_of_text = (uint64_t)main;
 #ifdef __linux__
     extern char etext, edata, end;

@@ -1,7 +1,7 @@
 /*
     module  : print.c
-    version : 1.25
-    date    : 06/29/22
+    version : 1.26
+    date    : 07/04/22
 */
 #include "joy.h"
 
@@ -141,7 +141,7 @@ void writefactor(value_t value)
         printf("%s", str_locate(GET_AS_USR_INDEX(value)));
         break;
     case USR_:
-        printf("%s", GET_AS_USR_STRING(value));
+        printf("%s", (char *)GET_AS_USR_STRING(value));
         break;
     case ANON_FUNCT_:
         printf("%s", find(GET_AS_ANON_FUNCT(value)));
