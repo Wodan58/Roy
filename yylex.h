@@ -1,14 +1,12 @@
 /*
     module  : yylex.h
-    version : 1.2
-    date    : 11/30/20
+    version : 1.3
+    date    : 06/21/22
 */
 #ifndef YYLEX_H
 #define YYLEX_H
 
-void inilinebuffer(char *str);
-void redirect(FILE *fp);
-void include(char *filnam);
+void include(char *filnam, int err);
 int yywrap(void);
 int yylex(void);
 int getechoflag(void);

@@ -1,46 +1,44 @@
 /*
     module  : iffile.c
-    version : 1.8
-    date    : 06/23/20
+    version : 1.9
+    date    : 06/21/22
 */
 #ifndef IFFILE_C
 #define IFFILE_C
 
+/**
+2700  iffile  :  DDDU 	X [T] [E]  ->  ...
+If X is a file, executes T else executes E.
+*/
 void iffile(Stack *prog[])
 {
-    if (is_file(stack_top()))
-	execute(prog[0]);
+    ONEPARAM;
+    if (IS_FILE(stack[-1]))
+        execute(prog[0]);
     else
-	execute(prog[1]);
+        execute(prog[1]);
 }
 
 #ifdef COMPILING
 void put_iffile(Stack *prog[])
 {
-    fprintf(program, "if (is_file(stack_top())) {");
-    execute(prog[0]);
+    fprintf(program, "if (IS_FILE(stack[-1])) {");
+    compile(prog[0]);
     fprintf(program, "} else {");
-    execute(prog[1]);
+    compile(prog[1]);
     fprintf(program, "}");
 }
 #endif
 
-/**
-iffile  :  X [T] [E]  ->  ...
-If X is a file, executes T else executes E.
-*/
 void do_iffile(void)
 {
     Stack *prog[2];
 
-    BINARY;
-    prog[1] = (Stack *)do_pop();
-    prog[0] = (Stack *)do_pop();
-#ifdef COMPILING
-    if (compiling && STACK(1))
-	put_iffile(prog);
-    else
-#endif
+    TWOPARAMS;
+    TWOQUOTES;
+    prog[1] = (Stack *)GET_AS_LIST(stack_pop());
+    prog[0] = (Stack *)GET_AS_LIST(stack_pop());
+    INSTANT(put_iffile);
     iffile(prog);
 }
 #endif

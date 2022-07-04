@@ -1,24 +1,25 @@
 /*
     module  : modf.c
-    version : 1.9
-    date    : 01/19/20
+    version : 1.10
+    date    : 06/21/22
 */
 #ifndef MODF_C
 #define MODF_C
 
 /**
-modf  :  F  ->  G H
+1620  modf  :  DAA	F  ->  G H
 G is the fractional part and H is the integer part
 (but expressed as a float) of F.
 */
 void do_modf(void)
 {
-    real_t dbl, exp;
+    double dbl, exp;
 
-    UNARY;
-    dbl = unpack(stack[-1]);
+    ONEPARAM;
+    NUMBER;
+    dbl = GET_AS_NUMBER(stack[-1]);
     dbl = modf(dbl, &exp);
-    stack[-1] = pack(dbl);
-    do_push(pack(exp));
+    stack[-1] = MAKE_DOUBLE(dbl);
+    do_push(MAKE_DOUBLE(exp));
 }
 #endif

@@ -1,18 +1,17 @@
 /*
     module  : __memorymax.c
-    version : 1.9
-    date    : 01/19/20
+    version : 1.11
+    date    : 06/23/22
 */
-#ifndef __MEMORYMAX_C
-#define __MEMORYMAX_C
+#ifndef _LOWBAR__LOWBAR_MEMORYMAX_C
+#define _LOWBAR__LOWBAR_MEMORYMAX_C
 
 /**
-__memorymax  :  ->  I
+1160  __memorymax  :  A 	->  I
 Pushes value of total size of memory.
 */
-void do___memorymax(void)
+void do__lowbar__lowbar_memorymax(void)
 {
-    COMPILE;
-    do_push(stack_max());
+    do_push(MAKE_INTEGER(GC_get_memory_use()));
 }
 #endif

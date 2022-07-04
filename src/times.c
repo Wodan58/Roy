@@ -1,45 +1,44 @@
 /*
     module  : times.c
-    version : 1.12
-    date    : 06/23/20
+    version : 1.13
+    date    : 06/21/22
 */
 #ifndef TIMES_C
 #define TIMES_C
 
-void times(Stack *Prog)
+/**
+2820  times  :  DDU	N [P]  ->  ...
+N times executes P.
+*/
+void exe_times(Stack *prog)
 {
-    intptr_t num;
+    int num;
 
-    num = do_pop();
+    INTEGER;
+    num = GET_AS_INTEGER(stack_pop());
     while (num--)
-	execute(Prog);
+        execute(prog);
 }
 
 #ifdef COMPILING
-void put_times(Stack *Prog)
+void put_times(Stack *prog)
 {
-    fprintf(program, "{ intptr_t num = do_pop();");
+    fprintf(program, "{ int num;");
+    fprintf(program, "num = GET_AS_INTEGER(stack_pop());");
     fprintf(program, "while (num--) {");
-    execute(Prog);
+    compile(prog);
     fprintf(program, "} }");
 }
 #endif
 
-/**
-times  :  N [P]  ->  ...
-N times executes P.
-*/
 void do_times(void)
 {
-    Stack *Prog;
+    Stack *prog;
 
-    UNARY;
-    Prog = (Stack *)do_pop();
-#ifdef COMPILING
-    if (compiling && STACK(1))
-	put_times(Prog);
-    else
-#endif
-    times(Prog);
+    ONEPARAM;
+    ONEQUOTE;
+    prog = (Stack *)GET_AS_LIST(stack_pop());
+    INSTANT(put_times);
+    exe_times(prog);
 }
 #endif

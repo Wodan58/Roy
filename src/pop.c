@@ -1,18 +1,18 @@
 /*
     module  : pop.c
-    version : 1.11
-    date    : 07/23/20
+    version : 1.12
+    date    : 06/21/22
 */
 #ifndef POP_C
 #define POP_C
 
 /**
-pop  :  X  ->
+1320  pop  :  D 	X  ->
 Removes X from top of the stack.
 */
-intptr_t do_pop(void)
+void do_pop(void)
 {
-    UNARY0;
-    return stack_pop();
+    ONEPARAM;
+    stack_pop();
 }
 #endif

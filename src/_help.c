@@ -1,34 +1,33 @@
 /*
     module  : _help.c
-    version : 1.7
-    date    : 01/19/20
+    version : 1.8
+    date    : 06/21/22
 */
-#ifndef _HELP_C
-#define _HELP_C
+#ifndef _LOWBAR_HELP_C
+#define _LOWBAR_HELP_C
 
 /**
-_help  :  ->
+2930  _help  :  N	->
 Lists all hidden symbols in library and then all hidden builtin symbols.
 */
-void do__help(void)
+void do__lowbar_help(void)
 {
 #ifdef COMPILING
-    khiter_t key;
-    Stack *List = 0;
-    const char *Name;
+    long key;
+    const char *name;
     int leng, column = 0, start = 1;
 
-    while ((Name = dump2(start, &key)) != 0) {
-	if (*Name == '_') {
-	    leng = strlen(Name) + 1;
-	    if (column + leng > LINEWIDTH) {
-		putchar('\n');
-		column = 0;
-	    }
-	    printf("%s ", Name);
-	    column += leng;
-	}
-	start = 0;
+    while ((name = dump_help(start, &key)) != 0) {
+        if (*name == '_') {
+            leng = strlen(name) + 1;
+            if (column + leng > LINEWIDTH) {
+                putchar('\n');
+                column = 0;
+            }
+            printf("%s ", name);
+            column += leng;
+        }
+        start = 0;
     }
     putchar('\n');
 #endif

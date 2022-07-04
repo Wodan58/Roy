@@ -1,80 +1,13 @@
 /*
     module  : condlinrec.c
-    version : 1.20
-    date    : 03/01/21
+    version : 1.21
+    date    : 06/21/22
 */
 #ifndef CONDLINREC_C
 #define CONDLINREC_C
 
-void condnestrec(Stack *list)
-{
-    int i;
-    Stack *quot, *next;
-
-    for (i = vec_size(list) - 1; i > 0; i--) {
-	quot = (Stack *)vec_at(list, i);
-	execute((Stack *)vec_back(quot));
-	if (do_pop())
-	    break;
-    }
-    if (i) {
-	vec_copy(next, quot);
-	vec_pop(next);
-    } else
-	next = (Stack *)vec_at(list, 0);
-    execute((Stack *)vec_back(next));
-    for (i = vec_size(next) - 2; i >= 0; i--) {
-	condnestrec(list);
-	if ((quot = (Stack *)vec_at(next, i)) != 0)
-	    execute(quot);
-    }
-}
-
-#ifdef COMPILING
-void put_condnestrec(Stack *list)
-{
-    static int ident;
-    int i, ch;
-    FILE *old;
-    Stack *quot, *next;
-
-    printf("void condnestrec_%d(void);", ++ident);
-    fprintf(old = program, "condnestrec_%d();", ident);
-    if ((program = my_tmpfile()) == 0)
-	yyerror("condnestrec");
-    fprintf(program, "void condnestrec_%d(void) {", ident);
-    for (i = vec_size(list) - 1; i > 0; i--) {
-	quot = (Stack *)vec_at(list, i);
-	execute((Stack *)vec_back(quot));
-	fprintf(program, "if (do_pop()) {");
-	vec_copy(next, quot);
-	vec_pop(next);
-	execute((Stack *)vec_back(next));
-	for (i = vec_size(next) - 2; i >= 0; i--) {
-	    fprintf(program, "condnestrec_%d();", ident);
-	    if ((quot = (Stack *)vec_at(next, i)) != 0)
-		execute(quot);
-	}
-	fprintf(program, "return; }");
-    }
-    next = (Stack *)vec_at(list, 0);
-    execute((Stack *)vec_back(next));
-    for (i = vec_size(next) - 2; i >= 0; i--) {
-	fprintf(program, "condnestrec_%d();", ident);
-	if ((quot = (Stack *)vec_at(next, i)) != 0)
-	    execute(quot);
-    }
-    fprintf(program, "}");
-    rewind(program);
-    while ((ch = getc(program)) != EOF)
-	putchar(ch);
-    fclose(program);
-    program = old;
-}
-#endif
-
 /**
-condlinrec  :  [ [C1] [C2] .. [D] ]  ->  ...
+2780  condlinrec  :  DU 	[ [C1] [C2] .. [D] ]  ->  ...
 Each [Ci] is of the form [[B] [T]] or [[B] [R1] [R2]].
 Tries each B. If that yields true and there is just a [T], executes T and exit.
 If there are [R1] and [R2], executes R1, recurses, executes R2.
@@ -82,17 +15,89 @@ Subsequent case are ignored. If no B yields true, then [D] is used.
 It is then of the form [[T]] or [[R1] [R2]]. For the former, executes T.
 For the latter executes R1, recurses, executes R2.
 */
+void condnestrec(Stack *list)
+{
+    int i, j = 0;
+    Stack *quot = 0;
+
+    for (i = vec_size(list) - 1; i >= 0; i--) {
+        CHECKLIST(vec_at(list, i));
+        quot = (Stack *)GET_AS_LIST(vec_at(list, i));
+        if (!i) {
+            j = vec_size(quot) - 1;
+            break;
+        }
+        CHECKLIST(vec_back(quot));
+        execute_cond((Stack *)GET_AS_LIST(vec_back(quot)), 0);
+        CHECKSTACK;
+        if (GET_AS_BOOLEAN(stack_pop())) {
+            j = vec_size(quot) - 2;
+            break;
+        }
+    }
+    CHECKLIST(vec_at(quot, j));
+    execute((Stack *)GET_AS_LIST(vec_at(quot, j)));
+    for (i = j - 1; i >= 0; i--) {
+        condnestrec(list);
+        CHECKLIST(vec_at(quot, i));
+        execute((Stack *)GET_AS_LIST(vec_at(quot, i)));
+    }
+}
+
+#ifdef COMPILING
+void put_condnestrec(Stack *list)
+{
+    static int ident;
+    FILE *old;
+    Stack *quot;
+    int i, j, k, ch;
+
+    printf("void condnestrec_%d(void);", ++ident);
+    fprintf(old = program, "condnestrec_%d();", ident);
+    program = my_tmpfile();
+    fprintf(program, "void condnestrec_%d(void) {", ident);
+    for (i = vec_size(list) - 1; i > 0; i--) {
+        CHECKLIST(vec_at(list, i));
+        quot = (Stack *)GET_AS_LIST(vec_at(list, i));
+        CHECKLIST(vec_back(quot));
+        compile_cond((Stack *)GET_AS_LIST(vec_back(quot)), 0);
+        fprintf(program, "if (GET_AS_BOOLEAN(stack_pop())) {");
+        j = vec_size(quot) - 2;
+        CHECKLIST(vec_at(quot, j));
+        compile((Stack *)GET_AS_LIST(vec_at(quot, j)));
+        for (k = j - 1; k >= 0; k--) {
+            printstack();
+            fprintf(program, "condnestrec_%d();", ident);
+            CHECKLIST(vec_at(quot, k));
+            compile((Stack *)GET_AS_LIST(vec_at(quot, k)));
+        }
+        fprintf(program, "return; }");
+    }
+    CHECKLIST(vec_at(list, 0));
+    quot = (Stack *)GET_AS_LIST(vec_at(list, 0));
+    j = vec_size(quot) - 1;
+    CHECKLIST(vec_at(quot, j));
+    compile((Stack *)GET_AS_LIST(vec_at(quot, j)));
+    for (k = j - 1; k >= 0; k--) {
+        printstack();
+        fprintf(program, "condnestrec_%d();", ident);
+        CHECKLIST(vec_at(quot, k));
+        compile((Stack *)GET_AS_LIST(vec_at(quot, k)));
+    }
+    fprintf(program, "}");
+    print_tmpfile(old);
+}
+#endif
+
 void do_condlinrec(void)
 {
-    Stack *list;
+    Stack *prog;
 
-    UNARY;
-    list = (Stack *)do_pop();
-#ifdef COMPILING
-    if (compiling && STACK(1))
-	put_condnestrec(list);
-    else
-#endif
-    condnestrec(list);
+    ONEPARAM;
+    LIST;
+    CHECKEMPTYLIST(stack[-1]);
+    prog = (Stack *)GET_AS_LIST(stack_pop());
+    INSTANT(put_condnestrec);
+    condnestrec(prog);
 }
 #endif

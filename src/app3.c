@@ -1,7 +1,7 @@
 /*
     module  : app3.c
-    version : 1.5
-    date    : 01/19/20
+    version : 1.6
+    date    : 06/21/22
 */
 #ifndef APP3_C
 #define APP3_C
@@ -14,12 +14,11 @@
 #include "unary3.c"
 
 /**
-app3  :  X1 X2 X3 [P]  ->  R1 R2 R3
+2560  app3  :  DDDDAAA	X1 X2 X3 [P]  ->  R1 R2 R3
 Obsolescent.  == unary3
 */
 void do_app3(void)
 {
     do_unary3();
 }
-/* app3 */
 #endif

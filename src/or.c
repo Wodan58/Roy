@@ -1,19 +1,26 @@
 /*
     module  : or.c
-    version : 1.9
-    date    : 07/23/20
+    version : 1.10
+    date    : 06/21/22
 */
 #ifndef OR_C
 #define OR_C
 
 /**
-or  :  X Y  ->  Z
+1340  or  :  DDA	X Y  ->  Z
 Z is the union of sets X and Y, logical disjunction for truth values.
 */
 void do_or(void)
 {
-    BINARY;
-    stack[-2] |= stack[-1];
-    do_pop();
+    TWOPARAMS;
+    SAME2TYPES;
+    if (IS_SET(stack[-1]))
+        stack[-2] = MAKE_SET(GET_AS_SET(stack[-2]) | GET_AS_SET(stack[-1]));
+    else if (IS_BOOLEAN(stack[-1]))
+        stack[-2] = MAKE_BOOLEAN(
+            GET_AS_BOOLEAN(stack[-2]) | GET_AS_BOOLEAN(stack[-1]));
+    else
+        BADDATA;
+    stack_pop();
 }
 #endif

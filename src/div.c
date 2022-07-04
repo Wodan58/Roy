@@ -1,22 +1,24 @@
 /*
     module  : div.c
-    version : 1.8
-    date    : 01/19/20
+    version : 1.9
+    date    : 06/21/22
 */
 #ifndef DIV_C
 #define DIV_C
 
 /**
-div  :  I J  ->  K L
+1430  div  :  DDAA	I J  ->  K L
 Integers K and L are the quotient and remainder of dividing I by J.
 */
 void do_div(void)
 {
-    lldiv_t result;
+    ldiv_t result;
 
-    BINARY;
-    result = lldiv(stack[-2], stack[-1]);
-    stack[-2] = result.quot;
-    stack[-1] = result.rem;
+    TWOPARAMS;
+    INTEGERS2;
+    CHECKZERO;
+    result = ldiv(GET_AS_INTEGER(stack[-2]), GET_AS_INTEGER(stack[-1]));
+    stack[-2] = MAKE_INTEGER(result.quot);
+    stack[-1] = MAKE_INTEGER(result.rem);
 }
 #endif

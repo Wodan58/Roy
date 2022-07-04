@@ -1,60 +1,76 @@
 /*
     module  : factor.c
-    version : 1.3
-    date    : 04/27/21
+    version : 1.5
+    date    : 06/22/22
 */
-#include <stdio.h>
 #include "joy.h"
-#include "parse.h"
-#include "builtin.h"
-#include "yylex.h"
-#include "module.h"
 
-void do_push(intptr_t Value);		/* stack.c */
+/*
+    readfactor - read a factor from stdin and push it on the stack.
 
-intptr_t pack(real_t dbl);		/* builtin.c */
-
-void readterm(int sym);			/* factor.c */
-
+    yylex: USR_, BOOLEAN_, CHAR_, INTEGER_, STRING_, FLOAT_
+*/
 void readfactor(int sym)
 {
-    intptr_t set = 0;
+    uint64_t set = 0;
 
     switch (sym) {
-    case '{' :
-	while ((sym = yylex()) != '}')
-	    if (sym == CHAR_ || sym == INTEGER_)
-		set |= (intptr_t)1 << yylval.num;
-	    else
-		execerror("numeric", "set");
-	do_push(set);
-	break;
-    case '[' :
-	readterm(yylex());
-	break;
-    case USR_ :
-	do_push((intptr_t)qualify(yylval.str));
-	break;
-    case FLOAT_ :
-	yylval.num = pack(yylval.dbl);
-	/* continue */
-    default :
-	do_push(yylval.num);
+    case '{':
+        while ((sym = yylex()) != '}')
+            if ((sym != CHAR_ && sym != INTEGER_) || yylval.num < 0
+                || yylval.num >= SETSIZE_)
+                yyerror("small numeric expected in set");
+            else
+                set |= (int64_t)1 << yylval.num;
+        do_push(MAKE_SET(set));
+        break;
+    case '[':
+        readterm(yylex());
+        break;
+    case INDEX_:
+        do_push(MAKE_USR_INDEX(yylval.num));
+        break;
+    case USR_:
+        do_push(qualify(yylval.str));
+        break;
+    case BOOLEAN_:
+        do_push(MAKE_BOOLEAN(yylval.num));
+        break;
+    case CHAR_:
+        do_push(MAKE_CHAR(yylval.num));
+        break;
+    case INTEGER_:
+        do_push(MAKE_INTEGER(yylval.num));
+        break;
+    case STRING_:
+        do_push(MAKE_USR_STRING(yylval.str));
+        break;
+    case FLOAT_:
+        do_push(MAKE_DOUBLE(yylval.dbl));
+        break;
+    default:
+	do_push(MAKE_INTEGER(sym));
 	break;
     }
 }
 
+/*
+    readterm - read a term from stdin and push this on the stack as a list.
+*/
 void readterm(int sym)
 {
-    Stack *List = 0;
+    Stack *list;
+    value_t value;
 
+    vec_init(list);
+    MK_INITIAL(value);
     if (sym != ']') {
-	do {
-	    readfactor(sym);
-	    vec_push(List, do_pop());
-	} while ((sym = yylex()) != ']');
-	vec_push(List, 0);
-	vec_reverse(List);
+        do {
+            readfactor(sym);
+            vec_push(list, stack_pop());
+        } while ((sym = yylex()) != ']');
+        vec_push(list, value);
+        vec_reverse(list);
     }
-    do_push((intptr_t)List);
+    do_push(MAKE_LIST(list));
 }

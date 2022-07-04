@@ -1,18 +1,23 @@
 /*
     module  : __html_manual.c
-    version : 1.5
-    date    : 01/19/20
+    version : 1.6
+    date    : 06/21/22
 */
-#ifndef __HTML_MANUAL_C
-#define __HTML_MANUAL_C
+#ifndef _LOWBAR__LOWBAR_HTML_LOWBAR_MANUAL_C
+#define _LOWBAR__LOWBAR_HTML_LOWBAR_MANUAL_C
 
-void make_manual(int style /* 0=plain, 1=HTML, 2=Latex */);
+#ifdef MANUAL_X
+#undef MANUAL_X
+#undef MANUAL_C
+#endif
+
+#include "manual.c"
 
 /**
-__html_manual  :  ->
+2960  __html_manual  :  N	->
 Writes this manual of all Joy primitives to output file in HTML style.
 */
-void do___html_manual(void)
+void do__lowbar__lowbar_html_lowbar_manual(void)
 {
 #ifdef COMPILING
     make_manual(1);

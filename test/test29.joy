@@ -1,0 +1,53 @@
+(*
+    module  : test29.joy
+    version : 1.1
+    date    : 06/21/22
+*)
+[4 5 6] 10 at.
+"test" 10 at.
+{4 5 6} 10 at.
+10 2 at.
+'A 10 +.
+[dummy] first body.
+[last] first 10 casting.
+[dummy] first 10 casting.
+10 [dummy] first casting.
+"last" "" casting.
+'A chr.
+true chr.
+[] [] concat.
+"test" 5 drop.
+{1 2 3} 5 drop.
+{1 2 3} -1 drop.
+[last] first [dummy] first equal.
+10 [dummy] first equal.
+[dummy] first 10 equal.
+10 4 has.
+2 "test" index.
+2 {4 5 6} index.
+true false max.
+false true max.
+true false min.
+false true min.
+[dummy] first name.
+"test" name.
+"\"test" name.
+'A not.
+65 ord.
+true ord.
+true pred.
+true putch.
+'A setautoput.
+true setautoput.
+'A setecho.
+true setecho.
+'A __settracegc.
+true __settracegc.
+'A setundeferror.
+true setundeferror.
+'Z 10 -.
+false succ.
+10 1 swons.
+[dummy] first typeof.
+[dummy] first user.
+argv [] casting.

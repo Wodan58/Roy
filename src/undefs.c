@@ -1,28 +1,24 @@
 /*
     module  : undefs.c
-    version : 1.13
-    date    : 01/20/20
+    version : 1.14
+    date    : 06/21/22
 */
 #ifndef UNDEFS_C
 #define UNDEFS_C
 
 /**
-undefs  :  ->  [..]
+1110  undefs  :  A	->  [..]
 Push a list of all undefined symbols in the current symbol table.
 */
 void do_undefs(void)
 {
-#ifdef COMPILING
-    khiter_t key;
-    int start = 1;
-    Stack *List = 0;
-    const char *Name;
+    /*
+        Push empty list, because undefined symbols are not stored in the symbol
+        table.
+    */
+    Stack *list;
 
-    while ((Name = dump1(start, &key)) != 0) {
-	vec_push(List, (intptr_t)Name | JLAP_INVALID);
-	start = 0;
-    }
-    do_push((intptr_t)List);
-#endif
+    vec_init(list);
+    do_push(MAKE_LIST(list));
 }
 #endif

@@ -1,7 +1,7 @@
 /*
     module  : app1.c
-    version : 1.10
-    date    : 01/19/20
+    version : 1.11
+    date    : 06/21/22
 */
 #ifndef APP1_C
 #define APP1_C
@@ -14,12 +14,13 @@
 #include "i.c"
 
 /**
-app1  :  X [P]  ->  R
+2460  app1  :  DDA	X [P]  ->  R
 Executes P, pushes result R on stack.
 */
 void do_app1(void)
 {
+    TWOPARAMS;
+    ONEQUOTE;
     do_i();
 }
-/* app1 */
 #endif

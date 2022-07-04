@@ -1,18 +1,18 @@
 /*
     module  : float.c
-    version : 1.8
-    date    : 01/19/20
+    version : 1.9
+    date    : 06/21/22
 */
 #ifndef FLOAT_C
 #define FLOAT_C
 
 /**
-float  :  R  ->  B
+2410  float  :  DA	R  ->  B
 Tests whether R is a float.
 */
 void do_float(void)
 {
-    UNARY;
-    stack[-1] = is_float(stack[-1]);
+    ONEPARAM;
+    stack[-1] = MAKE_BOOLEAN(IS_DOUBLE(stack[-1]));
 }
 #endif

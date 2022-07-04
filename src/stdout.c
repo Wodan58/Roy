@@ -1,18 +1,18 @@
 /*
     module  : stdout.c
-    version : 1.8
-    date    : 01/19/20
+    version : 1.9
+    date    : 06/21/22
 */
 #ifndef STDOUT_C
 #define STDOUT_C
 
 /**
-stdout  :  ->  S
+1180  stdout  :  A	->  S
 Pushes the standard output stream.
 */
 void do_stdout(void)
 {
     COMPILE;
-    do_push((intptr_t)stdout);
+    do_push(MAKE_FILE(stdout));
 }
 #endif

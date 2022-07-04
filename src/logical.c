@@ -1,18 +1,18 @@
 /*
     module  : logical.c
-    version : 1.7
-    date    : 01/19/20
+    version : 1.8
+    date    : 06/21/22
 */
 #ifndef LOGICAL_C
 #define LOGICAL_C
 
 /**
-logical  :  X  ->  B
+2350  logical  :  DA	X  ->  B
 Tests whether X is a logical.
 */
 void do_logical(void)
 {
-    UNARY;
-    stack[-1] = is_boolean(stack[-1]);
+    ONEPARAM;
+    stack[-1] = MAKE_BOOLEAN(IS_BOOLEAN(stack[-1]));
 }
 #endif

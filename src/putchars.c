@@ -1,21 +1,18 @@
 /*
     module  : putchars.c
-    version : 1.11
-    date    : 06/23/20
+    version : 1.12
+    date    : 06/21/22
 */
 #ifndef PUTCHARS_C
 #define PUTCHARS_C
 
 /**
-putchars  :  "abc.."  ->
+3130  putchars  :  D	"abc.."  ->
 Writes abc.. (without quotes)
 */
 void do_putchars(void)
 {
-    intptr_t Value;
-
     COMPILE;
-    if ((Value = do_pop()) != 0)
-	printf("%s", (char *)Value);
+    printf("%s", get_string(stack_pop()));
 }
 #endif

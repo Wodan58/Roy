@@ -1,18 +1,23 @@
 /*
     module  : while.c
-    version : 1.17
-    date    : 06/23/20
+    version : 1.18
+    date    : 06/21/22
 */
 #ifndef WHILE_C
 #define WHILE_C
 
-void my_while(Stack *prog[])
+/**
+2720  while  :  DDU	[B] [D]  ->  ...
+While executing B yields true executes D.
+*/
+void exe_while(Stack *prog[])
 {
     for (;;) {
-	execute(prog[0]);
-	if (!do_pop())
-	    break;
-	execute(prog[1]);
+        execute_cond(prog[0], 0);
+        CHECKSTACK;
+        if (!GET_AS_BOOLEAN(stack_pop()))
+            break;
+        execute(prog[1]);
     }
 }
 
@@ -20,29 +25,22 @@ void my_while(Stack *prog[])
 void put_while(Stack *prog[])
 {
     fprintf(program, "for (;;) {");
-    execute(prog[0]);
-    fprintf(program, "if (!do_pop()) break;");
-    execute(prog[1]);
+    compile_cond(prog[0], 0);
+    fprintf(program, "if (!GET_AS_BOOLEAN(stack_pop())) break;");
+    compile(prog[1]);
     fprintf(program, "}");
 }
 #endif
 
-/**
-while  :  [B] [D]  ->  ...
-While executing B yields true executes D.
-*/
 void do_while(void)
 {
     Stack *prog[2];
 
-    BINARY;
-    prog[1] = (Stack *)do_pop();
-    prog[0] = (Stack *)do_pop();
-#ifdef COMPILING
-    if (compiling && STACK(1))
-	put_while(prog);
-    else
-#endif
-    my_while(prog);
+    TWOPARAMS;
+    TWOQUOTES;
+    prog[1] = (Stack *)GET_AS_LIST(stack_pop());
+    prog[0] = (Stack *)GET_AS_LIST(stack_pop());
+    INSTANT(put_while);
+    exe_while(prog);
 }
 #endif

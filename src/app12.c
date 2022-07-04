@@ -1,7 +1,7 @@
 /*
     module  : app12.c
-    version : 1.10
-    date    : 07/23/20
+    version : 1.11
+    date    : 06/21/22
 */
 #ifndef APP12_C
 #define APP12_C
@@ -19,13 +19,14 @@
 #include "rolldown.c"
 
 /**
-app12  :  X Y1 Y2 [P]  ->  R1 R2
+2480  app12  :  DDDDAA	X Y1 Y2 [P]  ->  R1 R2
 Executes P twice, with Y1 and Y2, returns R1 and R2.
 */
 void do_app12(void)
 {
+    FOURPARAMS;
     do_unary2();
     do_rolldown();
-    do_pop();
+    stack_pop();
 }
 #endif

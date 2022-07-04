@@ -1,18 +1,18 @@
 /*
     module  : integer.c
-    version : 1.9
-    date    : 01/19/20
+    version : 1.10
+    date    : 06/21/22
 */
 #ifndef INTEGER_C
 #define INTEGER_C
 
 /**
-integer  :  X  ->  B
+2330  integer  :  DA	X  ->  B
 Tests whether X is an integer.
 */
 void do_integer(void)
 {
-    UNARY;
-    stack[-1] = is_integer(stack[-1]);
+    ONEPARAM;
+    stack[-1] = MAKE_BOOLEAN(IS_INTEGER(stack[-1]));
 }
 #endif

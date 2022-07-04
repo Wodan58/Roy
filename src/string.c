@@ -1,18 +1,25 @@
 /*
     module  : string.c
-    version : 1.9
-    date    : 06/23/20
+    version : 1.10
+    date    : 06/21/22
 */
 #ifndef STRING_C
 #define STRING_C
 
 /**
-string  :  X  ->  B
+2370  string  :  DA	X  ->  B
 Tests whether X is a string.
 */
 void do_string(void)
 {
-    UNARY;
-    stack[-1] = !is_usr(stack[-1]) && is_string(stack[-1]);
+    char *str;
+
+    ONEPARAM;
+    if (!IS_USR_STRING(stack[-1]))
+        stack[-1] = MAKE_BOOLEAN(0);
+    else {
+        str = GET_AS_USR_STRING(stack[-1]);
+        stack[-1] = MAKE_BOOLEAN(*str == '"');
+    }
 }
 #endif

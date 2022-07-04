@@ -1,18 +1,18 @@
 /*
     module  : maxint.c
-    version : 1.10
-    date    : 01/19/20
+    version : 1.11
+    date    : 06/21/22
 */
 #ifndef MAXINT_C
 #define MAXINT_C
 
 /**
-maxint  :  ->  maxint
+1020  maxint  :  A	->  maxint
 Pushes largest integer (platform dependent). Typically it is 32 bits.
 */
 void do_maxint(void)
 {
-    do_push(MAXINT_);
+    do_push(MAKE_INTEGER(MAXINT_));
 }
-/* maxint */
+/* maxint.c */
 #endif

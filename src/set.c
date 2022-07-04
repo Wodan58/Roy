@@ -1,18 +1,18 @@
 /*
     module  : set.c
-    version : 1.7
-    date    : 01/19/20
+    version : 1.8
+    date    : 06/21/22
 */
 #ifndef SET_C
 #define SET_C
 
 /**
-set  :  X  ->  B
+2360  set  :  DA	X  ->  B
 Tests whether X is a set.
 */
 void do_set(void)
 {
-    UNARY;
-    stack[-1] = is_set(stack[-1]);
+    ONEPARAM;
+    stack[-1] = MAKE_BOOLEAN(IS_SET(stack[-1]));
 }
 #endif

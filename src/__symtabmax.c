@@ -1,20 +1,20 @@
 /*
     module  : __symtabmax.c
-    version : 1.9
-    date    : 01/19/20
+    version : 1.10
+    date    : 06/21/22
 */
-#ifndef __SYMTABMAX_C
-#define __SYMTABMAX_C
+#ifndef _LOWBAR__LOWBAR_SYMTABMAX_C
+#define _LOWBAR__LOWBAR_SYMTABMAX_C
 
 /**
-__symtabmax  :  ->  I
+1050  __symtabmax  :  A 	->  I
 Pushes value of maximum size of the symbol table.
 */
-void do___symtabmax(void)
+void do__lowbar__lowbar_symtabmax(void)
 {
 #ifdef COMPILING
     COMPILE;
-    do_push(symtabmax());
+    do_push(MAKE_INTEGER(symtabmax()));
 #endif
 }
 #endif

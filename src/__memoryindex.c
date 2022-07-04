@@ -1,18 +1,17 @@
 /*
     module  : __memoryindex.c
-    version : 1.9
-    date    : 01/19/20
+    version : 1.11
+    date    : 06/23/22
 */
-#ifndef __MEMORYINDEX_C
-#define __MEMORYINDEX_C
+#ifndef _LOWBAR__LOWBAR_MEMORYINDEX_C
+#define _LOWBAR__LOWBAR_MEMORYINDEX_C
 
 /**
-__memoryindex  :  ->  I
+3080  __memoryindex  :  A	->  I
 Pushes current value of memory.
 */
-void do___memoryindex(void)
+void do__lowbar__lowbar_memoryindex(void)
 {
-    COMPILE;
-    do_push(stack_size());
+    do_push(MAKE_INTEGER(GC_get_heap_size()));
 }
 #endif

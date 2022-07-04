@@ -1,20 +1,20 @@
 /*
     module  : neql.c
-    version : 1.8
-    date    : 07/23/20
+    version : 1.9
+    date    : 06/21/22
 */
 #ifndef NEQL_C
 #define NEQL_C
 
 /**
-!=  :  X Y  ->  B
-X and Y are numeric.
-Tests whether X is not equal to Y.
+2270  !=  :  DDA	X Y  ->  B
+Either both X and Y are numeric or both are strings or symbols.
+Tests whether X is not equal to Y.  Also supports float.
 */
 void do_neql(void)
 {
-    BINARY;
-    stack[-2] = stack[-2] != stack[-1];
-    do_pop();
+    TWOPARAMS;
+    stack[-2] = MAKE_BOOLEAN(Compare(stack[-2], stack[-1]) != 0);
+    stack_pop();
 }
 #endif

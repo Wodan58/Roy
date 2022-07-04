@@ -1,23 +1,24 @@
 /*
     module  : argv.c
-    version : 1.13
-    date    : 01/20/20
+    version : 1.14
+    date    : 06/21/22
 */
 #ifndef ARGV_C
 #define ARGV_C
 
 /**
-argv  :  ->  A
+3060  argv  :  A	->  A
 Creates an aggregate A containing the interpreter's command line arguments.
 */
 void do_argv(void)
 {
     int i;
-    Stack *List = 0;
+    Stack *list;
 
     COMPILE;
+    vec_init(list);
     for (i = g_argc - 1; i >= 0; i--)
-	vec_push(List, (intptr_t)g_argv[i]);
-    do_push((intptr_t)List);
+        vec_push(list, MAKE_USR_STRING(stringify(g_argv[i])));
+    do_push(MAKE_LIST(list));
 }
 #endif

@@ -1,20 +1,19 @@
 /*
     module  : srand.c
-    version : 1.10
-    date    : 03/01/21
+    version : 1.11
+    date    : 06/21/22
 */
 #ifndef SRAND_C
 #define SRAND_C
 
-void my_srand(unsigned num);
-
 /**
-srand  :  I  ->
+1780  srand  :  D	I  ->
 Sets the random integer seed to integer I.
 */
 void do_srand(void)
 {
-    UNARY;
-    my_srand(do_pop());
+    COMPILE;
+    ONEPARAM;
+    srand(GET_AS_INTEGER(stack_pop()));
 }
 #endif

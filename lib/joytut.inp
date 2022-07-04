@@ -1,11 +1,3 @@
-(* FILE:  joytut.inp *)
-
-"joytut.joy" include.
-1 setecho.
-
-(* input that might have come from a terminal *)
-
-joytut quit.
 	hahaha
 	1234
 	42

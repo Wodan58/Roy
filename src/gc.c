@@ -1,13 +1,13 @@
 /*
     module  : gc.c
-    version : 1.6
-    date    : 01/19/20
+    version : 1.7
+    date    : 06/21/22
 */
 #ifndef GC_C
 #define GC_C
 
 /**
-gc  :  ->
+3030  gc  :  N	->
 Initiates garbage collection.
 */
 void do_gc(void)

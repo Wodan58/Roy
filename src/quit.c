@@ -7,7 +7,7 @@
 #define QUIT_C
 
 /**
-quit  :  ->
+3160  quit  :  N	->
 Exit from Joy.
 */
 void do_quit(void)

@@ -1,66 +1,54 @@
 /*
     module  : infra.c
-    version : 1.16
-    date    : 06/23/20
+    version : 1.17
+    date    : 06/21/22
 */
 #ifndef INFRA_C
 #define INFRA_C
 
-#ifdef STACK_X
-#undef STACK_X
-#undef STACK_C
-#endif
-#ifdef UNSTACK_X
-#undef UNSTACK_X
-#undef UNSTACK_C
-#endif
-
-#include "stack.c"
-#include "unstack.c"
-
-void infra(Stack *prog)
+/**
+2830  infra  :  DDA	L1 [P]  ->  L2
+Using list L1 as stack, executes P and returns a new list L2.
+The first element of L1 is used as the top of stack,
+and after execution of P the top of stack becomes the first element of L2.
+*/
+void infra(Stack *prog, Stack *list)
 {
-    Stack *save, *list;
+    Stack *save;
 
-    list = (Stack *)do_pop();
-    save = stk2lst();
-    lst2stk(list);
+    save = stack_copy();
+    stack_from_list(list);
     execute(prog);
-    list = stk2lst();
-    lst2stk(save);
-    do_push((intptr_t)list);
+    list = stack_copy();
+    stack_from_list(save);
+    do_push(MAKE_LIST(list));
 }
 
 #ifdef COMPILING
 void put_infra(Stack *prog)
 {
-    fprintf(program, "{ Stack *save, *list = (Stack *)do_pop();");
-    fprintf(program, "save = stk2lst();");
-    fprintf(program, "lst2stk(list);");
-    execute(prog);
-    fprintf(program, "list = stk2lst();");
-    fprintf(program, "lst2stk(save);");
-    fprintf(program, "do_push((node_t)list); }");
+    fprintf(program, "{ Stack *list, *save;");
+    fprintf(program, "list = (Stack *)GET_AS_LIST(stack_pop());");
+    fprintf(program, "save = stack_copy();");
+    fprintf(program, "stack_from_list(list);");
+    compile(prog);
+    fprintf(program, "list = stack_copy();");
+    fprintf(program, "stack_from_list(save);");
+    fprintf(program, "do_push(MAKE_LIST(list)); }");
 }
 #endif
 
-/**
-infra  :  L1 [P]  ->  L2
-Using list L1 as stack, executes P and returns a new list L2.
-The first element of L1 is used as the top of stack,
-and after execution of P the top of stack becomes the first element of L2.
-*/
 void do_infra(void)
 {
-    Stack *prog;
+    Stack *prog, *list;
 
-    UNARY;
-    prog = (Stack *)do_pop();
-#ifdef COMPILING
-    if (compiling && STACK(1))
-	put_infra(prog);
-    else
-#endif
-    infra(prog);
+    ONEPARAM;
+    ONEQUOTE;
+    prog = (Stack *)GET_AS_LIST(stack_pop());
+    INSTANT(put_infra);
+    ONEPARAM;
+    LIST;
+    list = (Stack *)GET_AS_LIST(stack_pop());
+    infra(prog, list);
 }
 #endif

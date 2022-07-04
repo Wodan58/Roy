@@ -1,20 +1,20 @@
 /*
     module  : rolldownd.c
-    version : 1.7
-    date    : 01/19/20
+    version : 1.8
+    date    : 06/21/22
 */
 #ifndef ROLLDOWND_C
 #define ROLLDOWND_C
 
 /**
-rolldownd  :  X Y Z W  ->  Y Z X W
+1300  rolldownd  :  DDDDAAAA	X Y Z W  ->  Y Z X W
 As if defined by:   rolldownd  ==  [rolldown] dip
 */
 void do_rolldownd(void)
 {
-    intptr_t temp;
+    value_t temp;
 
-    QUATERN;
+    FOURPARAMS;
     temp = stack[-4];
     stack[-4] = stack[-3];
     stack[-3] = stack[-2];

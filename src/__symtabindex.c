@@ -1,20 +1,20 @@
 /*
     module  : __symtabindex.c
-    version : 1.10
-    date    : 01/19/20
+    version : 1.11
+    date    : 06/21/22
 */
-#ifndef __SYMTABINDEX_C
-#define __SYMTABINDEX_C
+#ifndef _LOWBAR__LOWBAR_SYMTABINDEX_C
+#define _LOWBAR__LOWBAR_SYMTABINDEX_C
 
 /**
-__symtabindex  :  ->  I
+1060  __symtabindex  :  A	->  I
 Pushes current size of the symbol table.
 */
-void do___symtabindex(void)
+void do__lowbar__lowbar_symtabindex(void)
 {
 #ifdef COMPILING
     COMPILE;
-    do_push(symtabindex());
+    do_push(MAKE_INTEGER(symtabindex()));
 #endif
 }
 #endif

@@ -1,29 +1,23 @@
 /*
     module  : getenv.c
-    version : 1.9
-    date    : 01/19/20
+    version : 1.10
+    date    : 06/21/22
 */
 #ifndef GETENV_C
 #define GETENV_C
 
 /**
-getenv  :  "variable"  ->  "value"
+3050  getenv  :  DA	"variable"  ->  "value"
 Retrieves the value of the environment variable "variable".
 */
 void do_getenv(void)
 {
-    char *str, *ptr;
+    char *str;
 
-    if (stack[-1]) {
-	str = (char *)stack[-1];
-	if ((str = getenv(str)) == 0)
-	    stack[-1] = 0;
-	else {
-	    ptr = GC_malloc_atomic(strlen(str) + 2);
-	    ptr[0] = '"';
-	    strcpy(ptr + 1, str);
-	    stack[-1] = (intptr_t)ptr | JLAP_INVALID;
-	}
-    }
+    COMPILE;
+    ONEPARAM;
+    STRING;
+    str = getenv(get_string(stack[-1]));
+    stack[-1] = MAKE_USR_STRING(stringify(str));
 }
 #endif

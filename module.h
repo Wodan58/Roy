@@ -1,7 +1,7 @@
 /*
     module  : module.h
-    version : 1.3
-    date    : 11/30/20
+    version : 1.4
+    date    : 06/21/22
 */
 #ifndef MODULE_H
 #define MODULE_H
@@ -11,7 +11,6 @@ void initpriv(void);
 void stoppriv(void);
 void exitpriv(void);
 void exitmod(void);
-char *iterate(char *name);
 char *classify(char *name);
-char *qualify(char *name);
+value_t qualify(char *name);
 #endif

@@ -1,7 +1,7 @@
 /*
     module  : stop.c
-    version : 1.11
-    date    : 06/23/20
+    version : 1.12
+    date    : 06/21/22
 */
 #ifndef STOP_C
 #define STOP_C
@@ -10,18 +10,18 @@ void do_stop(void)
 {
     COMPILE;
     if (!stack_empty()) {
-	switch (autoput) {
-	case 0:
-	    break;
-	case 1:
-	    writefactor(do_pop());
-	    break;
-	case 2:
-	    write_stack();
-	    break;
-	}
-	if (autoput)
-	    putchar('\n');
+        switch (autoput) {
+        case 0:
+            break;
+        case 1:
+            writefactor(stack_pop());
+            break;
+        case 2:
+            writestack();
+            break;
+        }
+        if (autoput)
+            putchar('\n');
     }
 }
 #endif

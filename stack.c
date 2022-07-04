@@ -1,28 +1,49 @@
 /*
     module  : stack.c
-    version : 1.5
-    date    : 03/16/21
+    version : 1.6
+    date    : 06/21/22
 */
-#ifdef VECTOR
-/* declare data stack */
-static Stack *theStack;
+#include "joy.h"
 
-/* make stack addressing possible */
-#define stack	vec_end(theStack)
+/* declare data stack */
+#ifdef VECTOR
+Stack *theStack;
 #else
-intptr_t memory[MEMORYMAX], *stack;
+value_t memory[MEMORYMAX], *stack;
 #endif
 
-void init_stack(void)
+#ifdef REPORT
+static double count_push;
+
+/*
+    report_push - report the number of times an item was pushed on the stack.
+*/
+static void report_push(void)
 {
+    fprintf(stderr, "push = %.0f\n", count_push);
+}
+#endif
+
+/*
+    stack_init - start using the stack.
+*/
+void stack_init(void)
+{
+#ifdef REPORT
+    atexit(report_push);
+#endif
 #ifdef VECTOR
     vec_init(theStack);
+    vec_setowner(theStack, OWNER);
 #else
     stack = memory;
 #endif
 }
 
-void clear_stack(void)
+/*
+    stack_clear - make the stack empty again.
+*/
+void stack_clear(void)
 {
 #ifdef VECTOR
     vec_setsize(theStack, 0);
@@ -31,6 +52,9 @@ void clear_stack(void)
 #endif
 }
 
+/*
+    stack_size - report the size of the stack that is currently in use.
+*/
 int stack_size(void)
 {
 #ifdef VECTOR
@@ -40,6 +64,9 @@ int stack_size(void)
 #endif
 }
 
+/*
+    stack_max - report the current maximum size of the stack.
+*/
 int stack_max(void)
 {
 #ifdef VECTOR
@@ -49,6 +76,9 @@ int stack_max(void)
 #endif
 }
 
+/*
+    stack_empty - tell whether the stack is empty or not.
+*/
 int stack_empty(void)
 {
 #ifdef VECTOR
@@ -58,67 +88,111 @@ int stack_empty(void)
 #endif
 }
 
-intptr_t stack_top(void)
+/*
+    writestack - print the contents of the stack from top to bottom.
+*/
+void writestack(void)
 {
 #ifdef VECTOR
-    return vec_back(theStack);
+    int i;
+
+    for (i = vec_size(theStack) - 1; i >= 0; i--) {
+        writefactor(vec_at(theStack, i));
+        if (i)
+            putchar(' ');
+    }
 #else
-    return stack[-1];
+    value_t *mem;
+
+    for (mem = stack - 1; mem >= memory; mem--) {
+        writefactor(*mem);
+        if (mem > memory)
+            putchar(' ');
+    }
 #endif
 }
 
-void write_stack(void)
+/*
+    stack_write - print the contents of the stack from bottom to top.
+*/
+void stack_write(void)
 {
 #ifdef VECTOR
-    int Index, Limit;
+    int i, j;
 
-    for (Index = 0, Limit = vec_size(theStack) - 1; Index <= Limit; Index++) {
-	writefactor(vec_at(theStack, Index));
-	if (Index < Limit)
-	    putchar(' ');
+    for (i = 0, j = vec_size(theStack) - 1; i <= j; i++) {
+        writefactor(vec_at(theStack, i));
+        if (i < j)
+            putchar(' ');
     }
 #else
-    intptr_t *mem;
+    value_t *mem;
 
     for (mem = memory; mem < stack; mem++) {
-	writefactor(*mem);
-	if (mem < stack)
-	    putchar(' ');
+        writefactor(*mem);
+        if (mem < stack)
+            putchar(' ');
     }
 #endif
 }
 
-Stack *copy_stack(void)
+/*
+    stack_copy - return a copy of the stack.
+*/
+Stack *stack_copy(void)
 {
-    Stack *Quot = 0;
+    Stack *quot = 0;
 
 #ifdef VECTOR
-    vec_copy(Quot, theStack);
+    vec_copy(quot, theStack);
 #else
-    intptr_t *mem;
+    value_t *mem;
 
     for (mem = memory; mem < stack; mem++)
-	vec_push(Quot, *mem);
+        vec_push(quot, *mem);
 #endif
-    return Quot;
+    return quot;
 }
 
-void do_push(intptr_t Value)
+/*
+    do_push - push a value onto the stack.
+*/
+void do_push(value_t value)
 {
+#ifdef REPORT
+    count_push++;
+#endif
 #ifdef VECTOR
-    vec_push(theStack, Value);
+    vec_push(theStack, value);
 #else
-    *stack++ = Value;
+    *stack++ = value;
 #endif
 }
 
-intptr_t stack_pop(void)
+/*
+    stack_from_list - replace the stack by the contents of a list. An exception
+                      is made for the initial value: it cannot exist.
+*/
+void stack_from_list(Stack *list)
 {
-    if (!stack_empty())
+    int i, j;
+    value_t value;
+
+    stack_clear();
+    for (i = 0, j = vec_size(list); i < j; i++) {
+        value = vec_at(list, i);
+        do_push(value);
+    }
+}
+
+/*
+    stack_pop - remove and return the top value of the stack.
+*/
+value_t stack_pop(void)
+{
 #ifdef VECTOR
-	return vec_pop(theStack);
+    return vec_pop(theStack);
 #else
-	return *--stack;
+    return *--stack;
 #endif
-    return 0;
 }

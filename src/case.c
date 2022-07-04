@@ -1,83 +1,72 @@
 /*
     module  : case.c
-    version : 1.18
-    date    : 03/01/21
+    version : 1.19
+    date    : 06/21/22
 */
 #ifndef CASE_C
 #define CASE_C
 
-#ifdef EQUAL_X
-#undef EQUAL_X
-#undef EQUAL_C
-#endif
-
-#include "equal.c"
-
-void my_case(Stack *list)
+/**
+2110  case  :  DDU	X [..[X Y]..]  ->  [Y] i
+Indexing on the value of X, execute the matching Y.
+*/
+void exe_case(Stack *list)
 {
     int i;
-    intptr_t First;
-    Stack *quot, *next;
+    Stack *quot, *result = 0;
 
-    First = stack[-1];
-    for (i = vec_size(list) - 1; i > 0; i--) {
-	quot = (Stack *)vec_at(list, i);
-	if (is_equal_item(First, vec_back(quot))) {
-	    do_pop();
-	    break;
-	}
+    ONEPARAM;
+    for (i = vec_size(list) - 1; i >= 0; i--) {
+        CHECKLIST(vec_at(list, i));
+        quot = (Stack *)GET_AS_LIST(vec_at(list, i));
+        if (!i || !Compare(stack[-1], vec_back(quot))) {
+            if (!i)
+                result = quot;
+            else {
+                vec_shallow_copy(result, quot);
+                vec_pop(result);
+                stack_pop();
+            }
+            break;
+        }
     }
-    if (i) {
-	vec_copy(next, quot);
-	vec_pop(next);
-    } else
-	next = (Stack *)vec_at(list, 0);
-    execute(next);
+    execute(result);
 }
 
 #ifdef COMPILING
 void put_case(Stack *list)
 {
     int i;
-    intptr_t Second;
-    Stack *quot, *next;
+    Stack *quot, *result;
 
-    fprintf(program, "{ int num = 0; intptr_t First = stack[-1]; do {");
+    fprintf(program, "{ int num = 0; do {");
     for (i = vec_size(list) - 1; i > 0; i--) {
-	quot = (Stack *)vec_at(list, i);
-	Second = vec_back(quot);
-	if (is_usr(Second) || is_string(Second)) {
-	    fprintf(program, "if (!strcmp((char *)First, ");
-	    writestring(program, (char *)Second);
-	} else
-	    fprintf(program, "if (stack[-1] == %" PRIdPTR "", Second);
-	fprintf(program, ") { do_pop();");
-	vec_copy(next, quot);
-	vec_pop(next);
-	execute(next);
-	fprintf(program, "num = 1; break; }");
+        CHECKLIST(vec_at(list, i));
+        quot = (Stack *)GET_AS_LIST(vec_at(list, i));
+        printvalue(vec_back(quot));
+        fprintf(program, "if (!Compare(stack[-2], stack[-1])) {");
+        fprintf(program, "stack_pop(); stack_pop();");
+        vec_shallow_copy(result, quot);
+        vec_pop(result);
+        compile(result);
+        fprintf(program, "num = 1; break; } stack_pop();");
     }
     fprintf(program, "break; } while(0); if (!num) {");
-    execute((Stack *)vec_at(list, 0));
+    CHECKLIST(vec_at(list, 0));
+    compile((Stack *)GET_AS_LIST(vec_at(list, 0)));
     fprintf(program, "} }");
 }
 #endif
 
-/**
-case  :  X [..[X Y]..]  ->  [Y] i
-Indexing on the value of X, execute the matching Y.
-*/
 void do_case(void)
 {
-    Stack *list;
+    Stack *prog;
 
-    UNARY;
-    list = (Stack *)do_pop();
-#ifdef COMPILING
-    if (compiling && STACK(1))
-	put_case(list);
-    else
-#endif
-    my_case(list);
+    ONEPARAM;
+    LIST;
+    CHECKEMPTYLIST(stack[-1]);
+    prog = (Stack *)GET_AS_LIST(stack_pop());
+    INSTANT(put_case);
+    exe_case(prog);
 }
 #endif

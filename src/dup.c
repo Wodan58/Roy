@@ -1,18 +1,18 @@
 /*
     module  : dup.c
-    version : 1.10
-    date    : 01/19/20
+    version : 1.11
+    date    : 06/21/22
 */
 #ifndef DUP_C
 #define DUP_C
 
 /**
-dup  :  X  ->  X X
+1210  dup  :  A	X  ->  X X
 Pushes an extra copy of X onto stack.
 */
 void do_dup(void)
 {
-    UNARY;
+    ONEPARAM;
     do_push(stack[-1]);
 }
 #endif

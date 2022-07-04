@@ -1,18 +1,18 @@
 /*
     module  : time.c
-    version : 1.9
-    date    : 01/19/20
+    version : 1.10
+    date    : 06/21/22
 */
 #ifndef TIME_C
 #define TIME_C
 
 /**
-time  :  ->  I
+1140  time  :  A	->  I
 Pushes the current time (in seconds since the Epoch).
 */
 void do_time(void)
 {
     COMPILE;
-    do_push(time(0));
+    do_push(MAKE_INTEGER(time(0)));
 }
 #endif

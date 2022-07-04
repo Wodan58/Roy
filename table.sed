@@ -1,0 +1,11 @@
+s/do___dump/do__lowbar__lowbar_dump/
+s/do__help/do__lowbar_help/
+s/do___html_manual/do__lowbar__lowbar_html_lowbar_manual/
+s/do___latex_manual/do__lowbar__lowbar_latex_lowbar_manual/
+s/do___manual_list/do__lowbar__lowbar_manual_lowbar_list/
+s/do___memoryindex/do__lowbar__lowbar_memoryindex/
+s/do___memorymax/do__lowbar__lowbar_memorymax/
+s/do___settracegc/do__lowbar__lowbar_settracegc/
+s/do___symtabindex/do__lowbar__lowbar_symtabindex/
+s/do___symtabmax/do__lowbar__lowbar_symtabmax/
+s/do__in/do__lowbar_in/

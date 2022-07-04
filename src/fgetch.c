@@ -1,18 +1,23 @@
 /*
     module  : fgetch.c
-    version : 1.8
-    date    : 01/19/20
+    version : 1.9
+    date    : 06/21/22
 */
 #ifndef FGETCH_C
 #define FGETCH_C
 
 /**
-fgetch  :  S  ->  S C
+1880  fgetch  :  A	S  ->  S C
 C is the next available character from stream S.
 */
 void do_fgetch(void)
 {
+    FILE *fp;
+
     COMPILE;
-    do_push(getc((FILE *)stack[-1]));
+    ONEPARAM;
+    FILE1;
+    fp = GET_AS_FILE(stack[-1]);
+    do_push(MAKE_CHAR(fgetc(fp)));
 }
 #endif

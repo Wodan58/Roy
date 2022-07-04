@@ -1,20 +1,20 @@
 /*
     module  : rotated.c
-    version : 1.8
-    date    : 01/19/20
+    version : 1.9
+    date    : 06/21/22
 */
 #ifndef ROTATED_C
 #define ROTATED_C
 
 /**
-rotated  :  X Y Z W  ->  Z Y X W
+1310  rotated  :  DDDDAAAA	X Y Z W  ->  Z Y X W
 As if defined by:   rotated  ==  [rotate] dip
 */
 void do_rotated(void)
 {
-    intptr_t temp;
+    value_t temp;
 
-    QUATERN;
+    FOURPARAMS;
     temp = stack[-2];
     stack[-2] = stack[-4];
     stack[-4] = temp;

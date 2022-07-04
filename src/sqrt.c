@@ -1,22 +1,23 @@
 /*
     module  : sqrt.c
-    version : 1.7
-    date    : 01/19/20
+    version : 1.8
+    date    : 06/21/22
 */
 #ifndef SQRT_C
 #define SQRT_C
 
 /**
-sqrt  :  F  ->  G
+1660  sqrt  :  DA	F  ->  G
 G is the square root of F.
 */
 void do_sqrt(void)
 {
-    real_t dbl;
+    double dbl;
 
-    UNARY;
-    dbl = unpack(stack[-1]);
+    ONEPARAM;
+    NUMBER;
+    dbl = GET_AS_NUMBER(stack[-1]);
     dbl = sqrt(dbl);
-    stack[-1] = pack(dbl);
+    stack[-1] = MAKE_DOUBLE(dbl);
 }
 #endif

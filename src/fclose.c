@@ -1,21 +1,20 @@
 /*
     module  : fclose.c
-    version : 1.9
-    date    : 01/19/20
+    version : 1.10
+    date    : 06/21/22
 */
 #ifndef FCLOSE_C
 #define FCLOSE_C
 
 /**
-fclose  :  S  ->
+1830  fclose  :  D	S  ->
 Stream S is closed and removed from the stack.
 */
 void do_fclose(void)
 {
-    FILE *fp;
-
     COMPILE;
-    if ((fp = (FILE *)do_pop()) != 0)
-	fclose(fp);
+    ONEPARAM;
+    FILE1;
+    fclose(GET_AS_FILE(stack_pop()));
 }
 #endif

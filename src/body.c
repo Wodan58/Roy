@@ -1,27 +1,31 @@
 /*
     module  : body.c
-    version : 1.13
-    date    : 06/23/20
+    version : 1.14
+    date    : 06/21/22
 */
 #ifndef BODY_C
 #define BODY_C
 
 /**
-body  :  U  ->  [P]
+2200  body  :  DA	U  ->  [P]
 Quotation [P] is the body of user-defined symbol U.
 */
 void do_body(void)
 {
 #ifdef COMPILING
-    const char *Name;
+    Stack *list;
 
-    UNARY;
-#ifdef COMPILING
-    Name = (const char *)(stack[-1] & ~JLAP_INVALID);
+    ONEPARAM;
+    USERDEF;
+    if (IS_USR_INDEX(stack[-1]))
+        stack[-1] = locate(GET_AS_USR_INDEX(stack[-1]));
+    else {
+        vec_init(list);
+        stack[-1] = MAKE_LIST(list);
+    }
 #else
-    Name = (const char *)stack[-1];
-#endif
-    stack[-1] = lookup(Name);
+    ONEPARAM;
+    stack_pop();
 #endif
 }
 #endif

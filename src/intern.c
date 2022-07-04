@@ -1,21 +1,31 @@
 /*
     module  : intern.c
-    version : 1.14
-    date    : 01/19/20
+    version : 1.15
+    date    : 06/21/22
 */
 #ifndef INTERN_C
 #define INTERN_C
 
 /**
-intern  :  "sym"  ->  sym
+2190  intern  :  DA	"sym"  ->  sym
 Pushes the item whose name is "sym".
 */
 void do_intern(void)
 {
-    char *str;
+    char *str, *ptr;
 
-    UNARY;
-    if ((str = (char *)stack[-1]) != 0)
-	stack[-1] = (intptr_t)GC_strdup(str) | JLAP_INVALID;
+    ONEPARAM;
+    STRING;
+    ptr = str = get_string(stack[-1]);
+    if (!strchr("\"#'().0123456789;[]{}", *ptr)) {
+        if (*ptr == '-' && isdigit((int)ptr[1]))
+            ;
+        else
+            for (ptr++; *ptr; ptr++)
+                if (!isalnum((int)*ptr) && !strchr("-=_", *ptr))
+                    break;
+    }
+    CHECKNAME(ptr);
+    stack[-1] = qualify(GC_strdup(str));
 }
 #endif

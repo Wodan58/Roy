@@ -1,80 +1,89 @@
 /*
     module  : treegenrec.c
-    version : 1.14
-    date    : 03/01/21
+    version : 1.15
+    date    : 06/21/22
 */
 #ifndef TREEGENREC_C
 #define TREEGENREC_C
 
-static intptr_t _treegenrec;
+#ifdef CONS_X
+#undef CONS_X
+#undef CONS_C
+#endif
 
+#include "cons.c"
+
+/**
+2910  treegenrec  :  DDDDU	T [O1] [O2] [C]  ->  ...
+T is a tree. If T is a leaf, executes O1.
+Else executes O2 and then [[[O1] [O2] C] treegenrec] C.
+*/
 void treegenrec(void)
 {
+    static value_t _treegenrec;
     Stack *prog;
 
-    prog = (Stack *)do_pop();
-    if (is_list(stack[-1])) {
-	execute((Stack *)vec_at(prog, vec_size(prog) - 2));
-	do_push((intptr_t)prog);
-	do_push(_treegenrec);
-	do_cons();
-	execute_rest(prog, vec_size(prog) - 3);
+    if (IS_INITIAL(_treegenrec)) {
+        do_push(MAKE_ANON_FUNCT(treegenrec));
+        vec_init(prog);
+        do_push(MAKE_LIST(prog));
+        do_cons();
+        _treegenrec = stack_pop();
+#ifdef COMPILING
+        enter("_treegenrec", "", treegenrec);
+#endif
+    }
+    prog = (Stack *)GET_AS_LIST(stack_pop());
+    ONEPARAM;
+    if (IS_LIST(stack[-1])) {
+        execute((Stack *)GET_AS_LIST(vec_at(prog, vec_size(prog) - 2)));
+        do_push(MAKE_LIST(prog));
+        do_push(_treegenrec);
+        do_cons();
+        execute_rest(prog, vec_size(prog) - 3);
     } else
-	execute((Stack *)vec_at(prog, vec_size(prog) - 1));
+        execute((Stack *)GET_AS_LIST(vec_back(prog)));
 }
 
 #ifdef COMPILING
-void put_treegenrec(void)
+void put_treegenrec(Stack *prog)
 {
     static int ident;
     int ch;
     FILE *old;
-    Stack *prog = (Stack *)do_pop();
 
+    set_inuse("treegenrec");
+    printf("void treegenrec(void);");
     printf("void treegenrec_%d(void);", ++ident);
     fprintf(old = program, "treegenrec_%d();", ident);
-    if ((program = my_tmpfile()) == 0)
-	yyerror("treegenrec");
-    fprintf(program, "void treegenrec_%d(void) {", ident);
-    fprintf(program, "if (is_list(stack[-1])) {");
-    execute((Stack *)vec_at(prog, vec_size(prog) - 2));
+    program = my_tmpfile();
+    fprintf(program, "void treegenrec_%d(void) { Stack *list;", ident);
+    fprintf(program, "if (IS_LIST(stack[-1])) {");
+    compile((Stack *)GET_AS_LIST(vec_at(prog, vec_size(prog) - 2)));
     fprintf(program, "do_list_%d();", FindNode(prog));
-    fprintf(program, "do_push((intptr_t)treegenrec | JLAP_INVALID);");
-    fprintf(program, "do_push(0); do_cons(); do_cons();");
-    execute_rest(prog, vec_size(prog) - 3);
+    fprintf(program, "do_push(MAKE_ANON_FUNCT(treegenrec)); vec_init(list);");
+    fprintf(program, "do_push(MAKE_LIST(list)); do_cons(); do_cons();");
+    compile_rest(prog, vec_size(prog) - 3);
     fprintf(program, "} else {");
-    execute((Stack *)vec_at(prog, vec_size(prog) - 1));
+    compile((Stack *)GET_AS_LIST(vec_back(prog)));
     fprintf(program, "} }");
-    rewind(program);
-    while ((ch = getc(program)) != EOF)
-	putchar(ch);
-    fclose(program);
-    program = old;
+    print_tmpfile(old);
 }
 #endif
 
-/**
-treegenrec  :  T [O1] [O2] [C]  ->  ...
-T is a tree. If T is a leaf, executes O1.
-Else executes O2 and then [[[O1] [O2] C] treegenrec] C.
-*/
 void do_treegenrec(void)
 {
-    TERNARY;
-    if (!_treegenrec) {
-	do_push((intptr_t)GC_strdup("_treegenrec") | JLAP_INVALID);
-	do_push(0);
-	do_cons();
-	_treegenrec = do_pop();
-	enter("_treegenrec", treegenrec);
-    }
+    Stack *prog;
+    value_t temp;
+
+    THREEPARAMS;
+    THREEQUOTES;
     do_cons();
     do_cons();
-#ifdef COMPILING
-    if (compiling && STACK(1))
-	put_treegenrec();
-    else
-#endif
+    temp = stack_pop();
+    prog = (Stack *)GET_AS_LIST(temp);
+    INSTANT(put_treegenrec);
+    do_push(temp);
     treegenrec();
 }
 #endif

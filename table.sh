@@ -1,20 +1,21 @@
 #
 #   module  : table.sh
-#   version : 1.2
-#   date    : 04/27/21
+#   version : 1.3
+#   date    : 06/21/22
 #
 #   Generate table.c
+#   The directory needs to be given as parameter.
 #
 echo checking table.c
 todo=0
-if [ ! -f table.c ]
+if [ ! -f $1/table.c ]
 then
   echo creating table.c
   todo=1
 else
-  for i in src/*.c gui/*.c
+  for i in $1/src/*.c
   do
-    if [ $i -nt table.c ]
+    if [ $i -nt $1/table.c ]
     then
       echo updating table.c
       todo=1
@@ -27,9 +28,11 @@ then
   echo table.c is up-to-date
   exit
 fi
-rm -f table.c
-for i in src/*.c gui/*.c
+rm -f $1/table.c
+for i in $1/src/*.c
 do
+  j=`basename $i`
+  j=`expr $j : '\(.*\).c'`
   sed -n '/\/\*\*/ {
 	N
 	N
@@ -39,10 +42,11 @@ do
 	N
 	N
 	N
-	s/[^\n]*\n\([^ ]*\)[ ]*:[ ]*\([^\n]*\)[ \n]*\([^*]*\)\*\/.*/{ @\1@, @\2@, @\3@ },/
+	s/[^\n]*\n\([^ \t]*\)[ \t]*\([^ \t]*\)[ \t]*:[ \t]*\([DANU]*\)[ \t]*\([^\n]*\)[ \n]*\([^*]*\)\*\/.*/\/* \1 *\/ { @\2@, do_'$j', @\3@, @\4@, @\5@ },/
 	s/\n/\\n/g
 	s/"/\\"/g
 	s/@/"/g
 	P
   }' <$i
-done | sort >table.c
+done | sort | sed -f $1/table.sed >$1/table.c
+touch $1/optable.c

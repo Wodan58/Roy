@@ -1,18 +1,20 @@
 /*
     module  : conts.c
-    version : 1.9
-    date    : 01/19/20
+    version : 1.10
+    date    : 06/21/22
 */
 #ifndef CONTS_C
 #define CONTS_C
 
 /**
-conts  :  ->  [[P] [Q] ..]
+1080  conts  :  A	->  [[P] [Q] ..]
 Pushes current continuations. Buggy, do not use.
 */
 void do_conts(void)
 {
-    do_push(0);
+    Stack *list;
+
+    vec_init(list);
+    do_push(MAKE_LIST(list));
 }
-/* conts */
 #endif

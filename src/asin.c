@@ -1,22 +1,23 @@
 /*
     module  : asin.c
-    version : 1.7
-    date    : 01/19/20
+    version : 1.8
+    date    : 06/21/22
 */
 #ifndef ASIN_C
 #define ASIN_C
 
 /**
-asin  :  F  ->  G
+1500  asin  :  DA	F  ->  G
 G is the arc sine of F.
 */
 void do_asin(void)
 {
-    real_t dbl;
+    double dbl;
 
-    UNARY;
-    dbl = unpack(stack[-1]);
+    ONEPARAM;
+    NUMBER;
+    dbl = GET_AS_NUMBER(stack[-1]);
     dbl = asin(dbl);
-    stack[-1] = pack(dbl);
+    stack[-1] = MAKE_DOUBLE(dbl);
 }
 #endif

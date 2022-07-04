@@ -1,20 +1,26 @@
-/*
+/*    
     module  : tailrec.c
-    version : 1.19
-    date    : 03/01/21
+    version : 1.20
+    date    : 06/21/22
 */
 #ifndef TAILREC_C
 #define TAILREC_C
 
+/**
+2740  tailrec  :  DDDU	[P] [T] [R1]  ->  ...
+Executes P. If that yields true, executes T.
+Else executes R1, recurses.
+*/
 void tailrec(Stack *prog[])
 {
     for (;;) {
-	execute(prog[0]);
-	if (do_pop()) {
-	    execute(prog[1]);
-	    break;
-	}
-	execute(prog[2]);
+        execute_cond(prog[0], 0);
+        CHECKSTACK;
+        if (GET_AS_BOOLEAN(stack_pop())) {
+            execute(prog[1]);
+            break;
+        }
+        execute(prog[2]);
     }
 }
 
@@ -27,42 +33,29 @@ void put_tailrec(Stack *prog[])
 
     printf("void tailrec_%d(void);", ++ident);
     fprintf(old = program, "tailrec_%d();", ident);
-    if ((program = my_tmpfile()) == 0)
-	yyerror("tailrec");
+    program = my_tmpfile();
     fprintf(program, "void tailrec_%d(void) {", ident);
     fprintf(program, "for (;;) {");
-    execute(prog[0]);
-    fprintf(program, "if (do_pop()) {");
-    execute(prog[1]);
+    compile_cond(prog[0], 0);
+    fprintf(program, "if (GET_AS_BOOLEAN(stack_pop())) {");
+    compile(prog[1]);
     fprintf(program, "break; }");
-    execute(prog[2]);
-    fprintf(program, "} }\n");
-    rewind(program);
-    while ((ch = getc(program)) != EOF)
-	putchar(ch);
-    fclose(program);
-    program = old;
+    compile(prog[2]);
+    fprintf(program, "} }");
+    print_tmpfile(old);
 }
 #endif
 
-/**
-tailrec  :  [P] [T] [R1]  ->  ...
-Executes P. If that yields true, executes T.
-Else executes R1, recurses.
-*/
 void do_tailrec(void)
 {
     Stack *prog[3];
 
-    TERNARY;
-    prog[2] = (Stack *)do_pop();
-    prog[1] = (Stack *)do_pop();
-    prog[0] = (Stack *)do_pop();
-#ifdef COMPILING
-    if (compiling && STACK(1))
-	put_tailrec(prog);
-    else
-#endif
+    THREEPARAMS;
+    THREEQUOTES;
+    prog[2] = (Stack *)GET_AS_LIST(stack_pop());
+    prog[1] = (Stack *)GET_AS_LIST(stack_pop());
+    prog[0] = (Stack *)GET_AS_LIST(stack_pop());
+    INSTANT(put_tailrec);
     tailrec(prog);
 }
 #endif

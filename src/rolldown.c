@@ -1,20 +1,20 @@
 /*
     module  : rolldown.c
-    version : 1.10
-    date    : 01/19/20
+    version : 1.11
+    date    : 06/21/22
 */
 #ifndef ROLLDOWN_C
 #define ROLLDOWN_C
 
 /**
-rolldown  :  X Y Z  ->  Y Z X
+1240  rolldown  :  DDDAAA	X Y Z  ->  Y Z X
 Moves Y and Z down, moves X up.
 */
 void do_rolldown(void)
 {
-    intptr_t temp;
+    value_t temp;
 
-    TERNARY;
+    THREEPARAMS;
     temp = stack[-3];
     stack[-3] = stack[-2];
     stack[-2] = stack[-1];

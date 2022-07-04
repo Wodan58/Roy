@@ -1,20 +1,54 @@
 /*
     module  : max.c
-    version : 1.8
-    date    : 07/23/20
+    version : 1.9
+    date    : 06/21/22
 */
 #ifndef MAX_C
 #define MAX_C
 
 /**
-max  :  N1 N2  ->  N
-N is the maximum of numeric values N1 and N2.
+1810  max  :  DDA	N1 N2  ->  N
+N is the maximum of numeric values N1 and N2.  Also supports float.
 */
+void f_max(void)
+{
+    value_t temp;
+    double dbl1, dbl2;
+
+    NUMBERS2;
+    temp = stack_pop();
+    dbl2 = GET_AS_NUMBER(temp);
+    dbl1 = GET_AS_NUMBER(stack[-1]);
+    if (dbl1 < dbl2)
+        stack[-1] = temp;
+}
+
+void i_max(void)
+{
+    value_t tmp1, tmp2;
+
+    SAME2TYPES;
+    NUMERICTYPE;
+    tmp2 = stack_pop();
+    tmp1 = stack[-1];
+    if (IS_INTEGER(tmp1)) {
+        if (GET_AS_INTEGER(tmp1) < GET_AS_INTEGER(tmp2))
+            stack[-1] = tmp2;
+    } else if (IS_CHAR(tmp1)) {
+        if (GET_AS_CHAR(tmp1) < GET_AS_CHAR(tmp2))
+            stack[-1] = tmp2;
+    } else if (IS_BOOLEAN(tmp1)) {
+        if (GET_AS_BOOLEAN(tmp1) < GET_AS_BOOLEAN(tmp2))
+            stack[-1] = tmp2;
+    }
+}
+
 void do_max(void)
 {
-    BINARY;
-    if (stack[-2] < stack[-1])
-	stack[-2] = stack[-1];
-    do_pop();
+    TWOPARAMS;
+    if (IS_DOUBLE(stack[-1]) || IS_DOUBLE(stack[-2]))
+        f_max();
+    else
+        i_max();
 }
 #endif

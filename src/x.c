@@ -1,18 +1,19 @@
 /*
     module  : x.c
-    version : 1.9
-    date    : 01/19/20
+    version : 1.10
+    date    : 06/21/22
 */
 #ifndef X_C
 #define X_C
 
 /**
-x  :  [P] x  ->  ...
+2440  x  :  U 	[P] x  ->  ...
 Executes P without popping [P]. So, [P] x  ==  [P] P.
 */
 void do_x(void)
 {
-    UNARY;
-    execute((Stack *)stack[-1]);
+    ONEPARAM;
+    ONEQUOTE;
+    execute((Stack *)GET_AS_LIST(stack[-1]));
 }
 #endif

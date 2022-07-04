@@ -1,14 +1,15 @@
 #
 #   module  : prims.sh
-#   version : 1.2
-#   date    : 04/27/21
+#   version : 1.3
+#   date    : 06/21/22
 #
 #   Generate runtime.c and builtin.h
+#   The directory needs to be given as parameter.
 #
 echo checking runtime.c and builtin.h
 todo=0
-ls -1Q src/*.c gui/*.c | sed 's/^/#include /' >prims.tmp
-if [ ! -f runtime.c -o ! -f builtin.h ]
+ls -1Q $1/src/*.c | sed 's/^/#include /' >prims.tmp
+if [ ! -f $1/runtime.c -o ! -f $1/builtin.h ]
 then
   echo creating runtime.c and builtin.h
   todo=1
@@ -25,7 +26,8 @@ else
 fi
 if [ $todo -eq 1 ]
 then
-  rm -f runtime.c builtin.h
-  mv prims.tmp runtime.c
-  sed 's/.*\//void do_/;s/\..*/(void);/' <runtime.c | sed 's/void do_pop(/intptr_t do_pop(/' >builtin.h
+  rm -f $1/runtime.c $1/builtin.h
+  mv prims.tmp $1/runtime.c
+  sed 's/.*\//void do_/;s/\..*/(void);/' <$1/runtime.c | sed -f $1/table.sed >$1/builtin.h
+  touch $1/builtin.c
 fi

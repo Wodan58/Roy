@@ -1,7 +1,7 @@
 /*
     module  : app11.c
-    version : 1.9
-    date    : 01/19/20
+    version : 1.10
+    date    : 06/21/22
 */
 #ifndef APP11_C
 #define APP11_C
@@ -19,11 +19,13 @@
 #include "popd.c"
 
 /**
-app11  :  X Y [P]  ->  R
+2470  app11  :  DDDA	X Y [P]  ->  R
 Executes P, pushes result R on stack.
 */
 void do_app11(void)
 {
+    THREEPARAMS;
+    ONEQUOTE;
     do_app1();
     do_popd();
 }

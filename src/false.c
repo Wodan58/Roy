@@ -1,18 +1,18 @@
 /*
     module  : false.c
-    version : 1.9
-    date    : 01/19/20
+    version : 1.10
+    date    : 06/21/22
 */
 #ifndef FALSE_C
 #define FALSE_C
 
 /**
-false  :  ->  false
+1000  false  :  A	->  false
 Pushes the value false.
 */
 void do_false(void)
 {
-    COMPILE;
-    do_push(0);
+    do_push(MAKE_BOOLEAN(0));
 }
+/* false.c */
 #endif

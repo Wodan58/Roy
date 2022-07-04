@@ -1,20 +1,18 @@
 /*
     module  : rand.c
-    version : 1.10
-    date    : 03/01/21
+    version : 1.11
+    date    : 06/21/22
 */
 #ifndef RAND_C
 #define RAND_C
 
-int my_rand(void);
-
 /**
-rand  :  ->  I
+1150  rand  :  A	->  I
 I is a random integer.
 */
 void do_rand(void)
 {
     COMPILE;
-    do_push(my_rand());
+    do_push(MAKE_INTEGER(rand()));
 }
 #endif

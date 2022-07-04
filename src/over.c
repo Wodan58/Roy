@@ -1,18 +1,18 @@
 /*
     module  : over.c
-    version : 1.6
-    date    : 01/19/20
+    version : 1.7
+    date    : 06/21/22
 */
 #ifndef OVER_C
 #define OVER_C
 
 /**
-over  :  X Y  ->  X Y X
+3220  over  :  A	X Y  ->  X Y X
 Pushes an extra copy of the second item X on top of the stack.
 */
 void do_over(void)
 {
-    BINARY;
+    TWOPARAMS;
     do_push(stack[-2]);
 }
 #endif

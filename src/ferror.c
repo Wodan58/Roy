@@ -1,18 +1,23 @@
 /*
     module  : ferror.c
-    version : 1.8
-    date    : 01/19/20
+    version : 1.9
+    date    : 06/21/22
 */
 #ifndef FERROR_C
 #define FERROR_C
 
 /**
-ferror  :  S  ->  S B
+1850  ferror  :  A	S  ->  S B
 B is the error status of stream S.
 */
 void do_ferror(void)
 {
+    FILE *fp;
+
     COMPILE;
-    do_push(ferror((FILE *)stack[-1]));
+    ONEPARAM;
+    FILE1;
+    fp = GET_AS_FILE(stack[-1]);
+    do_push(MAKE_BOOLEAN(ferror(fp) != 0));
 }
 #endif

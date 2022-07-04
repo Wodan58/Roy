@@ -2,13 +2,10 @@ bdwgc
 CMakeCache.txt
 CMakeFiles
 cmake_install.cmake
-demo*.txt
 joy
 Makefile
 table.c
-trans.c
 parse.c
 parse.h
 builtin.h
 runtime.c
-runtime.h

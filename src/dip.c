@@ -1,44 +1,43 @@
 /*
     module  : dip.c
-    version : 1.12
-    date    : 06/23/20
+    version : 1.13
+    date    : 06/21/22
 */
 #ifndef DIP_C
 #define DIP_C
 
-void dip(Stack *Prog)
-{
-    intptr_t Value;
-
-    Value = do_pop();
-    execute(Prog);
-    do_push(Value);
-}
-
-#ifdef COMPILING
-void put_dip(Stack *Prog)
-{
-    fprintf(program, "{ intptr_t Value = do_pop();");
-    execute(Prog);
-    fprintf(program, "do_push(Value); }");
-}
-#endif
-
 /**
-dip  :  X [P]  ->  ...  X
+2450  dip  :  DDAU	X [P]  ->  ...  X
 Saves X, executes P, pushes X back.
 */
+void dip(Stack *prog)
+{
+    value_t temp;
+
+    ONEPARAM;
+    temp = stack_pop();
+    execute(prog);
+    do_push(temp);
+}
+
+#ifdef COMPILING
+void put_dip(Stack *prog)
+{
+    fprintf(program, "{ value_t temp;");
+    fprintf(program, "temp = stack_pop();");
+    compile(prog);
+    fprintf(program, "do_push(temp); }");
+}
+#endif
+
 void do_dip(void)
 {
-    Stack *Prog;
+    Stack *prog;
 
-    UNARY;
-    Prog = (Stack *)do_pop();
-#ifdef COMPILING
-    if (compiling && STACK(1))
-	put_dip(Prog);
-    else
-#endif
-    dip(Prog);
+    ONEPARAM;
+    ONEQUOTE;
+    prog = (Stack *)GET_AS_LIST(stack_pop());
+    INSTANT(put_dip);
+    dip(prog);
 }
 #endif

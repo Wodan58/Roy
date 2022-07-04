@@ -1,31 +1,31 @@
 /*
     module  : __manual_list.c
-    version : 1.9
-    date    : 01/20/20
+    version : 1.10
+    date    : 06/21/22
 */
-#ifndef __MANUAL_LIST_C
-#define __MANUAL_LIST_C
+#ifndef _LOWBAR__LOWBAR_MANUAL_LOWBAR_LIST_C
+#define _LOWBAR__LOWBAR_MANUAL_LOWBAR_LIST_C
 
 /**
-__manual_list  :  ->  L
+2980  __manual_list  :  A	->  L
 Pushes a list L of lists (one per operator) of three documentation strings.
 */
-void do___manual_list(void)
+void do__lowbar__lowbar_manual_lowbar_list(void)
 {
 #ifdef COMPILING
     int i;
-    Stack *List = 0, *Quot;
+    Stack *list = 0, *quot;
 
     for (i = 0; optable[i].name; i++)
-	;
+        ;
     while (--i) {
-	Quot = 0;
-	vec_push(Quot, (intptr_t)optable[i].messg2);
-	vec_push(Quot, (intptr_t)optable[i].messg1);
-	vec_push(Quot, (intptr_t)optable[i].name);
-	vec_push(List, (intptr_t)Quot);
+        quot = 0;
+        vec_push(quot, MAKE_USR_STRING(stringify(optable[i].messg2)));
+        vec_push(quot, MAKE_USR_STRING(stringify(optable[i].messg1)));
+        vec_push(quot, MAKE_USR_STRING(stringify(optable[i].name)));
+        vec_push(list, MAKE_LIST(quot));
     }
-    do_push((intptr_t)List);
+    do_push(MAKE_LIST(list));
 #endif
 }
 #endif

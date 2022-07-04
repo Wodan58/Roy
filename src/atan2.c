@@ -1,23 +1,24 @@
 /*
     module  : atan2.c
-    version : 1.7
-    date    : 01/19/20
+    version : 1.8
+    date    : 06/21/22
 */
 #ifndef ATAN2_C
 #define ATAN2_C
 
 /**
-atan2  :  F G  ->  H
+1520  atan2  :  DDA	F G  ->  H
 H is the arc tangent of F / G.
 */
 void do_atan2(void)
 {
-    real_t dbl1, dbl2;
+    double dbl1, dbl2;
 
-    BINARY;
-    dbl2 = unpack(do_pop());
-    dbl1 = unpack(stack[-1]);
+    TWOPARAMS;
+    NUMBERS2;
+    dbl2 = GET_AS_NUMBER(stack_pop());
+    dbl1 = GET_AS_NUMBER(stack[-1]);
     dbl1 = atan2(dbl1, dbl2);
-    stack[-1] = pack(dbl1);
+    stack[-1] = MAKE_DOUBLE(dbl1);
 }
 #endif
