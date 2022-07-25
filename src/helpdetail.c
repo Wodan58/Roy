@@ -1,7 +1,7 @@
 /*
     module  : helpdetail.c
-    version : 1.16
-    date    : 06/21/22
+    version : 1.17
+    date    : 07/25/22
 */
 #ifndef HELPDETAIL_C
 #define HELPDETAIL_C
@@ -56,8 +56,6 @@ void do_helpdetail(void)
             name = get_string(temp);
 	    if ((j = search(name)) == 0)
                 printf("%s  ==  \n    \n\n", name);
-	    else
-		printline(j);
             break;
         case ANON_FUNCT_:
             printline(search(find(GET_AS_ANON_FUNCT(temp))));

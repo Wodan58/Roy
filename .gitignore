@@ -10,3 +10,6 @@ parse.h
 builtin.h
 runtime.c
 *.out
+vergelijk.sh
+files
+t
