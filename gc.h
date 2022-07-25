@@ -13,7 +13,7 @@
 #define SIGNAL_HANDLING
 #endif
 /* #define FREE_ON_EXIT */
-/* #define SCAN_BSS_MEMORY */
+#define SCAN_BSS_MEMORY
 /* #define STACK_GROWS_UPWARD */
 /* #define USE_GC_MALLOC_UNCOLLECTABLE */
 #define USE_GC_MALLOC_ATOMIC
