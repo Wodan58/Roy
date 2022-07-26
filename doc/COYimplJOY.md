@@ -63,6 +63,7 @@ similar fashion. The original Joy has `__settracegc` set to 0.
   |           joy1 |      76 |        7.0 |    0.03 |
   |           Moy  |      85 |        7.4 |    0.03 |
   |           Coy  |      23 |        5.2 |    0.03 |
+  |           Doy  |         |            |         |
   ---------------------------------------------------
 
 An explanation is needed. Why is Joy slower than the original version? This is
@@ -73,12 +74,14 @@ Joy1 is slower than Joy, because it uses the BDW garbage collector. The many
 small nodes that are needed for Joy are not a good fit for a garbage collector.
 
 Moy is slower than joy1, because it translates builtins to an index in the
-symbol table. It makes compiling easier at the cost of a slower interpreter.
+symbol table. That makes compiling easier at the cost of a slower interpreter.
 
 Coy is faster than the original in fib.joy, because it doesn't create garbage
 in the first place and that is always faster. Coy is also faster when executing
 grmtst.joy. Vectors can be more efficient than linked lists, because they
 reduce the number of objects that the garbage collector needs to visit.
 
-joy0 executes grmtst.joy a lot faster than any other implementation. That makes
+joy0 executes grmtst.joy a lot faster than other implementations. That makes
 the garbage collectors in the other implementations look bad.
+
+Doy still has to be developed fully before it can be times.
