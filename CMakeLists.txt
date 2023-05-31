@@ -1,6 +1,6 @@
 #
 #   module  : CMakeLists.txt
-#   version : 1.21
+#   version : 1.22
 #   date    : 05/31/23
 #
 cmake_minimum_required(VERSION 3.0)
@@ -14,7 +14,8 @@ endif()
 option(REAL_BDW "Use BDW garbage collector" OFF)
 option(RUN_TESTS "Run standard tests" OFF)
 find_package(BISON)
-BISON_TARGET(MyParser parse.y ${CMAKE_CURRENT_BINARY_DIR}/parse.c)
+BISON_TARGET(MyParser parse.y ${CMAKE_CURRENT_BINARY_DIR}/parse.c
+	         DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/parse.h)
 if(WINDOWS)
 add_definitions(-DGC_NOT_DLL -D_CRT_SECURE_NO_WARNINGS)
 else()
