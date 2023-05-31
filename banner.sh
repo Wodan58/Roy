@@ -6,5 +6,5 @@
 #   Announce project creation
 #
 echo Updating $1 version $2
-lcov --version
-lcov --directory . --zerocounters
+# lcov --version
+# lcov --directory . --zerocounters
