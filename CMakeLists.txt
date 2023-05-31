@@ -1,6 +1,6 @@
 #
 #   module  : CMakeLists.txt
-#   version : 1.18
+#   version : 1.19
 #   date    : 05/31/23
 #
 cmake_minimum_required(VERSION 3.0)
@@ -50,15 +50,13 @@ endif()
 add_dependencies(joy always)
 if(WINDOWS)
 add_custom_target(always
-		  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-		  COMMAND sh prims.sh .
-		  COMMAND sh table.sh .)
+		  COMMAND sh ${CMAKE_SOURCE_DIR}/prims.sh ${CMAKE_SOURCE_DIR}
+		  COMMAND sh ${CMAKE_SOURCE_DIR}/table.sh ${CMAKE_SOURCE_DIR})
 else()
 add_custom_target(always
-		  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-		  COMMAND sh banner.sh ${PROJECT_NAME} ${PROJECT_VERSION}
-		  COMMAND sh prims.sh .}
-		  COMMAND sh table.sh .)
+		  COMMAND sh ${CMAKE_SOURCE_DIR}/banner.sh ${PROJECT_NAME} ${PROJECT_VERSION}
+		  COMMAND sh ${CMAKE_SOURCE_DIR}/prims.sh ${CMAKE_SOURCE_DIR}
+		  COMMAND sh ${CMAKE_SOURCE_DIR}/table.sh ${CMAKE_SOURCE_DIR})
 if(RUN_TESTS)
 #add_subdirectory(lib)
 add_subdirectory(test)
