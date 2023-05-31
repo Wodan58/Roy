@@ -1,7 +1,7 @@
 #
-#   module  : CMakeLists.txt
-#   version : 1.16
-#   date    : 07/25/22
+#   module  : %M%
+#   version : %I%
+#   date    : %G%
 #
 cmake_minimum_required(VERSION 3.0)
 project(Coy VERSION 1.0)
@@ -47,7 +47,7 @@ else()
 target_link_libraries(joy m)
 endif()
 endif()
-add_dependencies(joy always)
+add_dependencies(joy always ${CMAKE_SOURCE_DIR}/${BISON_MyParser_OUTPUTS})
 if(WINDOWS)
 add_custom_target(always
 		  COMMAND sh ${CMAKE_SOURCE_DIR}/prims.sh ${CMAKE_SOURCE_DIR}
