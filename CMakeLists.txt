@@ -1,6 +1,6 @@
 #
 #   module  : CMakeLists.txt
-#   version : 1.22
+#   version : 1.23
 #   date    : 05/31/23
 #
 cmake_minimum_required(VERSION 3.0)
@@ -15,7 +15,7 @@ option(REAL_BDW "Use BDW garbage collector" OFF)
 option(RUN_TESTS "Run standard tests" OFF)
 find_package(BISON)
 BISON_TARGET(MyParser parse.y ${CMAKE_CURRENT_BINARY_DIR}/parse.c
-	         DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/parse.h)
+	         DEFINES_FILE ${CMAKE_SOURCE_DIR}/parse.h)
 if(WINDOWS)
 add_definitions(-DGC_NOT_DLL -D_CRT_SECURE_NO_WARNINGS)
 else()
@@ -38,7 +38,7 @@ endif()
 add_subdirectory(bdwgc)
 else()
 add_definitions(-DJVERSION="MINGC ${CMAKE_BUILD_TYPE} ${PROJECT_VERSION}")
-include_directories(. ${CMAKE_SOURCE_DIR})
+include_directories(. ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 add_executable(joy main.c ${CMAKE_CURRENT_BINARY_DIR}/parse.c print.c
                builtin.c symbol.c tmpfile.c module.c yylex.c factor.c optable.c
                compile.c arity.c identify.c compare.c gc.c)

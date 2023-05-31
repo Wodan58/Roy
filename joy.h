@@ -1,7 +1,7 @@
 /*
     module  : joy.h
-    version : 1.29
-    date    : 06/21/22
+    version : 1.30
+    date    : 05/31/23
 */
 #ifndef JOY_H
 #define JOY_H
@@ -59,7 +59,7 @@
 #include "nanbox2.h"
 #include "value.h"
 #include "stack.h"
-#include "parse.h"
+#include <parse.h>
 
 #include "arity.h"
 #include "builtin.h"
