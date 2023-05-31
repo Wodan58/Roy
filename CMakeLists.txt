@@ -1,6 +1,6 @@
 #
 #   module  : CMakeLists.txt
-#   version : 1.20
+#   version : 1.21
 #   date    : 05/31/23
 #
 cmake_minimum_required(VERSION 3.0)
@@ -25,7 +25,7 @@ endif()
 endif()
 if(REAL_BDW)
 add_definitions(-DGC_BDW -DJVERSION="BDW ${CMAKE_BUILD_TYPE} ${PROJECT_VERSION}")
-include_directories(bdwgc/include . ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR})
+include_directories(bdwgc/include . ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 add_executable(joy main.c ${CMAKE_CURRENT_BINARY_DIR}/parse.c print.c
                builtin.c symbol.c tmpfile.c module.c yylex.c factor.c optable.c
                compile.c arity.c identify.c compare.c)
