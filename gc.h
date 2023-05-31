@@ -6,7 +6,7 @@
 #ifndef GC_H
 #define GC_H
 
-/* #define USE_GC_GET_HEAP_SIZE */
+#define USE_GC_GET_HEAP_SIZE
 /* #define SIGNAL_HANDLING */
 /* #define FREE_ON_EXIT */
 #define SCAN_BSS_MEMORY
