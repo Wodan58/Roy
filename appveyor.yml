@@ -1,6 +1,8 @@
 version: 1.0.0.{build}
 
-image: Visual Studio 2019
+image: Visual Studio 2022
+platform:
+  - x64
 
 cache:
   - gc-8.0.4.tar.gz
@@ -23,6 +25,6 @@ install:
   - bison --version
  
 build_script:
-  - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat"
+  - call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
   - cmake .
   - cmake --build .
