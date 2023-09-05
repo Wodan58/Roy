@@ -1,7 +1,7 @@
 /*
     module  : main.c
-    version : 1.19
-    date    : 06/29/22
+    version : 1.20
+    date    : 09/05/23
 */
 #include "joy.h"
 
@@ -9,6 +9,7 @@ int autoput = INIAUTOPUT, tracegc = INITRACEGC, undeferror = INIUNDEFERR;
 int g_argc, library, compiling, debugging;
 char **g_argv, *filename;
 clock_t startclock;
+char *bottom_of_stack;
 static jmp_buf begin;
 
 /*
@@ -202,10 +203,7 @@ int main(int argc, char **argv)
 {
     int (*volatile m)(int, char **) = start_main;
 
-#ifdef GC_BDW
+    bottom_of_stack = (char *)&argc;
     GC_INIT();
-#else
-    GC_init(&argc, fatal);
-#endif
     return (*m)(argc, argv);
 }

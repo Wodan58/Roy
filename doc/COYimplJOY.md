@@ -50,10 +50,10 @@ Comparison
 ----------
 
 The fib.joy program is: `40 [small] [] [pred dup pred] [+] binrec.`
-The lst.joy program is: `1 9000 from-to-list.` In the case of Coy some changes
-have been made so as to allow the program to run faster: fib has the condition
-set to `[dup small]` instead of `[small]`; lst.joy has been changed in a
-similar fashion. The original Joy has `__settracegc` set to 0.
+The lst.joy program is: `1 9000 from-to-list.` In the case of Coy and Moy some
+changes have been made so as to allow the program to run faster: fib has the
+condition set to `[dup small]` instead of `[small]`; lst.joy has been changed
+in a similar fashion. The original Joy has `__settracegc` set to 0.
 
   ---------------------------------------------------
   | implementation | fib.joy | grmtst.joy | lst.joy |
@@ -61,9 +61,8 @@ similar fashion. The original Joy has `__settracegc` set to 0.
   |           joy0 |      28 |        1.6 |    0.03 |
   |           Joy  |      61 |        6.1 |    0.03 |
   |           joy1 |      76 |        7.0 |    0.03 |
-  |           Moy  |      85 |        7.4 |    0.03 |
+  |           Moy  |     140 |       16.0 |    0.08 |
   |           Coy  |      23 |        5.2 |    0.03 |
-  |           Doy  |         |            |         |
   ---------------------------------------------------
 
 An explanation is needed. Why is Joy slower than the original version? This is
@@ -73,8 +72,7 @@ collector. The original uses a fixed array and a simpler collector.
 Joy1 is slower than Joy, because it uses the BDW garbage collector. The many
 small nodes that are needed for Joy are not a good fit for a garbage collector.
 
-Moy is slower than joy1, because it translates builtins to an index in the
-symbol table. That makes compiling easier at the cost of a slower interpreter.
+Moy is slowest, because it has a slow function call mechanism.
 
 Coy is faster than the original in fib.joy, because it doesn't create garbage
 in the first place and that is always faster. Coy is also faster when executing
@@ -83,5 +81,3 @@ reduce the number of objects that the garbage collector needs to visit.
 
 joy0 executes grmtst.joy a lot faster than other implementations. That makes
 the garbage collectors in the other implementations look bad.
-
-Doy still has to be developed fully before it can be times.
