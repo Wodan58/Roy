@@ -3,4 +3,5 @@ defs.h
 deps.h
 *.o
 *.exe
-prim.*
+prim.c
+prim.h
