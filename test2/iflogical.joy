@@ -1,7 +1,7 @@
 (*
     module  : iflogical.joy
-    version : 1.1
-    date    : 06/21/22
+    version : 1.3
+    date    : 09/19/23
 *)
-true [[logical] first] [[nological] first] iflogical.
-1 [[logical] first] [[nological] first] iflogical.
+true ["islogical"] ["nological"] iflogical "islogical" =.
+1 ["islogical"] ["nological"] iflogical "nological" =.

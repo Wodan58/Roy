@@ -1,22 +1,27 @@
 /*
     module  : rotated.c
-    version : 1.9
-    date    : 06/21/22
+    version : 1.10
+    date    : 09/19/23
 */
 #ifndef ROTATED_C
 #define ROTATED_C
 
 /**
-1310  rotated  :  DDDDAAAA	X Y Z W  ->  Z Y X W
+OK 1310  rotated  :  DDDDAAAA	X Y Z W  ->  Z Y X W
 As if defined by:   rotated  ==  [rotate] dip
 */
-void do_rotated(void)
+void rotated_(pEnv env)
 {
-    value_t temp;
+    Node first, second, third, fourth;
 
-    FOURPARAMS;
-    temp = stack[-2];
-    stack[-2] = stack[-4];
-    stack[-4] = temp;
+    PARM(4, ANYTYPE);
+    fourth = lst_pop(env->stck);
+    third = lst_pop(env->stck);
+    second = lst_pop(env->stck);
+    first = lst_pop(env->stck);
+    lst_push(env->stck, third);
+    lst_push(env->stck, second);
+    lst_push(env->stck, first);
+    lst_push(env->stck, fourth);
 }
 #endif

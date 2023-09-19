@@ -1,26 +1,35 @@
 /*
     module  : or.c
-    version : 1.10
-    date    : 06/21/22
+    version : 1.11
+    date    : 09/19/23
 */
 #ifndef OR_C
 #define OR_C
 
 /**
-1340  or  :  DDA	X Y  ->  Z
+OK 1340  or  :  DDA	X Y  ->  Z
 Z is the union of sets X and Y, logical disjunction for truth values.
 */
-void do_or(void)
+void or_(pEnv env)
 {
-    TWOPARAMS;
-    SAME2TYPES;
-    if (IS_SET(stack[-1]))
-        stack[-2] = MAKE_SET(GET_AS_SET(stack[-2]) | GET_AS_SET(stack[-1]));
-    else if (IS_BOOLEAN(stack[-1]))
-        stack[-2] = MAKE_BOOLEAN(
-            GET_AS_BOOLEAN(stack[-2]) | GET_AS_BOOLEAN(stack[-1]));
-    else
-        BADDATA;
-    stack_pop();
+    Node first, second;
+
+    PARM(2, ANDORXOR);
+    second = lst_pop(env->stck);
+    first = lst_pop(env->stck);
+    switch (first.op) {
+    case SET_:
+	first.u.set = first.u.set | second.u.set;
+	break;
+    case BOOLEAN_:
+    case CHAR_:
+    case INTEGER_:
+	first.u.num = first.u.num || second.u.num;
+	first.op = BOOLEAN_;
+	break;
+    default:
+	break;
+    }
+    lst_push(env->stck, first);
 }
 #endif

@@ -1,42 +1,39 @@
 /*
     module  : size.c
-    version : 1.12
-    date    : 06/21/22
+    version : 1.13
+    date    : 09/19/23
 */
 #ifndef SIZE_C
 #define SIZE_C
 
 /**
-2090  size  :  DA	A  ->  I
+OK 2080  size  :  DA	A  ->  I
 Integer I is the number of elements of aggregate A.
 */
-void size_str(void)
+void size_(pEnv env)
 {
-    stack[-1] = MAKE_INTEGER(strlen(get_string(stack[-1])));
-}
+    int i;
+    Node node, temp;
 
-void size_set(void)
-{
-    int i, k = 0;
-    uint64_t j, set;
-
-    set = GET_AS_SET(stack[-1]);
-    for (i = 0, j = 1; i < SETSIZE_; i++, j <<= 1)
-        if (set & j)
-            k++;
-    stack[-1] = MAKE_INTEGER(k);
-}
-
-void do_size(void)
-{
-    ONEPARAM;
-    if (IS_LIST(stack[-1]))
-        stack[-1] = MAKE_INTEGER(vec_size((Stack *)GET_AS_LIST(stack[-1])));
-    else if (IS_USR_STRING(stack[-1]))
-        size_str();
-    else if (IS_SET(stack[-1]))
-        size_set();
-    else
-        BADAGGREGATE;
+    PARM(1, SIZE);
+    node = lst_pop(env->stck);
+    switch (node.op) {
+    case LIST_:
+	temp.u.num = lst_size(node.u.lis);
+	break;
+    case STRING_:
+    case BIGNUM_:
+	temp.u.num = strlen(node.u.str);
+	break;
+    case SET_:
+	for (i = 0, temp.u.num = 0; i < SETSIZE; i++)
+	    if (node.u.set & ((int64_t)1 << i))
+		temp.u.num++;
+	break;
+    default:
+	break;
+    }
+    temp.op = INTEGER_;
+    lst_push(env->stck, temp);
 }
 #endif

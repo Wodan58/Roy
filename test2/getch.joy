@@ -1,7 +1,8 @@
 (*
     module  : getch.joy
-    version : 1.1
-    date    : 06/21/22
+    version : 1.4
+    date    : 09/19/23
 *)
-getch.
+0 setautoput getch.
 A
+1 setautoput 'A =.

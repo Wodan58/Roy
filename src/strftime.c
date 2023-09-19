@@ -1,36 +1,30 @@
 /*
     module  : strftime.c
-    version : 1.11
-    date    : 06/21/22
+    version : 1.12
+    date    : 09/19/23
 */
 #ifndef STRFTIME_C
 #define STRFTIME_C
 
-#ifdef MKTIME_X
-#undef MKTIME_X
-#undef MKTIME_C
-#endif
-
-#include "mktime.c"
+#include "decode.h"
 
 /**
-1730  strftime  :  DDA	T S1  ->  S2
+OK 1730  strftime  :  DDA	T S1  ->  S2
 Formats a list T in the format of localtime or gmtime
 using string S1 and pushes the result S2.
 */
-void do_strftime(void)
+void strftime_(pEnv env)
 {
-    int length;
     struct tm t;
-    char *fmt, *result;
+    Node first, second, node;
 
-    TWOPARAMS;
-    STRING;
-    fmt = get_string(stack_pop());
-    decode_time(&t);
-    length = INPLINEMAX;
-    result = GC_malloc_atomic(length);
-    strftime(result, length, fmt, &t);
-    stack[-1] = MAKE_USR_STRING(stringify(result));
+    PARM(2, STRFTIME);
+    second = lst_pop(env->stck);
+    first = lst_pop(env->stck);
+    decode(first, &t);
+    node.u.str = GC_malloc_atomic(INPLINEMAX);
+    strftime(node.u.str, INPLINEMAX, second.u.str, &t);
+    node.op = STRING_;
+    lst_push(env->stck, node);
 }
 #endif

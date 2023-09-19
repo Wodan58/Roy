@@ -1,26 +1,21 @@
 /*
     module  : app1.c
-    version : 1.11
-    date    : 06/21/22
+    version : 1.12
+    date    : 09/19/23
 */
 #ifndef APP1_C
 #define APP1_C
 
-#ifdef I_X
-#undef I_X
-#undef I_C
-#endif
-
-#include "i.c"
-
 /**
-2460  app1  :  DDA	X [P]  ->  R
+OK 2440  app1  :  DDA	X [P]  ->  R
 Executes P, pushes result R on stack.
 */
-void do_app1(void)
+void app1_(pEnv env)
 {
-    TWOPARAMS;
-    ONEQUOTE;
-    do_i();
+    Node node;
+
+    PARM(2, DIP);
+    node = lst_pop(env->stck);
+    exeterm(env, node.u.lis);
 }
 #endif

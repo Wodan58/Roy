@@ -1,25 +1,26 @@
 /*
     module  : strtol.c
-    version : 1.11
-    date    : 06/21/22
+    version : 1.12
+    date    : 09/19/23
 */
 #ifndef STRTOL_C
 #define STRTOL_C
 
 /**
-1740  strtol  :  DDA	S I  ->  J
+OK 1740  strtol  :  DDA	S I  ->  J
 String S is converted to the integer J using base I.
 If I = 0, assumes base 10,
 but leading "0" means base 8 and leading "0x" means base 16.
 */
-void do_strtol(void)
+void strtol_(pEnv env)
 {
-    int base;
+    Node first, second;
 
-    TWOPARAMS;
-    INTEGER;
-    base = GET_AS_INTEGER(stack_pop());
-    STRING;
-    stack[-1] = MAKE_INTEGER(strtol(get_string(stack[-1]), 0, base));
+    PARM(2, STRTOL);
+    second = lst_pop(env->stck);
+    first = lst_pop(env->stck);
+    first.u.num = strtol(first.u.str, 0, second.u.num);
+    first.op = INTEGER_;
+    lst_push(env->stck, first);
 }
 #endif

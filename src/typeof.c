@@ -1,18 +1,25 @@
 /*
     module  : typeof.c
-    version : 1.2
-    date    : 06/21/22
+    version : 1.3
+    date    : 09/19/23
 */
 #ifndef TYPEOF_C
 #define TYPEOF_C
 
 /**
-3260  typeof  :  DA	X  ->  I
-Replace X by its type.
+OK 3250  typeof  :  DA	X  ->  I
+[EXT] Replace X by its type.
 */
-void do_typeof(void)
+void typeof_(pEnv env)
 {
-    ONEPARAM;
-    stack[-1] = MAKE_INTEGER(get_type(stack[-1]));
+    Node node;
+
+    PARM(1, ANYTYPE);
+    node = lst_pop(env->stck);
+    if (node.op == USR_STRING_ || node.op == USR_LIST_)
+	node.op = USR_;
+    node.u.num = node.op;
+    node.op = INTEGER_;
+    lst_push(env->stck, node);    
 }
 #endif

@@ -1,20 +1,27 @@
 /*
     module  : put.c
-    version : 1.12
-    date    : 06/21/22
+    version : 1.13
+    date    : 09/19/23
 */
 #ifndef PUT_C
 #define PUT_C
 
 /**
-3110  put  :  D 	X  ->
+OK 3080  put  :  D 	X  ->
 Writes X to output, pops X off stack.
 */
-void do_put(void)
+void put_(pEnv env)
 {
-    COMPILE;
-    ONEPARAM;
-    writefactor(stack_pop());
+    Node node;
+
+    PARM(1, ANYTYPE);
+    node = lst_pop(env->stck);
+    if (node.op == LIST_) {
+	putchar('[');
+	writeterm(env, node.u.lis, stdout);
+	putchar(']');
+    } else
+	writefactor(env, node, stdout);
     putchar(' ');
 }
 #endif

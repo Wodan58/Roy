@@ -1,8 +1,0 @@
-#
-#   module  : gcd.joy
-#   version : 1.2
-#   date    : 03/20/22
-#
-DEFINE 	gcd == [dup 0 >] [dup rollup rem] while pop .
-
-argv rest [10 strtol] map uncons uncons pop gcd .

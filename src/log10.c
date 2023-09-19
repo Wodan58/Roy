@@ -1,23 +1,23 @@
 /*
     module  : log10.c
-    version : 1.8
-    date    : 06/21/22
+    version : 1.9
+    date    : 09/19/23
 */
 #ifndef LOG10_C
 #define LOG10_C
 
 /**
-1610  log10  :  DA	F  ->  G
+OK 1610  log10  :  DA	F  ->  G
 G is the common logarithm of F.
 */
-void do_log10(void)
+void log10_(pEnv env)
 {
-    double dbl;
+    Node node;
 
-    ONEPARAM;
-    NUMBER;
-    dbl = GET_AS_NUMBER(stack[-1]);
-    dbl = log10(dbl);
-    stack[-1] = MAKE_DOUBLE(dbl);
+    PARM(1, UFLOAT);
+    node = lst_pop(env->stck);
+    node.u.dbl = log10(node.op == FLOAT_ ? node.u.dbl : (double)node.u.num);
+    node.op = FLOAT_;
+    lst_push(env->stck, node);
 }
 #endif

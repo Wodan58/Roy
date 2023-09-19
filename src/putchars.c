@@ -1,18 +1,21 @@
 /*
     module  : putchars.c
-    version : 1.12
-    date    : 06/21/22
+    version : 1.13
+    date    : 09/19/23
 */
 #ifndef PUTCHARS_C
 #define PUTCHARS_C
 
 /**
-3130  putchars  :  D	"abc.."  ->
+OK 3100  putchars  :  D	"abc.."  ->
 Writes abc.. (without quotes)
 */
-void do_putchars(void)
+void putchars_(pEnv env)
 {
-    COMPILE;
-    printf("%s", get_string(stack_pop()));
+    Node node;
+
+    PARM(1, STRTOD);
+    node = lst_pop(env->stck);
+    printf("%s", node.u.str);
 }
 #endif

@@ -1,39 +1,21 @@
 /*
     module  : enconcat.c
-    version : 1.10
-    date    : 06/21/22
+    version : 1.11
+    date    : 09/19/23
 */
 #ifndef ENCONCAT_C
 #define ENCONCAT_C
 
 /**
-2170  enconcat  :  DDDA 	X S T  ->  U
+OK 2160  enconcat  :  DDDA 	X S T  ->  U
 Sequence U is the concatenation of sequences S and T
 with X inserted between S and T (== swapd cons concat).
 */
-#ifdef SWAPD_X
-#undef SWAPD_X
-#undef SWAPD_C
-#endif
-#ifdef CONS_X
-#undef CONS_X
-#undef CONS_C
-#endif
-#ifdef CONCAT_X
-#undef CONCAT_X
-#undef CONCAT_C
-#endif
-
-#include "swapd.c"
-#include "cons.c"
-#include "concat.c"
-
-void do_enconcat(void)
+void enconcat_(pEnv env)
 {
-    THREEPARAMS;
-    SAME2TYPES;
-    do_swapd();
-    do_cons();
-    do_concat();
+    PARM(3, CONCAT);
+    swapd_(env);
+    cons_(env);
+    concat_(env);
 }
 #endif

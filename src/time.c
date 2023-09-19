@@ -1,18 +1,21 @@
 /*
     module  : time.c
-    version : 1.10
-    date    : 06/21/22
+    version : 1.11
+    date    : 09/19/23
 */
 #ifndef TIME_C
 #define TIME_C
 
 /**
-1140  time  :  A	->  I
+OK 1140  time  :  A	->  I
 Pushes the current time (in seconds since the Epoch).
 */
-void do_time(void)
+void time_(pEnv env)
 {
-    COMPILE;
-    do_push(MAKE_INTEGER(time(0)));
+    Node node;
+
+    node.u.num = time(0);
+    node.op = INTEGER_;
+    lst_push(env->stck, node);
 }
 #endif

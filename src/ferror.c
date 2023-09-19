@@ -1,23 +1,23 @@
 /*
     module  : ferror.c
-    version : 1.9
-    date    : 06/21/22
+    version : 1.10
+    date    : 09/19/23
 */
 #ifndef FERROR_C
 #define FERROR_C
 
 /**
-1850  ferror  :  A	S  ->  S B
+OK 1850  ferror  :  A	S  ->  S B
 B is the error status of stream S.
 */
-void do_ferror(void)
+void ferror_(pEnv env)
 {
-    FILE *fp;
+    Node node;
 
-    COMPILE;
-    ONEPARAM;
-    FILE1;
-    fp = GET_AS_FILE(stack[-1]);
-    do_push(MAKE_BOOLEAN(ferror(fp) != 0));
+    PARM(1, FGET);
+    node = lst_back(env->stck);
+    node.u.num = ferror(node.u.fil);
+    node.op = BOOLEAN_;
+    lst_push(env->stck, node);    
 }
 #endif

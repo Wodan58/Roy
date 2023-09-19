@@ -1,68 +1,56 @@
 /*
     module  : concat.c
-    version : 1.16
-    date    : 06/21/22
+    version : 1.17
+    date    : 09/19/23
 */
 #ifndef CONCAT_C
 #define CONCAT_C
 
 /**
-2160  concat  :  DDA		S T  ->  U
+OK 2150  concat  :  DDA	S T  ->  U
 Sequence U is the concatenation of sequences S and T.
 */
-void concat_lst(void)
+void concat_(pEnv env)
 {
     int i, j;
-    Stack *first, *second, *result = 0;
+    Node first, second, result;
 
-    second = (Stack *)GET_AS_LIST(stack_pop());
-    first = (Stack *)GET_AS_LIST(stack[-1]);
-    if (!vec_size(first) && !vec_size(second))
-        vec_init(result);
-    else {
-        if (vec_size(second))
-            vec_copy(result, second);
-        for (i = 0, j = vec_size(first); i < j; i++)
-            vec_push(result, vec_at(first, i));
+    PARM(2, CONCAT);
+    second = lst_pop(env->stck);
+    first = lst_pop(env->stck);
+    switch (first.op) {
+    case LIST_:
+	if (!lst_size(first.u.lis))
+	    result = second;
+	else if (!lst_size(second.u.lis))
+	    result = first;
+	else {
+	    lst_init(result.u.lis);
+	    lst_copy(result.u.lis, second.u.lis);
+	    for (i = 0, j = lst_size(first.u.lis); i < j; i++)
+		lst_push(result.u.lis, lst_at(first.u.lis, i));
+	}
+	break;
+
+    case STRING_:
+    case BIGNUM_:
+    case USR_STRING_:
+	i = strlen(first.u.str);
+	j = strlen(second.u.str);
+	result.u.str = GC_malloc_atomic(i + j + 1);
+	strcpy(result.u.str, first.u.str);
+	strcpy(result.u.str + i, second.u.str);
+	break;
+
+    case SET_:
+	result.u.set = first.u.set | second.u.set;
+	break;
+
+    default:
+	result = first;
+	break;
     }
-    stack[-1] = MAKE_LIST(result);
-}
-
-void concat_str(void)
-{
-    int i, j;
-    char *first, *second, *result;
-
-    second = get_string(stack_pop());
-    first = get_string(stack[-1]);
-    i = strlen(first);
-    j = strlen(second);
-    result = GC_malloc_atomic(i + j + 2);
-    *result = '"';
-    strcpy(result + 1, first);
-    strcpy(result + i + 1, second);
-    stack[-1] = MAKE_USR_STRING(result);
-}
-
-void concat_set(void)
-{
-    uint64_t set;
-
-    set = GET_AS_SET(stack_pop());
-    stack[-1] = MAKE_SET(GET_AS_SET(stack[-1]) | set);
-}
-
-void do_concat(void)
-{
-    TWOPARAMS;
-    SAME2TYPES;
-    if (IS_LIST(stack[-1]))
-        concat_lst();
-    else if (IS_USR_STRING(stack[-1]))
-        concat_str();
-    else if (IS_SET(stack[-1]))
-        concat_set();
-    else
-        BADAGGREGATE;
+    result.op = first.op;
+    lst_push(env->stck, result);
 }
 #endif

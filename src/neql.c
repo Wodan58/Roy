@@ -1,20 +1,27 @@
 /*
     module  : neql.c
-    version : 1.9
-    date    : 06/21/22
+    version : 1.10
+    date    : 09/19/23
 */
 #ifndef NEQL_C
 #define NEQL_C
 
+#include "compare.h"
+
 /**
-2270  !=  :  DDA	X Y  ->  B
+OK 2260  !=\0neql  :  DDA	X Y  ->  B
 Either both X and Y are numeric or both are strings or symbols.
-Tests whether X is not equal to Y.  Also supports float.
+Tests whether X not equal to Y.  Also supports float.
 */
-void do_neql(void)
+void neql_(pEnv env)
 {
-    TWOPARAMS;
-    stack[-2] = MAKE_BOOLEAN(Compare(stack[-2], stack[-1]) != 0);
-    stack_pop();
+    Node first, second, node;
+
+    PARM(2, ANYTYPE);
+    second = lst_pop(env->stck);
+    first = lst_pop(env->stck);
+    node.u.num = Compare(env, first, second) != 0;
+    node.op = BOOLEAN_;
+    lst_push(env->stck, node);
 }
 #endif

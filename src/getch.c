@@ -1,18 +1,21 @@
 /*
     module  : getch.c
-    version : 1.10
-    date    : 06/21/22
+    version : 1.11
+    date    : 09/19/23
 */
 #ifndef GETCH_C
 #define GETCH_C
 
 /**
-3100  getch  :  A	->  N
-Reads a character from input and puts it onto stack.
+OK 3200  getch  :  A	->  N
+[EXT] Reads a character from input and puts it onto stack.
 */
-void do_getch(void)
+void getch_(pEnv env)
 {
-    COMPILE;
-    do_push(MAKE_CHAR(getchar()));
+    Node node;
+
+    node.u.num = get_char();
+    node.op = CHAR_;
+    lst_push(env->stck, node);
 }
 #endif

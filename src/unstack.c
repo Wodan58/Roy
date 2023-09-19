@@ -1,20 +1,21 @@
 /*
     module  : unstack.c
-    version : 1.13
-    date    : 06/21/22
+    version : 1.14
+    date    : 09/19/23
 */
 #ifndef UNSTACK_C
 #define UNSTACK_C
 
 /**
-2010  unstack  :  DU	[X Y ..]  ->  ..Y X
+OK 2000  unstack  :  DU	[X Y ..]  ->  ..Y X
 The list [X Y ..] becomes the new stack.
 */
-void do_unstack(void)
+void unstack_(pEnv env)
 {
-    SYNCING;
-    ONEPARAM;
-    LIST;
-    stack_from_list(GET_AS_LIST(stack_pop()));
+    Node node;
+
+    PARM(1, HELP);
+    node = lst_pop(env->stck);
+    lst_copy(env->stck, node.u.lis);
 }
 #endif

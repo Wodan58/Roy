@@ -1,56 +1,47 @@
 /*
     module  : cons.c
-    version : 1.10
-    date    : 06/21/22
+    version : 1.11
+    date    : 09/19/23
 */
 #ifndef CONS_C
 #define CONS_C
 
 /**
-2020  cons  :  DDA	X A  ->  B
+OK 2010  cons  :  DDA	X A  ->  B
 Aggregate B is A with a new member X (first member for sequences).
 */
-void cons_lst(void)
+void cons_(pEnv env)
 {
-    Stack *list, *quot;
+    Node elem, aggr, node;
 
-    list = (Stack *)GET_AS_LIST(stack_pop());
-    vec_shallow_copy_take_ownership(quot, list);
-    vec_push(quot, stack[-1]);
-    stack[-1] = MAKE_LIST(quot);
-}
+    PARM(2, CONS);
+    aggr = lst_pop(env->stck);
+    elem = lst_pop(env->stck);
+    switch (aggr.op) {
+    case LIST_:
+	lst_init(node.u.lis);
+	if (lst_size(aggr.u.lis))
+	    lst_shallow_copy_take_ownership(node.u.lis, aggr.u.lis);
+	lst_push(node.u.lis, elem);
+	break;
 
-void cons_str(void)
-{
-    char *str, *result;
+    case STRING_:
+    case BIGNUM_:
+    case USR_STRING_:
+	node.u.str = GC_malloc_atomic(strlen(aggr.u.str) + 2);
+	node.u.str[0] = elem.u.num;
+	strcpy(&node.u.str[1], aggr.u.str);
+	break;
 
-    str = get_string(stack_pop());
-    result = GC_malloc_atomic(strlen(str) + 3);
-    *result = '"';
-    CHARACTER;
-    result[1] = GET_AS_CHAR(stack[-1]);
-    strcpy(result + 2, str);
-    stack[-1] = MAKE_USR_STRING(result);
-}
+    case SET_:
+	node.u.set = aggr.u.set | ((int64_t)1 << elem.u.num);
+	break;
 
-void cons_set(void)
-{
-    CHECKSETMEMBER(stack[-2]);
-    stack[-2] = MAKE_SET(
-        GET_AS_SET(stack[-1]) | (uint64_t)1 << GET_AS_INTEGER(stack[-2]));
-    stack_pop();
-}
-
-void do_cons(void)
-{
-    TWOPARAMS;
-    if (IS_LIST(stack[-1]))
-        cons_lst();
-    else if (IS_USR_STRING(stack[-1]))
-        cons_str();
-    else if (IS_SET(stack[-1]))
-        cons_set();
-    else
-        BADAGGREGATE;
+    default:
+	node = aggr;
+	break;
+    }
+    node.op = aggr.op;
+    lst_push(env->stck, node);
 }
 #endif

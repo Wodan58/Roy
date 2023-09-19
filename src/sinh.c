@@ -1,23 +1,23 @@
 /*
     module  : sinh.c
-    version : 1.8
-    date    : 06/21/22
+    version : 1.9
+    date    : 09/19/23
 */
 #ifndef SINH_C
 #define SINH_C
 
 /**
-1650  sinh  :  DA	F  ->  G
+OK 1650  sinh  :  DA	F  ->  G
 G is the hyperbolic sine of F.
 */
-void do_sinh(void)
+void sinh_(pEnv env)
 {
-    double dbl;
+    Node node;
 
-    ONEPARAM;
-    NUMBER;
-    dbl = GET_AS_NUMBER(stack[-1]);
-    dbl = sinh(dbl);
-    stack[-1] = MAKE_DOUBLE(dbl);
+    PARM(1, UFLOAT);
+    node = lst_pop(env->stck);
+    node.u.dbl = sinh(node.op == FLOAT_ ? node.u.dbl : (double)node.u.num);
+    node.op = FLOAT_;
+    lst_push(env->stck, node);
 }
 #endif

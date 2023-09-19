@@ -1,23 +1,23 @@
 /*
     module  : log.c
-    version : 1.8
-    date    : 06/21/22
+    version : 1.9
+    date    : 09/19/23
 */
 #ifndef LOG_C
 #define LOG_C
 
 /**
-1600  log  :  DA	F  ->  G
+OK 1600  log  :  DA	F  ->  G
 G is the natural logarithm of F.
 */
-void do_log(void)
+void log_(pEnv env)
 {
-    double dbl;
+    Node node;
 
-    ONEPARAM;
-    NUMBER;
-    dbl = GET_AS_NUMBER(stack[-1]);
-    dbl = log(dbl);
-    stack[-1] = MAKE_DOUBLE(dbl);
+    PARM(1, UFLOAT);
+    node = lst_pop(env->stck);
+    node.u.dbl = log(node.op == FLOAT_ ? node.u.dbl : (double)node.u.num);
+    node.op = FLOAT_;
+    lst_push(env->stck, node);
 }
 #endif

@@ -24,25 +24,30 @@
 
 #include <stdlib.h>
 #define GC_malloc	malloc
+#define GC_realloc	realloc
+#define GC_free		free
 #include "kvec.h"
 
 int main()
 {
     int i, j;
-    vector(int) *array = 0; // initialization
+    vector(int) *array;      // declaration
 
-    vec_push(array, 10); // append
+    vec_init(array);         // initialization
+    vec_push(array, 10);     // append
+    vec_add(array, 20) = 5;  // dynamic
+    vec_at(array, 15) = 4;   // static
     for (i = 0, j = vec_size(array); i < j; i++) // size
 	printf("array[%d] = %d\n", i, vec_at(array, i)); // access
-    vec_destroy(array); // destructor
+    vec_destroy(array);      // destructor
     return 0;
 }
 */
 
 /*
     module  : kvec.h
-    version : 1.9
-    date    : 07/04/22
+    version : 1.10
+    date    : 07/21/23
 
  1. Change type of n, m from size_t to unsigned. Reason: takes less memory.
  2. Remove (type*) casts. Reason: not needed for C.
@@ -75,11 +80,8 @@ int main()
 25. Add vec_end macro. Reason: can be used as stack pointer.
 26. Use GC_malloc and GC_realloc. Reason: simpler interface.
 27. Remove stk_ macros. Reason: Two different memory allocators is confusing.
-28. MAX_BLOCK added. Reason: 29 bits is the maximum size in gc.c
-29. vec_shallow_copy added; vec_push modified to allow this to happen.
-30. vec_arity added: useful for quotations that need save/restore of the stack.
-31. vec_owner, vec_recur, vec_shallow_copy_take_ownership added; GC_realloc
-    removed.
+28. MAX_BLOCK added. Reason: 29 bits is the maximum size in gc.c. Removed.
+29. vec_push requires vec_init; vec_add added. Reason: a little bit faster.
 
   2008-09-22 (0.1.0):
 	* The initial version.
@@ -87,95 +89,48 @@ int main()
 #ifndef AC_KVEC_H
 #define AC_KVEC_H
 
-typedef enum arity_t {
-    ARITY_NOT_OK,
-    ARITY_OK,
-    ARITY_UNKNOWN
-} arity_t;
-
-typedef enum owner_t {
-    NOT_OWNER,
-    OWNER,
-} owner_t;
-
-typedef enum recur_t {
-    NOT_RECURRING,
-    RECURRING
-} recur_t;
-
-#ifndef MAX_BLOCK
-#define MAX_BLOCK	200000000
-#endif
-
-#define vector(type)		struct { unsigned long n : 30, m : 30, \
-				arity : 2, owner : 1, recur : 1; type *a; }
+#define vector(type)		struct { unsigned n, m; type *a; }
 #define vec_init(v)		do { (v) = GC_malloc(sizeof(*(v))); \
-				(v)->n = (v)->m = 0; (v)->a = 0; (v)->arity = \
-				ARITY_UNKNOWN; (v)->owner = NOT_OWNER; \
-				(v)->recur = NOT_RECURRING; } while (0)
-#define vec_destroy(v)		do { free((v)->a); free(v); } while (0)
+				(v)->n = (v)->m = 0; (v)->a = 0; } while (0)
+#define vec_destroy(v)		do { GC_free((v)->a); GC_free(v); } while (0)
 #define vec_at(v, i)		((v)->a[i])
 #define vec_pop(v)		((v)->a[--(v)->n])
 #define vec_back(v)		((v)->a[(v)->n - 1])
 #define vec_end(v)		((v)->a + (v)->n)
 #define vec_size(v)		((v) ? (v)->n : 0)
 #define vec_setsize(v, s)	((v)->n = (s))
-#define vec_getarity(v)         ((v)->arity)
-#define vec_setarity(v, s)      ((v)->arity = (s))
-#define vec_getowner(v)		((v)->owner)
-#define vec_setowner(v, s)	((v)->owner = (s))
-#define vec_getrecur(v)         ((v)->recur)
-#define vec_setrecur(v, s)      ((v)->recur = (s))
 #define vec_max(v)		((v)->m)
-#define vec_grow(v, s)		do { if ((s) > (v)->m) { size_t size = \
-				sizeof(*(v)->a); void *a = GC_malloc((s) * \
-				size); memcpy(a, (v)->a, (v)->m * size); \
-				(v)->a = a; ((v)->m = (s), (v)->owner = OWNER; \
+#define vec_grow(v, s)		((v)->m = (s), (v)->a = GC_realloc((v)->a, \
+				sizeof(*(v)->a) * (s)))
+#define vec_shrink(v)		do { if ((v)->n) { ((v)->m = (v)->n; (v)->a = \
+				GC_realloc((v)->a, sizeof(*(v)->a) * (v)->m));\
 				} } while (0)
-#define vec_shrink(v)		do { if ((v)->n) { size_t size = (v)->n * \
-				sizeof(*(v)->a); void *a = GC_malloc(size); \
-				memcpy(a, (v)->a, size); (v)->a = a; \
-				((v)->m = (v)->n; (v)->owner = OWNER; } \
-				} while (0)
 #define vec_equal(v, w)		((v)->n == (w)->n && !memcmp((v)->a, (w)->a, \
-				(v)->n * sizeof(*(v))))
+				sizeof(*(v)) * (v)->n))
 
 /* vec_copy assumes that v1 does not exist yet and needs to be created */
 #define vec_copy(v1, v0) 						\
 	do {								\
-	    size_t size = (v0)->n * sizeof(*(v0)->a); vec_init(v1);	\
-	    (v1)->n = (v1)->m = (v0)->n; if ((v0)->n) { (v1)->a =	\
-	    GC_malloc(size); memcpy((v1)->a, (v0)->a, size);		\
-	    (v1)->owner = OWNER; } (v1)->arity = (v0)->arity;		\
+	    vec_init(v1); (v1)->n = (v1)->m = (v0)->n;			\
+	    (v1)->a = GC_malloc(sizeof(*(v1)->a) * (v1)->m);		\
+	    memcpy((v1)->a, (v0)->a, sizeof(*(v1)->a) * (v1)->m);	\
 	} while (0)
 
-/* vec_shallow_copy makes a copy without taking ownership of the array */
-#define vec_shallow_copy(v1, v0)                                        \
-        do {                                                            \
-            vec_init(v1); (v1)->n = (v0)->n; (v1)->m = (v0)->m;         \
-            (v1)->a = (v0)->a; (v1)->arity = (v0)->arity;               \
-        } while (0)
-
-/* vec_shallow_copy_take_ownership makes a copy while taking ownership */
-#define vec_shallow_copy_take_ownership(v1, v0)                         \
-        do {                                                            \
-            if ((v0)->owner == OWNER) { vec_shallow_copy(v1, v0);       \
-            (v1)->owner = OWNER; (v0)->owner = NOT_OWNER; } else        \
-            vec_copy(v1, v0);                                           \
-        } while (0)
-
-/* vec_push assumes that v has been initialized to 0 before its called */
+/* vec_push assumes that v has been initialized before it being called */
 #define vec_push(v, x) 							\
 	do {								\
-	    if (!(v)) vec_init(v); else if ((v)->owner == NOT_OWNER) {	\
-	    if ((v)->n) { size_t size = (v)->n * sizeof(*(v)->a);	\
-	    void *a = GC_malloc(size); memcpy(a, (v)->a, size);		\
-	    (v)->owner = OWNER; } } if ((v)->n == (v)->m) { void *a;	\
-	    size_t size = sizeof(*(v)->a), m = (v)->m; (v)->m = m ?	\
-	    m << 1 : 1; if ((v)->m > MAX_BLOCK/sizeof(*(v)->a))	(v)->m	\
-	    = MAX_BLOCK/sizeof(*(v)->a); a = GC_malloc((v)->m * size);	\
-	    memcpy(a, (v)->a, m * size); (v)->a = a; (v)->owner = OWNER;\
+	    if ((v)->n == (v)->m) { (v)->m = (v)->m ? (v)->m << 1 : 2;  \
+		(v)->a = GC_realloc((v)->a, sizeof(*(v)->a) * (v)->m);	\
 	    } (v)->a[(v)->n++] = (x);					\
+	} while (0)
+
+/* vec_add adds an element at index, even when the index did not exist */
+#define vec_add(v, x, i) 						\
+	do {								\
+	    if ((v)->m <= (unsigned)(i)) { (v)->m = (v)->n = (i) + 1;	\
+	        (v)->a = GC_realloc((v)->a, sizeof(*(v)->a) * (v)->m);	\
+	    } else if ((v)->n <= (unsigned)(i)) (v)->n = (i) + 1;	\
+	    (v)->a[(i)] = (x);						\
 	} while (0)
 
 /* vec_reverse assumes that an extra element has been added as scratch */

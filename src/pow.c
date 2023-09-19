@@ -1,24 +1,25 @@
 /*
     module  : pow.c
-    version : 1.8
-    date    : 06/21/22
+    version : 1.9
+    date    : 09/19/23
 */
 #ifndef POW_C
 #define POW_C
 
 /**
-1630  pow  :  DDA	F G  ->  H
+OK 1630  pow  :  DDA	F G  ->  H
 H is F raised to the Gth power.
 */
-void do_pow(void)
+void pow_(pEnv env)
 {
-    double dbl1, dbl2;
+    Node first, second;
 
-    TWOPARAMS;
-    NUMBERS2;
-    dbl2 = GET_AS_NUMBER(stack_pop());
-    dbl1 = GET_AS_NUMBER(stack[-1]);
-    dbl1 = pow(dbl1, dbl2);
-    stack[-1] = MAKE_DOUBLE(dbl1);
+    PARM(2, BFLOAT);
+    second = lst_pop(env->stck);
+    first = lst_pop(env->stck);
+    first.u.dbl = pow(first.op == FLOAT_ ? first.u.dbl : (double)first.u.num,
+		    second.op == FLOAT_ ? second.u.dbl : (double)second.u.num);
+    first.op = FLOAT_;
+    lst_push(env->stck, first);
 }
 #endif

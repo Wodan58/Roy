@@ -1,22 +1,25 @@
 /*
     module  : rotate.c
-    version : 1.12
-    date    : 06/21/22
+    version : 1.13
+    date    : 09/19/23
 */
 #ifndef ROTATE_C
 #define ROTATE_C
 
 /**
-1250  rotate  :  DDDAAA 	X Y Z  ->  Z Y X
+OK 1250  rotate  :  DDDAAA 	X Y Z  ->  Z Y X
 Interchanges X and Z.
 */
-void do_rotate(void)
+void rotate_(pEnv env)
 {
-    value_t temp;
+    Node first, second, third;
 
-    THREEPARAMS;
-    temp = stack[-1];
-    stack[-1] = stack[-3];
-    stack[-3] = temp;
+    PARM(3, ANYTYPE);
+    third = lst_pop(env->stck);
+    second = lst_pop(env->stck);
+    first = lst_pop(env->stck);
+    lst_push(env->stck, third);
+    lst_push(env->stck, second);
+    lst_push(env->stck, first);
 }
 #endif

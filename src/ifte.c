@@ -1,44 +1,34 @@
 /*
     module  : ifte.c
-    version : 1.21
-    date    : 06/21/22
+    version : 1.22
+    date    : 09/19/23
 */
 #ifndef IFTE_C
 #define IFTE_C
 
 /**
-2620  ifte  :  DDDU	[B] [T] [F]  ->  ...
+OK 2600  ifte  :  DDDP	[B] [T] [F]  ->  ...
 Executes B. If that yields true, then executes T else executes F.
 */
-void ifte(Stack *prog[3])
+void ifte_(pEnv env)
 {
-    execute_cond(prog[0], 0);
-    CHECKSTACK;
-    execute(GET_AS_BOOLEAN(stack_pop()) ? prog[1] : prog[2]);
-}
+    Node first, second, third;
 
-#ifdef COMPILING
-void put_ifte(Stack *prog[3])
-{
-    compile_cond(prog[0], 0);
-    fprintf(program, "if (GET_AS_BOOLEAN(stack_pop())) {");
-    compile(prog[1]);
-    fprintf(program, "} else {");
-    compile(prog[2]);
-    fprintf(program, "}");
-}
-#endif
-
-void do_ifte(void)
-{
-    Stack *prog[3];
-
-    THREEPARAMS;
-    THREEQUOTES;
-    prog[2] = (Stack *)GET_AS_LIST(stack_pop());
-    prog[1] = (Stack *)GET_AS_LIST(stack_pop());
-    prog[0] = (Stack *)GET_AS_LIST(stack_pop());
-    INSTANT(put_ifte);
-    ifte(prog);
+    PARM(3, IFTE);
+    third = lst_pop(env->stck);
+    second = lst_pop(env->stck);
+    first = lst_pop(env->stck);
+    /*
+	execute the test of the ifte
+    */
+    exeterm(env, first.u.lis);
+    /*
+	pop the result from the stack
+    */
+    first = lst_pop(env->stck);
+    if (first.u.num)
+	exeterm(env, second.u.lis);
+    else
+	exeterm(env, third.u.lis);
 }
 #endif

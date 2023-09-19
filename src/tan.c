@@ -1,23 +1,23 @@
 /*
     module  : tan.c
-    version : 1.8
-    date    : 06/21/22
+    version : 1.9
+    date    : 09/19/23
 */
 #ifndef TAN_C
 #define TAN_C
 
 /**
-1670  tan  :  DA	F  ->  G
+OK 1670  tan  :  DA	F  ->  G
 G is the tangent of F.
 */
-void do_tan(void)
+void tan_(pEnv env)
 {
-    double dbl;
+    Node node;
 
-    ONEPARAM;
-    NUMBER;
-    dbl = GET_AS_NUMBER(stack[-1]);
-    dbl = tan(dbl);
-    stack[-1] = MAKE_DOUBLE(dbl);
+    PARM(1, UFLOAT);
+    node = lst_pop(env->stck);
+    node.u.dbl = tan(node.op == FLOAT_ ? node.u.dbl : (double)node.u.num);
+    node.op = FLOAT_;
+    lst_push(env->stck, node);
 }
 #endif

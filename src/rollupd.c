@@ -1,23 +1,27 @@
 /*
     module  : rollupd.c
-    version : 1.9
-    date    : 06/21/22
+    version : 1.10
+    date    : 09/19/23
 */
 #ifndef ROLLUPD_C
 #define ROLLUPD_C
 
 /**
-1290  rollupd  :  DDDDAAAA	X Y Z W  ->  Z X Y W
+OK 1290  rollupd  :  DDDDAAAA	X Y Z W  ->  Z X Y W
 As if defined by:   rollupd  ==  [rollup] dip
 */
-void do_rollupd(void)
+void rollupd_(pEnv env)
 {
-    value_t temp;
+    Node first, second, third, fourth;
 
-    FOURPARAMS;
-    temp = stack[-2];
-    stack[-2] = stack[-3];
-    stack[-3] = stack[-4];
-    stack[-4] = temp;
+    PARM(4, ANYTYPE);
+    fourth = lst_pop(env->stck);
+    third = lst_pop(env->stck);
+    second = lst_pop(env->stck);
+    first = lst_pop(env->stck);
+    lst_push(env->stck, third);
+    lst_push(env->stck, first);
+    lst_push(env->stck, second);
+    lst_push(env->stck, fourth);
 }
 #endif

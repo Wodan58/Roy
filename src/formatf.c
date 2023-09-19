@@ -1,39 +1,36 @@
 /*
     module  : formatf.c
-    version : 1.12
-    date    : 06/21/22
+    version : 1.13
+    date    : 09/19/23
 */
 #ifndef FORMATF_C
 #define FORMATF_C
 
 /**
-1770  formatf  :  DDDDA 	F C I J  ->  S
+OK 1770  formatf  :  DDDDA 	F C I J  ->  S
 S is the formatted version of F in mode C
 ('e or 'E = exponential, 'f = fractional,
 'g or G = general with lower or upper case letters)
 with maximum width I and precision J.
 */
-void do_formatf(void)
+PRIVATE void formatf_(pEnv env)
 {
-    double dbl;
-    int prec, width, type, leng;
-    char format[MAXNUM], *result;
+    Node first, second, third, fourth;
+    char format[6], *result;
+    int leng;
 
-    FOURPARAMS;
-    INTEGERS2;
-    prec = GET_AS_INTEGER(stack_pop());
-    width = GET_AS_INTEGER(stack_pop());
-    CHARACTER;
-    type = GET_AS_CHAR(stack_pop());
-    CHECKFORMATF(type);
+    PARM(4, FORMATF);
+    fourth = lst_pop(env->stck); /* min width */
+    third = lst_pop(env->stck);  /* max width */
+    second = lst_pop(env->stck); /* mode */
+    first = lst_pop(env->stck);  /* number */
     strcpy(format, "%*.*g");
-    format[4] = type;
-    NUMBER;
-    dbl = GET_AS_NUMBER(stack[-1]);
-    leng = snprintf(0, 0, format, width, prec, dbl) + 1;
-    result = GC_malloc_atomic(leng + 2);
-    *result = '"';
-    snprintf(result + 1, leng, format, width, prec, dbl);
-    stack[-1] = MAKE_USR_STRING(result);
+    format[4] = second.u.num;
+    leng = snprintf(0, 0, format, third.u.num, fourth.u.num, first.u.dbl) + 1;
+    result = GC_malloc_atomic(leng + 1);
+    snprintf(result, leng, format, third.u.num, fourth.u.num, first.u.dbl);
+    first.u.str = result;
+    first.op = STRING_;
+    lst_push(env->stck, first);
 }
 #endif

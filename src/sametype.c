@@ -1,22 +1,27 @@
 /*
     module  : sametype.c
-    version : 1.11
-    date    : 06/21/22
+    version : 1.12
+    date    : 09/19/23
 */
 #ifndef SAMETYPE_C
 #define SAMETYPE_C
 
 /**
-2320  sametype  :  DDA	X Y  ->  B
-Tests whether X and Y have the same type.
+OK 3240  sametype  :  DDA	X Y  ->  B
+[EXT] Tests whether X and Y have the same type.
 */
-void do_sametype(void)
+void sametype_(pEnv env)
 {
-    int type1, type2;
+    Node first, second, node;
 
-    TWOPARAMS;
-    type2 = get_type(stack_pop());
-    type1 = get_type(stack[-1]);
-    stack[-1] = MAKE_BOOLEAN(type1 == type2);
+    PARM(2, ANYTYPE);
+    second = lst_pop(env->stck);
+    first = lst_pop(env->stck);
+    if (first.op == ANON_FUNCT_)
+	node.u.num = first.u.proc == second.u.proc;
+    else
+	node.u.num = first.op == second.op;
+    node.op = BOOLEAN_;
+    lst_push(env->stck, node);
 }
 #endif

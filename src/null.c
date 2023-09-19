@@ -1,60 +1,57 @@
 /*
     module  : null.c
-    version : 1.12
-    date    : 06/21/22
+    version : 1.13
+    date    : 09/19/23
 */
 #ifndef NULL_C
 #define NULL_C
 
 /**
-2210  null  :  DA	X  ->  B
+OK 2200  null  :  DA	X  ->  B
 Tests for empty aggregate X or zero numeric.
 */
-void do_null(void)
+void null_(pEnv env)
 {
-    Stack *list;
-    const char *str;
+    Node node;
 
-    ONEPARAM;
-    switch (get_type(stack[-1])) {
-#ifdef COMPILING
-    case INDEX_:
-        str = str_locate(GET_AS_USR_INDEX(stack[-1]));
-        stack[-1] = MAKE_BOOLEAN(!*str);
-        break;
-#endif
-    case ANON_FUNCT_:
-        stack[-1] = MAKE_BOOLEAN(!GET_AS_ANON_FUNCT(stack[-1]));
-        break;
-    case BOOLEAN_:
-        stack[-1] = MAKE_BOOLEAN(!GET_AS_BOOLEAN(stack[-1]));
-        break;
-    case CHAR_:
-        stack[-1] = MAKE_BOOLEAN(!GET_AS_CHAR(stack[-1]));
-        break;
-    case INTEGER_:
-        stack[-1] = MAKE_BOOLEAN(!GET_AS_INTEGER(stack[-1]));
-        break;
-    case SET_:
-        stack[-1] = MAKE_BOOLEAN(!GET_AS_SET(stack[-1]));
-        break;
-#ifdef COMPILING
+    PARM(1, ANYTYPE);
+    node = lst_pop(env->stck);
+    switch (node.op) {
     case USR_:
-#endif
+    case USR_PRIME_:
+	node.u.num = !node.u.ent;
+	break;
+    case ANON_FUNCT_:
+    case ANON_PRIME_:
+	node.u.num = !node.u.proc;
+	break;
+    case BOOLEAN_:
+    case CHAR_:
+    case INTEGER_:
+	node.u.num = !node.u.num;
+	break;
+    case SET_:
+	node.u.num = !node.u.set;
+	break;
     case STRING_:
-        str = get_string(stack[-1]);
-        stack[-1] = MAKE_BOOLEAN(!*str);
-        break;
+    case USR_STRING_:
+	node.u.num = !*node.u.str;
+	break;
     case LIST_:
-        list = (Stack *)GET_AS_LIST(stack[-1]);
-        stack[-1] = MAKE_BOOLEAN(!vec_size(list));
-        break;
+    case USR_LIST_:
+	node.u.num = !lst_size(node.u.lis);
+	break;
     case FLOAT_:
-        stack[-1] = MAKE_BOOLEAN(!GET_AS_DOUBLE(stack[-1]));
-        break;
+	node.u.num = !node.u.dbl;
+	break;
     case FILE_:
-        stack[-1] = MAKE_BOOLEAN(!GET_AS_FILE(stack[-1]));
-        break;
+	node.u.num = !node.u.fil;
+	break;
+    case BIGNUM_:
+	node.u.num = node.u.str[1] == '0';
+	break;
     }
+    node.op = BOOLEAN_;
+    lst_push(env->stck, node);
 }
 #endif

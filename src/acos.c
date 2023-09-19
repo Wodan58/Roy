@@ -1,23 +1,23 @@
 /*
     module  : acos.c
-    version : 1.8
-    date    : 06/21/22
+    version : 1.9
+    date    : 09/19/23
 */
 #ifndef ACOS_C
 #define ACOS_C
 
 /**
-1490  acos  :  DA	F  ->  G
+OK 1490  acos  :  DA	F  ->  G
 G is the arc cosine of F.
 */
-void do_acos(void)
+void acos_(pEnv env)
 {
-    double dbl;
+    Node node;
 
-    ONEPARAM;
-    NUMBER;
-    dbl = GET_AS_NUMBER(stack[-1]);
-    dbl = acos(dbl);
-    stack[-1] = MAKE_DOUBLE(dbl);
+    PARM(1, UFLOAT);
+    node = lst_pop(env->stck);
+    node.u.dbl = acos(node.op == FLOAT_ ? node.u.dbl : (double)node.u.num);
+    node.op = FLOAT_;
+    lst_push(env->stck, node);
 }
 #endif

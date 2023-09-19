@@ -1,26 +1,25 @@
 /*
     module  : ldexp.c
-    version : 1.10
-    date    : 06/21/22
+    version : 1.11
+    date    : 09/19/23
 */
 #ifndef LDEXP_C
 #define LDEXP_C
 
 /**
-1590  ldexp  :  DDA	F I  ->  G
+OK 1590  ldexp  :  DDA	F I  ->  G
 G is F times 2 to the Ith power.
 */
-void do_ldexp(void)
+void ldexp_(pEnv env)
 {
-    int exp;
-    double dbl;
+    Node first, second;
 
-    TWOPARAMS;
-    INTEGER;
-    exp = GET_AS_INTEGER(stack_pop());
-    NUMBER;
-    dbl = GET_AS_NUMBER(stack[-1]);
-    dbl = ldexp(dbl, exp);
-    stack[-1] = MAKE_DOUBLE(dbl);
+    PARM(2, LDEXP);
+    second = lst_pop(env->stck);
+    first = lst_pop(env->stck);
+    first.u.dbl = ldexp(first.op == FLOAT_ ? first.u.dbl : first.u.num,
+			second.u.num);
+    first.op = FLOAT_;
+    lst_push(env->stck, first);
 }
 #endif

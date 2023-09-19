@@ -1,18 +1,23 @@
 /*
     module  : set.c
-    version : 1.8
-    date    : 06/21/22
+    version : 1.9
+    date    : 09/19/23
 */
 #ifndef SET_C
 #define SET_C
 
 /**
-2360  set  :  DA	X  ->  B
+OK 2340  set  :  DA	X  ->  B
 Tests whether X is a set.
 */
-void do_set(void)
+void set_(pEnv env)
 {
-    ONEPARAM;
-    stack[-1] = MAKE_BOOLEAN(IS_SET(stack[-1]));
+    Node node;
+
+    PARM(1, ANYTYPE);
+    node = lst_pop(env->stck);
+    node.u.num = node.op == SET_;
+    node.op = BOOLEAN_;
+    lst_push(env->stck, node);
 }
 #endif

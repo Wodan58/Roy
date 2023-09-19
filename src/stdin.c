@@ -1,18 +1,21 @@
 /*
     module  : stdin.c
-    version : 1.9
-    date    : 06/21/22
+    version : 1.10
+    date    : 09/19/23
 */
 #ifndef STDIN_C
 #define STDIN_C
 
 /**
-1170  stdin  :  A	->  S
+OK 1170  stdin  :  A	->  S
 Pushes the standard input stream.
 */
-void do_stdin(void)
+void stdin_(pEnv env)
 {
-    COMPILE;
-    do_push(MAKE_FILE(stdin));
+    Node node;
+
+    node.u.fil = stdin;
+    node.op = FILE_;
+    lst_push(env->stck, node);
 }
 #endif

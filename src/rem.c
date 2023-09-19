@@ -1,41 +1,48 @@
 /*
     module  : rem.c
-    version : 1.12
-    date    : 06/21/22
+    version : 1.13
+    date    : 09/19/23
 */
 #ifndef REM_C
 #define REM_C
 
 /**
-1420  rem  :  DDA	I J  ->  K
+OK 1420  rem  :  DDA	I J  ->  K
 Integer K is the remainder of dividing I by J.  Also supports float.
 */
-void frem(void)
+void rem_(pEnv env)
 {
-    double dbl1, dbl2;
+    Node first, second;
 
-    dbl2 = GET_AS_NUMBER(stack_pop());
-    dbl1 = GET_AS_NUMBER(stack[-1]);
-    dbl1 = fmod(dbl1, dbl2);
-    stack[-1] = MAKE_DOUBLE(dbl1);
-}
+    PARM(2, REM);
+    second = lst_pop(env->stck);
+    first = lst_pop(env->stck);
+    switch (first.op) {
+    case FLOAT_:
+	switch (second.op) {
+	case FLOAT_:
+	    first.u.dbl = fmod(first.u.dbl, second.u.dbl);
+	    break;
 
-void irem(void)
-{
-    INTEGERS2;
-    stack[-2]
-        = MAKE_INTEGER(GET_AS_INTEGER(stack[-2]) % GET_AS_INTEGER(stack[-1]));
-    stack_pop();
-}
+	default:
+	    first.u.dbl = fmod(first.u.dbl, second.u.num);
+	    break;
+	}
+	break;
 
-void do_rem(void)
-{
-    TWOPARAMS;
-    NUMBERS2;
-    CHECKZERO;
-    if (IS_DOUBLE(stack[-1]) || IS_DOUBLE(stack[-2]))
-        frem();
-    else
-        irem();
+    default:
+	switch (second.op) {
+	case FLOAT_:
+	    second.u.dbl = fmod(first.u.num, second.u.dbl);
+	    lst_push(env->stck, second);
+	    return;
+
+	default:
+	    first.u.num %= second.u.num;
+	    break;
+	}
+	break;
+    }
+    lst_push(env->stck, first);
 }
 #endif

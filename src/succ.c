@@ -1,24 +1,22 @@
 /*
     module  : succ.c
-    version : 1.8
-    date    : 06/21/22
+    version : 1.9
+    date    : 09/19/23
 */
 #ifndef SUCC_C
 #define SUCC_C
 
 /**
-1800  succ  :  DA	M  ->  N
+OK 1800  succ  :  DA	M  ->  N
 Numeric N is the successor of numeric M.
 */
-void do_succ(void)
+void succ_(pEnv env)
 {
-    ONEPARAM;
-    NUMERICTYPE;
-    if (IS_INTEGER(stack[-1]))
-        stack[-1] = MAKE_INTEGER(GET_AS_INTEGER(stack[-1]) + 1);
-    else if (IS_CHAR(stack[-1]))
-        stack[-1] = MAKE_CHAR(GET_AS_CHAR(stack[-1]) + 1);
-    else if (IS_BOOLEAN(stack[-1]))
-        stack[-1] = MAKE_BOOLEAN(GET_AS_BOOLEAN(stack[-1]) + 1);
+    Node node;
+
+    PARM(1, PREDSUCC);
+    node = lst_pop(env->stck);
+    node.u.num++;
+    lst_push(env->stck, node);
 }
 #endif

@@ -1,30 +1,30 @@
 /*
     module  : binary.c
-    version : 1.9
-    date    : 06/21/22
+    version : 1.10
+    date    : 09/19/23
 */
 #ifndef BINARY_C
 #define BINARY_C
 
 /**
-2580  binary  :  DDDA 	X Y [P]  ->  R
+OK 2560  binary  :  DDDA	X Y [P]  ->  R
 Executes P, which leaves R on top of the stack.
 No matter how many parameters this consumes,
 exactly two are removed from the stack.
 */
-void do_binary(void)
+void binary_(pEnv env)
 {
-    Stack *list;
+    Node node, list;
 
-    THREEPARAMS;
-    ONEQUOTE;
-    list = stack_copy();
-    execute((Stack *)GET_AS_LIST(stack_pop()));
-    vec_pop(list);
-    vec_pop(list);
-    vec_pop(list);
-    CHECKSTACK;
-    vec_push(list, stack_pop());
-    stack_from_list(list);
+    PARM(3, DIP);
+    list = lst_pop(env->stck);
+    lst_init(node.u.lis);
+    lst_copy(node.u.lis, env->stck);	/* stack is saved in node */
+    exeterm(env, list.u.lis);
+    list = lst_pop(env->stck);		/* take R from stack */
+    (void)lst_pop(node.u.lis);		/* remove Y from old stack */
+    (void)lst_pop(node.u.lis);		/* remove X from old stack */
+    lst_push(node.u.lis, list);		/* add R to old stack */
+    lst_copy(env->stck, node.u.lis);	/* restore old stack with R on top */
 }
 #endif

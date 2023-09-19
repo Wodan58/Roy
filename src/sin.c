@@ -1,23 +1,23 @@
 /*
     module  : sin.c
-    version : 1.8
-    date    : 06/21/22
+    version : 1.9
+    date    : 09/19/23
 */
 #ifndef SIN_C
 #define SIN_C
 
 /**
-1640  sin  :  DA	F  ->  G
+OK 1640  sin  :  DA	F  ->  G
 G is the sine of F.
 */
-void do_sin(void)
+void sin_(pEnv env)
 {
-    double dbl;
+    Node node;
 
-    ONEPARAM;
-    NUMBER;
-    dbl = GET_AS_NUMBER(stack[-1]);
-    dbl = sin(dbl);
-    stack[-1] = MAKE_DOUBLE(dbl);
+    PARM(1, UFLOAT);
+    node = lst_pop(env->stck);
+    node.u.dbl = sin(node.op == FLOAT_ ? node.u.dbl : (double)node.u.num);
+    node.op = FLOAT_;
+    lst_push(env->stck, node);
 }
 #endif

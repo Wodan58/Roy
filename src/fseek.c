@@ -1,28 +1,26 @@
 /*
     module  : fseek.c
-    version : 1.10
-    date    : 06/21/22
+    version : 1.11
+    date    : 09/19/23
 */
 #ifndef FSEEK_C
 #define FSEEK_C
 
 /**
-1990  fseek  :  DDA	S P W  ->  S B
+OK 1980  fseek  :  DDA	S P W  ->  S B
 Stream S is repositioned to position P relative to whence-point W,
 where W = 0, 1, 2 for beginning, current position, end respectively.
 */
-void do_fseek(void)
+void fseek_(pEnv env)
 {
-    FILE *fp;
-    int whence, pos;
+    Node node, locat, orien;
 
-    COMPILE;
-    THREEPARAMS;
-    INTEGERS2;
-    whence = GET_AS_INTEGER(stack_pop());
-    pos = GET_AS_INTEGER(stack[-1]);
-    FILE2;
-    fp = GET_AS_FILE(stack[-2]);
-    stack[-1] = MAKE_BOOLEAN(fseek(fp, pos, whence) != 0);
+    PARM(3, FSEEK);
+    orien = lst_pop(env->stck);
+    locat = lst_pop(env->stck);
+    node = lst_back(env->stck);
+    node.u.num = fseek(node.u.fil, locat.u.num, orien.u.num) != 0;
+    node.op = BOOLEAN_;
+    lst_push(env->stck, node);
 }
 #endif

@@ -1,12 +1,15 @@
 (*
     module  : linrec.joy
-    version : 1.1
-    date    : 06/21/22
+    version : 1.8
+    date    : 09/19/23
 *)
-DEFINE	from-to == [] cons [pop pop] swoncat [>] swap
-	[[dup succ] dip] [cons] linrec;
-	swoncat == swap concat;
-	from-to-list == [] from-to.
-1 10 from-to-list .
+DEFINE
+    from-to ==		(*  lo  hi  agg  *)
+	[] cons  [pop pop] swap concat
+	[over over >] swap
+	[ [dup succ] dip ]
+	[cons]
+	linrec;
+    from-to-list == [] from-to.
 
-1 1000 [>] [pop pop []] [[dup succ] dip] [cons] linrec.
+1 10 from-to-list [1 2 3 4 5 6 7 8 9 10] equal.

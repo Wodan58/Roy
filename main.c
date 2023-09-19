@@ -1,109 +1,122 @@
 /*
-    module  : main.c
-    version : 1.20
-    date    : 09/05/23
-*/
-#include "joy.h"
+ *  module  : main.c
+ *  version : 1.19
+ *  date    : 09/19/23
+ */
+#include "globals.h"
 
-int autoput = INIAUTOPUT, tracegc = INITRACEGC, undeferror = INIUNDEFERR;
-int g_argc, library, compiling, debugging;
-char **g_argv, *filename;
-clock_t startclock;
-char *bottom_of_stack;
-static jmp_buf begin;
+#define ERROR_ON_USRLIB 0		/* no error */
+
+extern FILE *yyin;			/* lexr.c */
+extern unsigned char mustinclude;	/* scan.c */
+
+static jmp_buf begin;			/* restart with empty program */
 
 /*
-    Abort execution and resume main loop.
+    abort execution and restart reading from yyin. In the NOBDW version the
+    stack is cleared as well.
 */
-void abortexecution()
+PUBLIC void abortexecution_(int num)
 {
-    longjmp(begin, 1);
+    longjmp(begin, num);
 }
 
 /*
-    fatal terminates the program after a stack overflow, likely to result in
-    heap corruption that makes it impossible to continue.
+    report_clock - report the amount of time spent.
 */
-#ifndef GC_BDW
-void fatal(void)
+#ifdef STATS
+PRIVATE void report_clock(pEnv env)
 {
     fflush(stdout);
-    fprintf(stderr, "fatal error: memory overflow\n");
-    exit(EXIT_FAILURE);
+    fprintf(stderr, "%ld milliseconds CPU to execute\n",
+	   (clock() - env->startclock) * 1000 / CLOCKS_PER_SEC);
 }
 #endif
 
 /*
-    execerror - print a runtime error to stderr. When compiling print the
-		function instead of generating an error.
-*/
-void execerror(char *message, const char *op)
+ *  copyright - Print all copyright notices, even historical ones.
+ *
+ *  The version must be set on the commandline when compiling:
+ *  -DJVERSION="\"alpha\"" or whatever.
+ */
+#ifdef COPYRIGHT
+PRIVATE void copyright(char *file)
 {
-    int leng;
-    char str[MAXSTR], *ptr;
+    int i, j = 0;
+    char str[BUFFERMAX], *ptr;
 
-    if (!strncmp(op, "do_", 3))
-	op += 3;
-    leng = strlen(op);
-    if ((ptr = strchr(op, '_')) != 0 && ptr != op)
-	leng = ptr - op;
-    if (!compiling) {
-	fflush(stdout);
-	fprintf(stderr, "run time error: %s needed for %.*s\n",
-		message, leng, op);
-	abortexecution();
+    static struct {
+	char *file;
+	time_t stamp;
+	char *gc;
+    } table[] = {
+	{ "joytut.inp", 994075177, "NOBDW" },
+	{ "jp-joytst.joy", 994075177, "NOBDW" },
+	{ "laztst.joy", 1005579152, "BDW" },
+	{ "symtst.joy", 1012575285, "BDW" },
+	{ "plgtst.joy", 1012575285, "BDW" },
+	{ "lsptst.joy", 1012575285, "BDW" },
+	{ "mtrtst.joy", 1017847160, "BDW" },
+	{ "grmtst.joy", 1017847160, "BDW" },
+	{ "reptst.joy", 1047653638, "NOBDW" },
+	{ "jp-reprodtst.joy", 1047653638, "NOBDW" },
+	{ "flatjoy.joy", 1047653638, "NOBDW" },
+	{ "modtst.joy", 1047920271, "BDW" },
+	{ 0, 1056113062, "NOBDW" } };
+
+    if (strcmp(file, "stdin")) {
+	if ((ptr = strrchr(file, '/')) != 0)
+	    file = ptr + 1;
+	for (i = 0; table[i].file; i++) {
+	    if (!strcmp(file, table[i].file)) {
+		strftime(str, sizeof(str), "%H:%M:%S on %b %d %Y",
+		    gmtime(&table[i].stamp));
+		printf("JOY  -  compiled at %s (%s)\n", str, table[i].gc);
+		j = 1;
+		break;
+	    }
+	}
+    } else {
+	printf("JOY  -  compiled at %s on %s", __TIME__, __DATE__);
+#ifdef JVERSION
+	printf(" (%s)", JVERSION);
+#endif
+	putchar('\n');
+	j = 1;
     }
-    if (strncmp(message, "definition", 10)) {
-	sprintf(str, "do_%.*s", leng, op);
-	print(str);
-    }
-}
-
-/*
-    report_clock - report the amount of time spent and the number of
-		   garbage collections.
-*/
-#ifdef REPORT
-void report_clock(void)
-{
-    double timediff;
-
-    timediff = clock() - startclock;
-    timediff /= CLOCKS_PER_SEC;
-    fprintf(stderr, "%.2f seconds CPU to execute\n", timediff);
-    fprintf(stderr, "%.0f garbage collections\n", (double)GC_get_gc_no());
+    if (j)
+	printf("Copyright 2001 by Manfred von Thun\n");
 }
 #endif
 
 /*
-    copyright - report copyright and compilation date and time.
+    dump the symbol table - accessed from quit_, because env is needed;
+    do this only for user defined symbols.
 */
-static void copyright(void)
+#ifdef SYMBOLS
+PRIVATE void dump_table(pEnv env)
 {
-    printf("JOY  -  compiled at %s on %s", __TIME__, __DATE__);
-    printf(JVERSION ? " (%s)\n" : "\n", JVERSION);
-    printf("Copyright 2022 by Ruurd Wiersma\n");
-}
+    int i;
+    Entry ent;
 
-/*
-    Test whether it is the interpreter that is executing.
-*/
-static int is_interpreter(char *argv)
-{
-    char *ptr;
-
-    if ((ptr = strrchr(argv, '/')) != 0)
-	ptr++;
-    else
-	ptr = argv;
-    return !strncmp(ptr, "joy", 3);
+    for (i = vec_size(env->symtab) - 1; i >= 0; i--) {
+	ent = vec_at(env->symtab, i);
+	if (!ent.is_user)
+	    printf("(%d) %s\n", i, ent.name);
+	else {
+	    printf("(%d) %s == ", i, ent.name);
+	    writeterm(env, ent.u.body, stdout);
+	    putchar('\n');
+	}
+    }
 }
+#endif
 
 /*
     options - print help on startup options and exit: options are those that
 	      cannot be set from within the language itself.
 */
-static void options(int interpreter)
+PRIVATE void options(void)
 {
     printf("Usage: joy [options] [filename] [parameters]\n");
     printf("options, filename, parameters can be given in any order\n");
@@ -112,50 +125,97 @@ static void options(int interpreter)
     printf("the filename parameter cannot start with '-' or a digit\n");
     printf("Options:\n");
     printf("  -h : print this help text and exit\n");
-    if (interpreter)
-	printf("  -c : compile with compile time evaluation\n");
+#ifdef COMPILING
+    printf("  -c : compile joy source into C source\n");
+#endif
+#ifdef TRACING
     printf("  -d : print a trace of program execution\n");
-    if (interpreter)
-	printf("  -l : compile in library mode\n");
-    printf("  -s : dump user-defined functions after execution\n");
-    printf("  -v : print a copyright notice\n");
-    exit(0);
+#endif
+#ifdef SYMBOLS
+    printf("  -s : dump symbol table functions after execution\n");
+#endif
+#ifdef COPYRIGHT
+    printf("  -v : do not print a copyright notice\n");
+#endif
+#ifdef OVERWRITE
+    printf("  -w : suppress warnings: overwriting, arities\n");
+#endif
+#if YYDEBUG
+    printf("  -y : print a trace of parser execution\n");
+#endif
+    exit(EXIT_SUCCESS);
 }
 
-static int start_main(int argc, char *argv[])
+PRIVATE int my_main(int argc, char **argv)
 {
-    int i, j;
-    unsigned char verbose = 0, symdump = 0, helping = 0, interpreter;
+    char *ptr;
+    int i, j, ch;
+    unsigned char helping = 0;
+#ifdef COPYRIGHT
+    unsigned char verbose = 1;
+#endif
+#ifdef SYMBOLS
+    unsigned char symdump = 0;
+#endif
 
+    Env env; /* global variables */
+    memset(&env, 0, sizeof(env));
     /*
-	First start the clock.
-    */
-    startclock = clock();
-#ifdef REPORT
-    atexit(report_clock);
+     *  Start the clock. my_atexit is called from quit_ that is called in
+     *  scan.c after reading EOF on the first input file.
+     */
+    env.startclock = clock();
+#ifdef STATS
+    my_atexit(report_clock);
+#endif
+    lst_init(env.stck);
+    lst_init(env.prog);
+    vec_init(env.tokens);
+    vec_init(env.symtab);
+#ifdef MULTI_TASK_THREAD_JOY
+    vec_init(env.context);
+    vec_init(env.channel);
 #endif
     /*
-	Initialise the stack. The stack is either a vector or a static array.
-	In both cases it needs to be initialised.
-    */
-    stack_init();
+     *  Initialize yyin and other environmental parameters.
+     */
+    yyin = stdin;
+    env.filename = "stdin";
+    env.overwrite = INIWARNING;
+    if ((ptr = strrchr(env.pathname = argv[0], '/')) != 0) {
+	*ptr++ = 0;
+	argv[0] = ptr;
+    } else if ((ptr = strrchr(env.pathname, '\\')) != 0) {
+	*ptr++ = 0;
+	argv[0] = ptr;
+    } else
+	env.pathname = ".";
     /*
-	Determine whether this is the interpreter executing.
-    */
-    interpreter = is_interpreter(argv[0]);
-    /*
-	First look for options. They start with -.
-    */
-    for (i = 0; i < argc; i++)
+     *  First look for options. They start with -.
+     */
+    for (i = 1; i < argc; i++)
 	if (argv[i][0] == '-') {
 	    for (j = 1; argv[i][j]; j++)
 		switch (argv[i][j]) {
-		case 'c' : compiling = 1; break;
-		case 'd' : debugging = 1; break;
 		case 'h' : helping = 1; break;
-		case 'l' : library = compiling = 1; break;
+#ifdef COMPILING
+		case 'c' : env.compiling = 1; break;
+#endif
+#ifdef TRACING
+		case 'd' : env.debugging = 1; break;
+#endif
+#ifdef SYMBOLS
 		case 's' : symdump = 1; break;
-		case 'v' : verbose = 1; break;
+#endif
+#ifdef COPYRIGHT
+		case 'v' : verbose = 0; break;
+#endif
+#ifdef OVERWRITE
+		case 'w' : env.overwrite = 0; break;
+#endif
+#if YYDEBUG
+		case 'y' : yydebug = 1; break;
+#endif
 		}
 	    /*
 		Overwrite the options with subsequent parameters.
@@ -165,45 +225,64 @@ static int start_main(int argc, char *argv[])
 	    break;
 	}
     /*
-	Look for a possible filename parameter. Filenames cannot start with -
-	and cannot start with a digit, unless preceded by a path: e.g. './'.
-    */
-    for (i = 1; i < argc; i++)
-	if (!isdigit(argv[i][0])) {
-	    if (freopen(filename = argv[i], "r", stdin) == 0) {
-		fprintf(stderr, "failed to open the file '%s'.\n", filename);
+     *  Look for a possible filename parameter. Filenames cannot start with -
+     *  and cannot start with a digit, unless preceded by a path: e.g. './'.
+     */
+    for (i = 1; i < argc; i++) {
+	ch = argv[i][0];
+	if (!isdigit(ch)) {
+	    if ((yyin = freopen(env.filename = argv[i], "r", stdin)) == 0) {
+		fprintf(stderr, "failed to open the file '%s'.\n",
+			env.filename);
 		return 0;
 	    }
 	    /*
-		Overwrite argv[0] with the filename and shift subsequent
-		parameters.
-	    */
-	    argv[0] = filename;
+	     *  Overwrite argv[0] with the filename and shift subsequent
+	     *  parameters. Also change directory to that filename.
+	     */
+	    if ((ptr = strrchr(argv[0] = env.filename, '/')) != 0) {
+		*ptr++ = 0;
+		argv[0] = env.filename = ptr;
+	    }
 	    for (--argc; i < argc; i++)
 		argv[i] = argv[i + 1];
 	    break;
 	}
-    g_argc = argc;
-    g_argv = argv;
+    }
+    env.g_argc = argc;
+    env.g_argv = argv;
+#ifdef COPYRIGHT
     if (verbose)
-	copyright();
+	copyright(env.filename);
+#endif
+#ifdef SYMBOLS
     if (symdump)
-	atexit(dump_table);
+	my_atexit(dump_table);
+#endif
     if (helping)
-	options(interpreter);
-    if (setjmp(begin) && !interpreter)
-	return 0;
-    do
-	yyparse();
-    while (interpreter);
-    return 0; /* main doesn't return */
+	options();
+    env.echoflag = INIECHOFLAG;
+    env.autoput = INIAUTOPUT;
+    env.undeferror = INIUNDEFERROR;
+    inilinebuffer(env.filename);
+    inisymboltable(&env);
+#ifdef COMPILING
+    if (env.compiling)
+	initcompile(&env);
+#endif
+    setjmp(begin); /* return here after error or abort */
+    lst_resize(env.prog, 0);
+    if (mustinclude) {
+	mustinclude = include(&env, "usrlib.joy", ERROR_ON_USRLIB);
+	fflush(stdout); /* flush include messages */
+    }
+    return yyparse(&env);
 }
 
 int main(int argc, char **argv)
 {
-    int (*volatile m)(int, char **) = start_main;
+    int (*volatile m)(int, char **) = my_main;
 
-    bottom_of_stack = (char *)&argc;
     GC_INIT();
     return (*m)(argc, argv);
 }

@@ -1,23 +1,23 @@
 /*
     module  : exp.c
-    version : 1.8
-    date    : 06/21/22
+    version : 1.9
+    date    : 09/19/23
 */
 #ifndef EXP_C
 #define EXP_C
 
 /**
-1560  exp  :  DA	F  ->  G
+OK 1560  exp  :  DA	F  ->  G
 G is e (2.718281828...) raised to the Fth power.
 */
-void do_exp(void)
+void exp_(pEnv env)
 {
-    double dbl;
+    Node node;
 
-    ONEPARAM;
-    NUMBER;
-    dbl = GET_AS_NUMBER(stack[-1]);
-    dbl = exp(dbl);
-    stack[-1] = MAKE_DOUBLE(dbl);
+    PARM(1, UFLOAT);
+    node = lst_pop(env->stck);
+    node.u.dbl = exp(node.op == FLOAT_ ? node.u.dbl : (double)node.u.num);
+    node.op = FLOAT_;
+    lst_push(env->stck, node);
 }
 #endif

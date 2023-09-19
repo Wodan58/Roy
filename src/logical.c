@@ -1,18 +1,23 @@
 /*
     module  : logical.c
-    version : 1.8
-    date    : 06/21/22
+    version : 1.9
+    date    : 09/19/23
 */
 #ifndef LOGICAL_C
 #define LOGICAL_C
 
 /**
-2350  logical  :  DA	X  ->  B
+OK 2330  logical  :  DA	X  ->  B
 Tests whether X is a logical.
 */
-void do_logical(void)
+void logical_(pEnv env)
 {
-    ONEPARAM;
-    stack[-1] = MAKE_BOOLEAN(IS_BOOLEAN(stack[-1]));
+    Node node;
+
+    PARM(1, ANYTYPE);
+    node = lst_pop(env->stck);
+    node.u.num = node.op == BOOLEAN_;
+    node.op = BOOLEAN_;
+    lst_push(env->stck, node);
 }
 #endif

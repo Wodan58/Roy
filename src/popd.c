@@ -1,19 +1,22 @@
 /*
     module  : popd.c
-    version : 1.11
-    date    : 06/21/22
+    version : 1.12
+    date    : 09/19/23
 */
 #ifndef POPD_C
 #define POPD_C
 
 /**
-1260  popd  :  DDA	Y Z  ->  Z
+OK 1260  popd  :  DDA	Y Z  ->  Z
 As if defined by:   popd  ==  [pop] dip
 */
-void do_popd(void)
+void popd_(pEnv env)
 {
-    TWOPARAMS;
-    stack[-2] = stack[-1];
-    stack_pop();
+    Node node;
+
+    PARM(2, ANYTYPE);
+    node = lst_pop(env->stck);
+    (void)lst_pop(env->stck);
+    lst_push(env->stck, node);
 }
 #endif

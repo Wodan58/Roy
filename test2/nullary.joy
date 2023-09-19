@@ -1,11 +1,6 @@
 (*
     module  : nullary.joy
-    version : 1.1
-    date    : 06/21/22
+    version : 1.6
+    date    : 09/19/23
 *)
-DEFINE	prime == 2 [[dup * >] nullary [rem 0 >] dip and]
-	[succ] while dup * <;
-	tab == '\t putch;
-	nl == '\n putch.
-
-2 20 [dup put tab dup prime put nl succ] times pop.
+2 20 [] nullary stack [20 20 2] equal.

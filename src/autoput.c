@@ -1,18 +1,21 @@
 /*
     module  : autoput.c
-    version : 1.10
-    date    : 06/21/22
+    version : 1.11
+    date    : 09/19/23
 */
 #ifndef AUTOPUT_C
 #define AUTOPUT_C
 
 /**
-1090  autoput  :  A	->  I
+OK 1090  autoput  :  A	->  I
 Pushes current value of flag for automatic output, I = 0..2.
 */
-void do_autoput(void)
+void autoput_(pEnv env)
 {
-    COMPILE;
-    do_push(MAKE_INTEGER(autoput));
+    Node node;
+
+    node.u.num = env->autoput;
+    node.op = INTEGER_;
+    lst_push(env->stck, node);
 }
 #endif

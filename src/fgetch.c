@@ -1,23 +1,23 @@
 /*
     module  : fgetch.c
-    version : 1.9
-    date    : 06/21/22
+    version : 1.10
+    date    : 09/19/23
 */
 #ifndef FGETCH_C
 #define FGETCH_C
 
 /**
-1880  fgetch  :  A	S  ->  S C
+OK 1870  fgetch  :  A	S  ->  S C
 C is the next available character from stream S.
 */
-void do_fgetch(void)
+void fgetch_(pEnv env)
 {
-    FILE *fp;
+    Node node;
 
-    COMPILE;
-    ONEPARAM;
-    FILE1;
-    fp = GET_AS_FILE(stack[-1]);
-    do_push(MAKE_CHAR(fgetc(fp)));
+    PARM(1, FGET);
+    node = lst_back(env->stck);
+    node.u.num = getc(node.u.fil);
+    node.op = CHAR_;
+    lst_push(env->stck, node);    
 }
 #endif

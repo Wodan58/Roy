@@ -1,18 +1,21 @@
 /*
     module  : maxint.c
-    version : 1.11
-    date    : 06/21/22
+    version : 1.12
+    date    : 09/19/23
 */
 #ifndef MAXINT_C
 #define MAXINT_C
 
 /**
-1020  maxint  :  A	->  maxint
+IMMEDIATE 1020  maxint  :  A	->  maxint
 Pushes largest integer (platform dependent). Typically it is 32 bits.
 */
-void do_maxint(void)
+void maxint_(pEnv env)
 {
-    do_push(MAKE_INTEGER(MAXINT_));
+    Node node;
+
+    node.u.num = MAXINT;
+    node.op = INTEGER_;
+    lst_push(env->stck, node);
 }
-/* maxint.c */
 #endif

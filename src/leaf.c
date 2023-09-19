@@ -1,18 +1,23 @@
 /*
     module  : leaf.c
-    version : 1.9
-    date    : 06/21/22
+    version : 1.10
+    date    : 09/19/23
 */
 #ifndef LEAF_C
 #define LEAF_C
 
 /**
-2390  leaf  :  DA	X  ->  B
+OK 2370  leaf  :  DA	X  ->  B
 Tests whether X is not a list.
 */
-void do_leaf(void)
+void leaf_(pEnv env)
 {
-    ONEPARAM;
-    stack[-1] = MAKE_BOOLEAN(!IS_LIST(stack[-1]));
+    Node node;
+
+    PARM(1, ANYTYPE);
+    node = lst_pop(env->stck);
+    node.u.num = node.op != LIST_;
+    node.op = BOOLEAN_;
+    lst_push(env->stck, node);
 }
 #endif

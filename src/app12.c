@@ -1,32 +1,21 @@
 /*
     module  : app12.c
-    version : 1.11
-    date    : 06/21/22
+    version : 1.12
+    date    : 09/19/23
 */
 #ifndef APP12_C
 #define APP12_C
 
-#ifdef UNARY2_X
-#undef UNARY2_X
-#undef UNARY2_C
-#endif
-#ifdef ROLLDOWN_X
-#undef ROLLDOWN_X
-#undef ROLLDOWN_C
-#endif
-
-#include "unary2.c"
-#include "rolldown.c"
-
 /**
-2480  app12  :  DDDDAA	X Y1 Y2 [P]  ->  R1 R2
+OK 2460  app12  :  DDDDAA	X Y1 Y2 [P]  ->  R1 R2
 Executes P twice, with Y1 and Y2, returns R1 and R2.
 */
-void do_app12(void)
+PRIVATE void app12_(pEnv env)
 {
-    FOURPARAMS;
-    do_unary2();
-    do_rolldown();
-    stack_pop();
+    /*   X  Y  Z  [P]  app12  */
+    PARM(4, DIP);
+    unary2_(env);
+    rolldown_(env);
+    pop_(env);
 }
 #endif

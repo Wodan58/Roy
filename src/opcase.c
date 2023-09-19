@@ -1,39 +1,42 @@
 /*
     module  : opcase.c
-    version : 1.15
-    date    : 06/21/22
+    version : 1.16
+    date    : 09/19/23
 */
 #ifndef OPCASE_C
 #define OPCASE_C
 
 /**
-2100  opcase  :  DA	X [..[X Xs]..]  ->  X [Xs]
+OK 2090  opcase  :  DA	X [..[X Xs]..]  ->  X [Xs]
 Indexing on type of X, returns the list [Xs].
 */
-void do_opcase(void)
+void opcase_(pEnv env)
 {
     int i;
-    value_t temp;
-    Stack *list, *quot, *result = 0;
+    Node node, aggr, elem, temp;
 
-    TWOPARAMS;
-    LIST;
-    CHECKEMPTYLIST(stack[-1]);
-    list = (Stack *)GET_AS_LIST(stack_pop());
-    temp = stack[-1];
-    for (i = vec_size(list) - 1; i >= 0; i--) {
-        CHECKLIST(vec_at(list, i));
-        quot = (Stack *)GET_AS_LIST(vec_at(list, i));
-        if (!i || !Compare(temp, vec_back(quot))) {
-            if (!i)
-                result = quot;
-            else {
-                vec_shallow_copy(result, quot);
-                vec_pop(result);
-            }
-            break;
-        }
+    PARM(2, CASE);
+    aggr = lst_pop(env->stck);
+    node = lst_back(env->stck);
+    for (i = lst_size(aggr.u.lis) - 1; i >= 0; i--) {
+	elem = lst_at(aggr.u.lis, i);
+	if (!i) {
+	    node = elem;
+	    break;
+	}
+	temp = lst_back(elem.u.lis);
+	if (node.op == temp.op) {
+	    if (node.op == ANON_FUNCT_ && node.u.proc != temp.u.proc)
+		;
+	    else {
+		lst_init(node.u.lis);
+		lst_shallow_copy(node.u.lis, elem.u.lis);
+		(void)lst_pop(node.u.lis);
+		node.op = LIST_;
+		break;
+	    }
+	}
     }
-    do_push(MAKE_LIST(result));
+    lst_push(env->stck, node);
 }
 #endif

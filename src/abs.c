@@ -1,29 +1,26 @@
 /*
     module  : abs.c
-    version : 1.9
-    date    : 06/21/22
+    version : 1.10
+    date    : 09/19/23
 */
 #ifndef ABS_C
 #define ABS_C
 
 /**
-1480  abs  :  DA	N1  ->  N2
+OK 1480  abs  :  DA	N1  ->  N2
 Integer N2 is the absolute value (0,1,2..) of integer N1,
 or float N2 is the absolute value (0.0 ..) of float N1.
 */
-void do_abs(void)
+void abs_(pEnv env)
 {
-    double dbl;
+    Node node;
 
-    ONEPARAM;
-    NUMBER;
-    if (IS_DOUBLE(stack[-1])) {
-        dbl = GET_AS_DOUBLE(stack[-1]);
-        dbl = fabs(dbl);
-        stack[-1] = MAKE_DOUBLE(dbl);
-    } else if (IS_INTEGER(stack[-1])) {
-        if (GET_AS_INTEGER(stack[-1]) < 0)
-            stack[-1] = MAKE_INTEGER(-GET_AS_INTEGER(stack[-1]));
-    }
+    PARM(1, UFLOAT);
+    node = lst_pop(env->stck);
+    if (node.op == FLOAT_)
+	node.u.dbl = fabs(node.u.dbl);
+    else
+	node.u.num = llabs(node.u.num);
+    lst_push(env->stck, node);
 }
 #endif

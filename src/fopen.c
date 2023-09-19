@@ -1,22 +1,25 @@
 /*
     module  : fopen.c
-    version : 1.11
-    date    : 06/21/22
+    version : 1.12
+    date    : 09/19/23
 */
 #ifndef FOPEN_C
 #define FOPEN_C
 
 /**
-1900  fopen  :  DDA	P M  ->  S
+OK 1890  fopen  :  DDA	P M  ->  S
 The file system object with pathname P is opened with mode M (r, w, a, etc.)
 and stream object S is pushed; if the open fails, file:NULL is pushed.
 */
-void do_fopen(void)
+void fopen_(pEnv env)
 {
-    COMPILE;
-    TWOPARAMS;
-    STRINGS2;
-    stack[-2] = MAKE_FILE(fopen(get_string(stack[-2]), get_string(stack[-1])));
-    stack_pop();
+    Node path, mode, node;
+
+    PARM(2, FOPEN);
+    mode = lst_pop(env->stck);
+    path = lst_pop(env->stck);
+    node.u.fil = fopen(path.u.str, mode.u.str);
+    node.op = FILE_;
+    lst_push(env->stck, node);
 }
 #endif

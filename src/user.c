@@ -1,26 +1,24 @@
 /*
     module  : user.c
-    version : 1.8
-    date    : 06/21/22
+    version : 1.9
+    date    : 09/19/23
 */
 #ifndef USER_C
 #define USER_C
 
 /**
-2400  user  :  DA	X  ->  B
+OK 2380  user  :  DA	X  ->  B
 Tests whether X is a user-defined symbol.
 */
-void do_user(void)
+void user_(pEnv env)
 {
-    char *str;
+    Node node;
 
-    ONEPARAM;
-    if (IS_USR_INDEX(stack[-1]))
-        stack[-1] = MAKE_BOOLEAN(1);
-    else if (IS_USR_STRING(stack[-1])) {
-        str = GET_AS_USR_STRING(stack[-1]);
-        stack[-1] = MAKE_BOOLEAN(*str != 0 && *str != '"');
-    } else
-        stack[-1] = MAKE_BOOLEAN(0);
+    PARM(1, ANYTYPE);
+    node = lst_pop(env->stck);
+    node.u.num = node.op == USR_ ||
+		 node.op == USR_STRING_ || node.op == USR_LIST_;
+    node.op = BOOLEAN_;
+    lst_push(env->stck, node);
 }
 #endif

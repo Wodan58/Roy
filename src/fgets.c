@@ -1,32 +1,32 @@
 /*
     module  : fgets.c
-    version : 1.11
-    date    : 06/21/22
+    version : 1.12
+    date    : 09/19/23
 */
 #ifndef FGETS_C
 #define FGETS_C
 
 /**
-1890  fgets  :  A	S  ->  S L
+OK 1880  fgets  :  A	S  ->  S L
 L is the next available line (as a string) from stream S.
 */
-void do_fgets(void)
+void fgets_(pEnv env)
 {
-    FILE *fp;
+    Node node;
     char *buf;
-    int leng = 1, size = INPLINEMAX;
+    size_t leng, size = INPLINEMAX;
 
-    COMPILE;
-    ONEPARAM;
-    FILE1;
-    fp = GET_AS_FILE(stack[-1]);
+    PARM(1, FGET);
+    node = lst_back(env->stck);
     buf = GC_malloc_atomic(size);
-    *buf = '"';
-    while (fgets(buf + leng, size - leng, fp)) {
-        if ((leng = strlen(buf)) > 0 && buf[leng - 1] == '\n')
-            break;
-        buf = GC_realloc(buf, size <<= 1);
+    buf[leng = 0] = 0;
+    while (fgets(buf + leng, size - leng, node.u.fil)) {
+	if ((leng = strlen(buf)) > 0 && buf[leng - 1] == '\n')
+	    break;
+	buf = GC_realloc(buf, size <<= 1);
     }
-    do_push(MAKE_USR_STRING(buf));
+    node.u.str = buf;
+    node.op = STRING_;
+    lst_push(env->stck, node);
 }
 #endif

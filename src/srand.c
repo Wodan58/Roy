@@ -1,19 +1,21 @@
 /*
     module  : srand.c
-    version : 1.11
-    date    : 06/21/22
+    version : 1.12
+    date    : 09/19/23
 */
 #ifndef SRAND_C
 #define SRAND_C
 
 /**
-1780  srand  :  D	I  ->
+OK 1780  srand  :  D	I  ->
 Sets the random integer seed to integer I.
 */
-void do_srand(void)
+void srand_(pEnv env)
 {
-    COMPILE;
-    ONEPARAM;
-    srand(GET_AS_INTEGER(stack_pop()));
+    Node node;
+
+    PARM(1, UNMKTIME);
+    node = lst_pop(env->stck);
+    srand(node.u.num);
 }
 #endif

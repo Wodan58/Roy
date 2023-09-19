@@ -1,21 +1,26 @@
 /*
     module  : pick.c
-    version : 1.7
-    date    : 06/21/22
+    version : 1.8
+    date    : 09/19/23
 */
 #ifndef PICK_C
 #define PICK_C
 
 /**
-3230  pick  :  A	X Y Z 2  ->  X Y Z X
-Pushes an extra copy of nth (e.g. 2) item X on top of the stack.
+OK 3220  pick  :  DA	X Y Z 2  ->  X Y Z X
+[EXT] Pushes an extra copy of nth (e.g. 2) item X on top of the stack.
 */
-void do_pick(void)
+void pick_(pEnv env)
 {
-    int num;
+    int size;
+    Node node, temp;
 
-    FOURPARAMS;
-    if ((num = GET_AS_INTEGER(stack[-1])) < stack_size() - 1)
-        stack[-1] = stack[-2 - num];
+    PARM(1, UNMKTIME);
+    node = lst_pop(env->stck);
+    size = lst_size(env->stck);
+    if (node.u.num < size) {
+	temp = lst_at(env->stck, size - node.u.num - 1);
+	lst_push(env->stck, temp);
+    }
 }
 #endif

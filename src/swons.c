@@ -1,59 +1,47 @@
 /*
     module  : swons.c
-    version : 1.10
-    date    : 06/21/22
+    version : 1.11
+    date    : 09/19/23
 */
 #ifndef SWONS_C
 #define SWONS_C
 
 /**
-2030  swons  :  DDA	A X  ->  B
+OK 2020  swons  :  DDA	A X  ->  B
 Aggregate B is A with a new member X (first member for sequences).
 */
-void swons_lst(void)
+void swons_(pEnv env)
 {
-    value_t temp;
-    Stack *list, *quot;
+    Node elem, aggr, node;
 
-    temp = stack_pop();
-    list = (Stack *)GET_AS_LIST(stack[-1]);
-    vec_shallow_copy_take_ownership(quot, list);
-    vec_push(quot, temp);
-    stack[-1] = MAKE_LIST(quot);
-}
+    PARM(2, HAS);
+    elem = lst_pop(env->stck);
+    aggr = lst_pop(env->stck);
+    switch (aggr.op) {
+    case LIST_:
+	lst_init(node.u.lis);
+	if (lst_size(aggr.u.lis))
+	    lst_shallow_copy_take_ownership(node.u.lis, aggr.u.lis);
+	lst_push(node.u.lis, elem);
+	break;
 
-void swons_str(void)
-{
-    char ch, *str, *result;
+    case STRING_:
+    case BIGNUM_:
+    case USR_STRING_:
+	node.u.str = GC_malloc_atomic(strlen(aggr.u.str) + 2);
+	node.u.str[0] = elem.u.num;
+	strcpy(&node.u.str[1], aggr.u.str);
+	break;
 
-    CHARACTER;
-    ch = GET_AS_CHAR(stack_pop());
-    str = get_string(stack[-1]);
-    result = GC_malloc_atomic(strlen(str) + 3);
-    *result = '"';
-    result[1] = ch;
-    strcpy(result + 2, str);
-    stack[-1] = MAKE_USR_STRING(result);
-}
+    case SET_:
+	node.u.set = aggr.u.set | ((int64_t)1 << elem.u.num);
+	break;
 
-void swons_set(void)
-{
-    CHECKSETMEMBER(stack[-1]);
-    stack[-2] = MAKE_SET(
-        GET_AS_SET(stack[-2]) | (uint64_t)1 << GET_AS_INTEGER(stack[-1]));
-    stack_pop();
-}
-
-void do_swons(void)
-{
-    TWOPARAMS;
-    if (IS_LIST(stack[-2]))
-        swons_lst();
-    else if (IS_USR_STRING(stack[-2]))
-        swons_str();
-    else if (IS_SET(stack[-2]))
-        swons_set();
-    else
-        BADAGGREGATE;
+    default:
+	node = aggr;
+	break;
+    }
+    node.op = aggr.op;
+    lst_push(env->stck, node);
 }
 #endif

@@ -1,18 +1,22 @@
 /*
     module  : stack.c
-    version : 1.13
-    date    : 06/21/22
+    version : 1.14
+    date    : 09/19/23
 */
 #ifndef STACK_C
 #define STACK_C
 
 /**
-1040  stack  :  A	.. X Y Z  ->  .. X Y Z [Z Y X ..]
+OK 1040  stack  :  A	.. X Y Z  ->  .. X Y Z [Z Y X ..]
 Pushes the stack as a list.
 */
-void do_stack(void)
+PRIVATE void stack_(pEnv env)
 {
-    COMPILE;
-    do_push(MAKE_LIST(stack_copy()));
+    Node node;
+
+    lst_init(node.u.lis);
+    lst_copy(node.u.lis, env->stck);
+    node.op = LIST_;
+    lst_push(env->stck, node);
 }
 #endif

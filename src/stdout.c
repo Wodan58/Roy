@@ -1,18 +1,21 @@
 /*
     module  : stdout.c
-    version : 1.9
-    date    : 06/21/22
+    version : 1.10
+    date    : 09/19/23
 */
 #ifndef STDOUT_C
 #define STDOUT_C
 
 /**
-1180  stdout  :  A	->  S
+OK 1180  stdout  :  A	->  S
 Pushes the standard output stream.
 */
-void do_stdout(void)
+void stdout_(pEnv env)
 {
-    COMPILE;
-    do_push(MAKE_FILE(stdout));
+    Node node;
+
+    node.u.fil = stdout;
+    node.op = FILE_;
+    lst_push(env->stck, node);
 }
 #endif

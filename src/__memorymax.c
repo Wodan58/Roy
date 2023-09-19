@@ -1,17 +1,21 @@
 /*
     module  : __memorymax.c
-    version : 1.11
-    date    : 06/23/22
+    version : 1.12
+    date    : 09/19/23
 */
-#ifndef _LOWBAR__LOWBAR_MEMORYMAX_C
-#define _LOWBAR__LOWBAR_MEMORYMAX_C
+#ifndef __MEMORYMAX_C
+#define __MEMORYMAX_C
 
 /**
-1160  __memorymax  :  A 	->  I
+OK 1160  __memorymax  :  A 	->  I
 Pushes value of total size of memory.
 */
-void do__lowbar__lowbar_memorymax(void)
+void __memorymax_(pEnv env)
 {
-    do_push(MAKE_INTEGER(GC_get_memory_use()));
+    Node node;
+
+    node.u.num = GC_get_memory_use() + GC_get_free_bytes();
+    node.op = INTEGER_;
+    lst_push(env->stck, node);
 }
 #endif

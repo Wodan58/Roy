@@ -1,19 +1,23 @@
 /*
     module  : file.c
-    version : 1.8
-    date    : 06/21/22
+    version : 1.9
+    date    : 09/19/23
 */
 #ifndef FILE_C
 #define FILE_C
 
 /**
-2420  file  :  DA	F  ->  B
+OK 2400  file  :  DA	F  ->  B
 Tests whether F is a file.
 */
-void do_file(void)
+void file_(pEnv env)
 {
-    COMPILE;
-    ONEPARAM;
-    stack[-1] = MAKE_BOOLEAN(IS_FILE(stack[-1]));
+    Node node;
+
+    PARM(1, ANYTYPE);
+    node = lst_pop(env->stck);
+    node.u.num = node.op == FILE_;
+    node.op = BOOLEAN_;
+    lst_push(env->stck, node);
 }
 #endif

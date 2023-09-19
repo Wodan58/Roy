@@ -1,44 +1,24 @@
 /*
     module  : ifchar.c
-    version : 1.9
-    date    : 06/21/22
+    version : 1.10
+    date    : 09/19/23
 */
 #ifndef IFCHAR_C
 #define IFCHAR_C
 
 /**
-2640  ifchar  :  DDDU 	X [T] [E]  ->  ...
+OK 2620  ifchar  :  DDDP	X [T] [E]  ->  ...
 If X is a character, executes T else executes E.
 */
-void ifchar(Stack *prog[])
+void ifchar_(pEnv env)
 {
-    ONEPARAM;
-    if (IS_CHAR(stack[-1]))
-        execute(prog[0]);
-    else
-        execute(prog[1]);
-}
+    Node first, second, node;
 
-#ifdef COMPILING
-void put_ifchar(Stack *prog[])
-{
-    fprintf(program, "if (IS_CHAR(stack[-1])) {");
-    compile(prog[0]);
-    fprintf(program, "} else {");
-    compile(prog[1]);
-    fprintf(program, "}");
-}
-#endif
-
-void do_ifchar(void)
-{
-    Stack *prog[2];
-
-    TWOPARAMS;
-    TWOQUOTES;
-    prog[1] = (Stack *)GET_AS_LIST(stack_pop());
-    prog[0] = (Stack *)GET_AS_LIST(stack_pop());
-    INSTANT(put_ifchar);
-    ifchar(prog);
+    PARM(3, WHILE);
+    second = lst_pop(env->stck);
+    first = lst_pop(env->stck);
+    node = lst_back(env->stck);
+    node = node.op == CHAR_ ? first : second;
+    exeterm(env, node.u.lis);
 }
 #endif

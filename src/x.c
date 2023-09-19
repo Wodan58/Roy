@@ -1,19 +1,21 @@
 /*
     module  : x.c
-    version : 1.10
-    date    : 06/21/22
+    version : 1.11
+    date    : 09/19/23
 */
 #ifndef X_C
 #define X_C
 
 /**
-2440  x  :  U 	[P] x  ->  ...
+OK 2420  x  :  P	[P] x  ->  ...
 Executes P without popping [P]. So, [P] x  ==  [P] P.
 */
-void do_x(void)
+void x_(pEnv env)
 {
-    ONEPARAM;
-    ONEQUOTE;
-    execute((Stack *)GET_AS_LIST(stack[-1]));
+    Node node;
+
+    PARM(1, DIP);
+    node = lst_back(env->stck);
+    exeterm(env, node.u.lis);
 }
 #endif

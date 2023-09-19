@@ -1,29 +1,30 @@
 /*
     module  : round.c
-    version : 1.9
-    date    : 06/21/22
+    version : 1.10
+    date    : 09/19/23
 */
 #ifndef ROUND_C
 #define ROUND_C
 
 /**
-3250  round  :  DA	F  ->  G
-G is F rounded to the nearest integer.
+OK 3230  round  :  DA	F  ->  G
+[EXT] G is F rounded to the nearest integer.
 */
 double round2(double num)
 {
     if (num < 0)
-        return -floor(-num + 0.5);
+	return -floor(-num + 0.5);
     return floor(num + 0.5);
 }
 
-void do_round(void)
+void round_(pEnv env)
 {
-    double dbl;
+    Node node;
 
-    ONEPARAM;
-    dbl = GET_AS_DOUBLE(stack[-1]);
-    dbl = round2(dbl);
-    stack[-1] = MAKE_DOUBLE(dbl);
+    PARM(1, UFLOAT);
+    node = lst_pop(env->stck);
+    node.u.dbl = round2(node.op == FLOAT_ ? node.u.dbl : node.u.num);
+    node.op = FLOAT_;
+    lst_push(env->stck, node);
 }
 #endif

@@ -1,18 +1,23 @@
 /*
     module  : integer.c
-    version : 1.10
-    date    : 06/21/22
+    version : 1.11
+    date    : 09/19/23
 */
 #ifndef INTEGER_C
 #define INTEGER_C
 
 /**
-2330  integer  :  DA	X  ->  B
+OK 2310  integer  :  DA	X  ->  B
 Tests whether X is an integer.
 */
-void do_integer(void)
+void integer_(pEnv env)
 {
-    ONEPARAM;
-    stack[-1] = MAKE_BOOLEAN(IS_INTEGER(stack[-1]));
+    Node node;
+
+    PARM(1, ANYTYPE);
+    node = lst_pop(env->stck);
+    node.u.num = node.op == INTEGER_;
+    node.op = BOOLEAN_;
+    lst_push(env->stck, node);
 }
 #endif

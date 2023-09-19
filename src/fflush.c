@@ -1,23 +1,21 @@
 /*
     module  : fflush.c
-    version : 1.9
-    date    : 06/21/22
+    version : 1.10
+    date    : 09/19/23
 */
 #ifndef FFLUSH_C
 #define FFLUSH_C
 
 /**
-1860  fflush  :  N	S  ->  S
+OK 1860  fflush  :  N	S  ->  S
 Flush stream S, forcing all buffered output to be written.
 */
-void do_fflush(void)
+void fflush_(pEnv env)
 {
-    FILE *fp;
+    Node node;
 
-    COMPILE;
-    ONEPARAM;
-    FILE1;
-    fp = GET_AS_FILE(stack[-1]);
-    fflush(fp);
+    PARM(1, FGET);
+    node = lst_back(env->stck);
+    fflush(node.u.fil);
 }
 #endif

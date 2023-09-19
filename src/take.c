@@ -1,73 +1,64 @@
 /*
     module  : take.c
-    version : 1.15
-    date    : 06/21/22
+    version : 1.16
+    date    : 09/19/23
 */
 #ifndef TAKE_C
 #define TAKE_C
 
 /**
-2150  take  :  DDA	A N  ->  B
+OK 2140  take  :  DDA	A N  ->  B
 Aggregate B is the result of retaining just the first N elements of A.
 */
-void take_lst(void)
+void take_(pEnv env)
 {
-    int i, num, leng;
-    Stack *list, *result = 0;
+    int i, j;
+    Node elem, aggr, node;
 
-    num = GET_AS_INTEGER(stack_pop());
-    list = (Stack *)GET_AS_LIST(stack[-1]);
-    leng = vec_size(list);
-    if (num < 0 || num >= leng)
-        INDEXTOOLARGE;
-    for (i = leng - num; i < leng; i++)
-        vec_push(result, vec_at(list, i));
-    stack[-1] = MAKE_LIST(result);
-}
+    PARM(2, TAKE);
+    elem = lst_pop(env->stck);
+    aggr = lst_pop(env->stck);
+    switch (aggr.op) {
+    case LIST_:
+	j = lst_size(aggr.u.lis);
+	if (elem.u.num >= j)
+	    node = aggr;
+	else {
+	    lst_init(node.u.lis);
+	    for (i = j - elem.u.num; i < j; i++)
+		lst_push(node.u.lis, lst_at(aggr.u.lis, i));
+	    node.op = LIST_;
+	}
+	break;
 
-void take_str(void)
-{
-    int num;
-    char *ptr, *str;
+    case STRING_:
+    case BIGNUM_:
+    case USR_STRING_:
+	j = strlen(aggr.u.str);
+	if (elem.u.num >= j)
+	    node = aggr;
+	else {
+	    node.u.str = GC_malloc_atomic(elem.u.num + 1);
+	    strncpy(node.u.str, aggr.u.str, elem.u.num);
+	    node.u.str[elem.u.num] = 0;
+	    node.op = STRING_;
+	}
+	break;
 
-    num = GET_AS_INTEGER(stack_pop());
-    ptr = get_string(stack[-1]);
-    if (num < 0 || num >= strlen(ptr))
-	INDEXTOOLARGE;
-    str = GC_malloc_atomic(num + 2);
-    *str = '"';
-    strncpy(str + 1, ptr, num);
-    str[num + 1] = 0;
-    stack[-1] = MAKE_USR_STRING(str);
-}
+    case SET_:
+	node.u.set = 0;
+	for (i = 0, j = 1; i < SETSIZE && elem.u.num; i++, j <<= 1)
+	    if (aggr.u.set & j) {
+		node.u.set |= j;
+		elem.u.num--;
+	    }
+	node.op = SET_;
+	break;
 
-void take_set(void)
-{
-    int i, num;
-    uint64_t j, set, result = 0;
-
-    num = GET_AS_INTEGER(stack_pop());
-    if (num < 0 || num >= SETSIZE_)
-	INDEXTOOLARGE;
-    set = GET_AS_SET(stack[-1]);
-    for (i = 0, j = 1; i < SETSIZE_ && num; i++, j <<= 1)
-        if (set & j) {
-            result |= j;
-            num--;
-        }
-    stack[-1] = MAKE_SET(result);
-}
-
-void do_take(void)
-{
-    TWOPARAMS;
-    if (IS_LIST(stack[-2]))
-        take_lst();
-    else if (IS_USR_STRING(stack[-2]))
-        take_str();
-    else if (IS_SET(stack[-2]))
-        take_set();
-    else
-        BADAGGREGATE;
+    default:
+	node = aggr;
+	break;
+    }
+    lst_push(env->stck, node);
 }
 #endif

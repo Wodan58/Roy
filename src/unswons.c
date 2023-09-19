@@ -1,63 +1,54 @@
 /*
     module  : unswons.c
-    version : 1.12
-    date    : 06/21/22
+    version : 1.13
+    date    : 09/19/23
 */
 #ifndef UNSWONS_C
 #define UNSWONS_C
 
 /**
-2130  unswons  :  DAA 	A  ->  R F
+OK 2120  unswons  :  DAA	A  ->  R F
 R and F are the rest and the first of non-empty aggregate A.
 */
-void unswons_lst(void)
+void unswons_(pEnv env)
 {
-    value_t temp;
-    Stack *list, *quot;
+    int i = 0;
+    Node node, temp;
 
-    CHECKEMPTYLIST(stack[-1]);
-    list = (Stack *)GET_AS_LIST(stack[-1]);
-    vec_shallow_copy(quot, list);
-    temp = vec_pop(quot);
-    stack[-1] = MAKE_LIST(quot);
-    do_push(temp);
-}
+    PARM(1, FIRST);
+    node = lst_pop(env->stck);
+    switch (node.op) {
+    case LIST_:
+	lst_init(temp.u.lis);
+	lst_shallow_copy(temp.u.lis, node.u.lis);
+	node = lst_pop(temp.u.lis);
+	temp.op = LIST_;
+	lst_push(env->stck, temp);
+	lst_push(env->stck, node);
+	break;
 
-void unswons_str(void)
-{
-    char ch, *str;
+    case STRING_:
+    case BIGNUM_:
+    case USR_STRING_:
+	temp.u.num = *node.u.str++;
+	node.u.str = GC_strdup(node.u.str);  
+	lst_push(env->stck, node);
+	temp.op = CHAR_;
+	lst_push(env->stck, temp);
+	break;
 
-    CHECKEMPTYSTRING(stack[-1]);
-    str = get_string(stack[-1]);
-    ch = *str++;
-    stack[-1] = MAKE_USR_STRING(stringify(str));
-    do_push(MAKE_CHAR(ch));
-}
+    case SET_:
+	while (!(node.u.set & ((int64_t)1 << i)))
+	    i++;
+	temp.u.num = i;
+	node.u.set &= ~((int64_t)1 << i);
+	lst_push(env->stck, node);
+	temp.op = INTEGER_;
+	lst_push(env->stck, temp);
+	break;
 
-void unswons_set(void)
-{
-    int i;
-    uint64_t j, set;
-
-    CHECKEMPTYSET(stack[-1]);
-    set = GET_AS_SET(stack[-1]);
-    for (i = 0, j = 1; i < SETSIZE_; i++, j <<= 1)
-        if (set & j)
-            break;
-    stack[-1] = MAKE_SET(set & ~j);
-    do_push(MAKE_INTEGER(i));
-}
-
-void do_unswons(void)
-{
-    ONEPARAM;
-    if (IS_LIST(stack[-1]))
-        unswons_lst();
-    else if (IS_USR_STRING(stack[-1]))
-        unswons_str();
-    else if (IS_SET(stack[-1]))
-        unswons_set();
-    else
-        BADAGGREGATE;
+    default:
+	break;
+    }
 }
 #endif

@@ -1,23 +1,25 @@
 /*
     module  : frename.c
-    version : 1.11
-    date    : 06/21/22
+    version : 1.12
+    date    : 09/19/23
 */
 #ifndef FRENAME_C
 #define FRENAME_C
 
 /**
-1940  frename  :  DDA 	P1 P2  ->  B
+OK 1930  frename  :  DDA	P1 P2  ->  B
 The file system object with pathname P1 is renamed to P2.
 B is a boolean indicating success or failure.
 */
-void do_frename(void)
+void frename_(pEnv env)
 {
-    COMPILE;
-    TWOPARAMS;
-    STRINGS2;
-    stack[-2]
-        = MAKE_BOOLEAN(!rename(get_string(stack[-2]), get_string(stack[-1])));
-    stack_pop();
+    Node node, path;
+
+    PARM(2, FOPEN);
+    path = lst_pop(env->stck);
+    node = lst_pop(env->stck);
+    node.u.num = !rename(node.u.str, path.u.str);
+    node.op = BOOLEAN_;
+    lst_push(env->stck, node);
 }
 #endif

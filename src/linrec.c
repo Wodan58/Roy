@@ -1,63 +1,45 @@
 /*
     module  : linrec.c
-    version : 1.19
-    date    : 06/21/22
+    version : 1.20
+    date    : 09/19/23
 */
 #ifndef LINREC_C
 #define LINREC_C
 
 /**
-2730  linrec  :  DDDDU	[P] [T] [R1] [R2]  ->  ...
+OK 2710  linrec  :  DDDDU	[P] [T] [R1] [R2]  ->  ...
 Executes P. If that yields true, executes T.
 Else executes R1, recurses, executes R2.
 */
-void linrec(Stack *prog[])
+void aux_linrec(pEnv env, NodeList *prog[4])
 {
-    execute_cond(prog[0], 0);
-    CHECKSTACK;
-    if (GET_AS_BOOLEAN(stack_pop()))
-        execute(prog[1]);
+    Node node;
+
+    exeterm(env, prog[0]);
+    node = lst_pop(env->stck);
+    if (node.u.num)
+	exeterm(env, prog[1]);
     else {
-        execute(prog[2]);
-        linrec(prog);
-        execute(prog[3]);
+	exeterm(env, prog[2]);
+	aux_linrec(env, prog);
+	exeterm(env, prog[3]);
     }
 }
 
-#ifdef COMPILING
-void put_linrec(Stack *prog[])
+void linrec_(pEnv env)
 {
-    static int ident;
-    int ch;
-    FILE *old;
+    Node node;
+    NodeList *prog[4];
 
-    printf("void linrec_%d(void);", ++ident);
-    fprintf(old = program, "linrec_%d();", ident);
-    program = my_tmpfile();
-    fprintf(program, "void linrec_%d(void) {", ident);
-    compile_cond(prog[0], 0);
-    fprintf(program, "if (GET_AS_BOOLEAN(stack_pop())) {");
-    compile(prog[1]);
-    fprintf(program, "} else {");
-    compile(prog[2]);
-    fprintf(program, "linrec_%d();", ident);
-    compile(prog[3]);
-    fprintf(program, "} }\n");
-    print_tmpfile(old);
-}
-#endif
-
-void do_linrec(void)
-{
-    Stack *prog[4];
-
-    FOURPARAMS;
-    FOURQUOTES;
-    prog[3] = (Stack *)GET_AS_LIST(stack_pop());
-    prog[2] = (Stack *)GET_AS_LIST(stack_pop());
-    prog[1] = (Stack *)GET_AS_LIST(stack_pop());
-    prog[0] = (Stack *)GET_AS_LIST(stack_pop());
-    INSTANT(put_linrec);
-    linrec(prog);
+    PARM(4, LINREC);
+    node = lst_pop(env->stck);
+    prog[3] = node.u.lis;
+    node = lst_pop(env->stck);
+    prog[2] = node.u.lis;
+    node = lst_pop(env->stck);
+    prog[1] = node.u.lis;
+    node = lst_pop(env->stck);
+    prog[0] = node.u.lis;
+    aux_linrec(env, prog);
 }
 #endif

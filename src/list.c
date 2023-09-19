@@ -1,18 +1,23 @@
 /*
     module  : list.c
-    version : 1.9
-    date    : 06/21/22
+    version : 1.10
+    date    : 09/19/23
 */
 #ifndef LIST_C
 #define LIST_C
 
 /**
-2380  list  :  DA	X  ->  B
+OK 2360  list  :  DA	X  ->  B
 Tests whether X is a list.
 */
-void do_list(void)
+void list_(pEnv env)
 {
-    ONEPARAM;
-    stack[-1] = MAKE_BOOLEAN(IS_LIST(stack[-1]));
+    Node node;
+
+    PARM(1, ANYTYPE);
+    node = lst_pop(env->stck);
+    node.u.num = node.op == LIST_;
+    node.op = BOOLEAN_;
+    lst_push(env->stck, node);
 }
 #endif

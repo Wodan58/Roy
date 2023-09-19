@@ -1,57 +1,52 @@
 /*
     module  : has.c
-    version : 1.12
-    date    : 06/21/22
+    version : 1.13
+    date    : 09/19/23
 */
 #ifndef HAS_C
 #define HAS_C
 
+#include "compare.h"
+
 /**
-2300  has  :  DDA	A X  ->  B
+OK 2290  has  :  DDA	A X  ->  B
 Tests whether aggregate A has X as a member.
 */
-void has_lst(void)
+void has_(pEnv env)
 {
-    int i;
-    Stack *list;
-    value_t temp;
+    int i, found = 0;
+    Node aggr, elem, node;
 
-    temp = stack_pop();
-    list = (Stack *)GET_AS_LIST(stack[-1]);
-    for (i = vec_size(list) - 1; i >= 0; i--)
-        if (!Compare(vec_at(list, i), temp))
-            break;
-    stack[-1] = MAKE_BOOLEAN(i >= 0);
-}
-
-void has_str(void)
-{
-    char ch, *str;
-
-    ch = GET_AS_CHAR(stack_pop());
-    str = get_string(stack[-1]);
-    for (; *str && *str != ch; str++)
-        ;
-    stack[-1] = MAKE_BOOLEAN(*str == ch);
-}
-
-void has_set(void)
-{
-    stack[-2] = MAKE_BOOLEAN(
-       (GET_AS_SET(stack[-2]) & (uint64_t)1 << GET_AS_INTEGER(stack[-1])) != 0);
-    stack_pop();
-}
-
-void do_has(void)
-{
-    TWOPARAMS;
-    if (IS_LIST(stack[-2]))
-        has_lst();
-    else if (IS_USR_STRING(stack[-2]))
-        has_str();
-    else if (IS_SET(stack[-2]))
-        has_set();
-    else
-        BADAGGREGATE;
+    PARM(2, HAS);
+    elem = lst_pop(env->stck);
+    aggr = lst_pop(env->stck);
+    switch (aggr.op) {
+    case LIST_:
+	for (i = lst_size(aggr.u.lis) - 1; i >= 0; i--) {
+	    node = lst_at(aggr.u.lis, i);
+	    if (!Compare(env, node, elem)) {
+		found = 1;
+		break;
+	    }
+	}
+	break;
+    case STRING_:
+    case BIGNUM_:
+    case USR_STRING_:
+	for (i = strlen(aggr.u.str) - 1; i >= 0; i--)
+	    if (aggr.u.str[i] == elem.u.num) {
+		found = 1;
+		break;
+	    }
+	break;
+    case SET_:
+	found = (aggr.u.set & ((int64_t)1 << elem.u.num)) > 0;
+	break;
+    default:
+	break;
+    }
+    node.u.num = found;
+    node.op = BOOLEAN_;
+    lst_push(env->stck, node);
 }
 #endif

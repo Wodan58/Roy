@@ -1,18 +1,21 @@
 /*
     module  : true.c
-    version : 1.10
-    date    : 06/21/22
+    version : 1.11
+    date    : 09/19/23
 */
 #ifndef TRUE_C
 #define TRUE_C
 
 /**
-1010  true  :  A	->  true
+IMMEDIATE 1010  true  :  A	->  true
 Pushes the value true.
 */
-void do_true(void)
+void true_(pEnv env)
 {
-    do_push(MAKE_BOOLEAN(1));
+    Node node;
+
+    node.u.num = 1;
+    node.op = BOOLEAN_;
+    lst_push(env->stck, node);
 }
-/* true.c */
 #endif

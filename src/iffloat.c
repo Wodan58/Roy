@@ -1,44 +1,24 @@
 /*
     module  : iffloat.c
-    version : 1.9
-    date    : 06/21/22
+    version : 1.10
+    date    : 09/19/23
 */
 #ifndef IFFLOAT_C
 #define IFFLOAT_C
 
 /**
-2690  iffloat  :  DDDU 	X [T] [E]  ->  ...
+OK 2670  iffloat  :  DDDP	X [T] [E]  ->  ...
 If X is a float, executes T else executes E.
 */
-void iffloat(Stack *prog[])
+void iffloat_(pEnv env)
 {
-    ONEPARAM;
-    if (IS_DOUBLE(stack[-1]))
-        execute(prog[0]);
-    else
-        execute(prog[1]);
-}
+    Node first, second, node;
 
-#ifdef COMPILING
-void put_iffloat(Stack *prog[])
-{
-    fprintf(program, "if (IS_DOUBLE(stack[-1])) {");
-    compile(prog[0]);
-    fprintf(program, "} else {");
-    compile(prog[1]);
-    fprintf(program, "}");
-}
-#endif
-
-void do_iffloat(void)
-{
-    Stack *prog[2];
-
-    TWOPARAMS;
-    TWOQUOTES;
-    prog[1] = (Stack *)GET_AS_LIST(stack_pop());
-    prog[0] = (Stack *)GET_AS_LIST(stack_pop());
-    INSTANT(put_iffloat);
-    iffloat(prog);
+    PARM(3, WHILE);
+    second = lst_pop(env->stck);
+    first = lst_pop(env->stck);
+    node = lst_back(env->stck);
+    node = node.op == FLOAT_ ? first : second;
+    exeterm(env, node.u.lis);
 }
 #endif

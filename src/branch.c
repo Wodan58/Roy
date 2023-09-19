@@ -1,36 +1,23 @@
 /*
     module  : branch.c
-    version : 1.11
-    date    : 06/21/22
+    version : 1.12
+    date    : 09/19/23
 */
 #ifndef BRANCH_C
 #define BRANCH_C
 
 /**
-2610  branch  :  DDDU 	B [T] [F]  ->  ...
+OK 2590  branch  :  DDDP	B [T] [F]  ->  ...
 If B is true, then executes T else executes F.
 */
-#ifdef COMPILING
-void put_branch(Stack *prog[])
+void branch_(pEnv env)
 {
-    fprintf(program, "{ if (GET_AS_BOOLEAN(stack_pop())) {");
-    compile(prog[0]);
-    fprintf(program, "} else {");
-    compile(prog[1]);
-    fprintf(program, "} }");
-}
-#endif
+    Node first, second, third;
 
-void do_branch(void)
-{
-    Stack *prog[2];
-
-    TWOPARAMS;
-    TWOQUOTES;
-    prog[1] = (Stack *)GET_AS_LIST(stack_pop());
-    prog[0] = (Stack *)GET_AS_LIST(stack_pop());
-    INSTANT(put_branch);
-    ONEPARAM;
-    execute(GET_AS_BOOLEAN(stack_pop()) ? prog[0] : prog[1]);
+    PARM(3, WHILE);
+    third = lst_pop(env->stck);
+    second = lst_pop(env->stck);
+    first = lst_pop(env->stck);
+    exeterm(env, first.u.num ? second.u.lis : third.u.lis);
 }
 #endif

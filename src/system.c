@@ -1,21 +1,23 @@
 /*
     module  : system.c
-    version : 1.9
-    date    : 06/21/22
+    version : 1.10
+    date    : 09/19/23
 */
 #ifndef SYSTEM_C
 #define SYSTEM_C
 
 /**
-3040  system  :  D	"command"  ->
+OK 3020  system  :  D	"command"  ->
 Escapes to shell, executes string "command".
 The string may cause execution of another program.
 When that has finished, the process returns to Joy.
 */
-void do_system(void)
+void system_(pEnv env)
 {
-    COMPILE;
-    STRING;
-    system(get_string(stack_pop()));
+    Node node;
+
+    PARM(1, STRTOD);
+    node = lst_pop(env->stck);
+    system(node.u.str);
 }
 #endif

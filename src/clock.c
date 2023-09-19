@@ -1,18 +1,21 @@
 /*
     module  : clock.c
-    version : 1.10
-    date    : 06/21/22
+    version : 1.11
+    date    : 09/19/23
 */
 #ifndef CLOCK_C
 #define CLOCK_C
 
 /**
-1130  clock  :  A	->  I
+OK 1130  clock  :  A	->  I
 Pushes the integer value of current CPU usage in milliseconds.
 */
-void do_clock(void)
+void clock_(pEnv env)
 {
-    COMPILE;
-    do_push(MAKE_INTEGER(clock() - startclock));
+    Node node;
+
+    node.u.num = ((clock() - env->startclock) * 1000) / CLOCKS_PER_SEC;
+    node.op = INTEGER_;
+    lst_push(env->stck, node);
 }
 #endif

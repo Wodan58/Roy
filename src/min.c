@@ -1,54 +1,52 @@
 /*
     module  : min.c
-    version : 1.9
-    date    : 06/21/22
+    version : 1.10
+    date    : 09/19/23
 */
 #ifndef MIN_C
 #define MIN_C
 
 /**
-1820  min  :  DDA	N1 N2  ->  N
+OK 1820  min  :  DDA	N1 N2  ->  N
 N is the minimum of numeric values N1 and N2.  Also supports float.
 */
-void f_min(void)
+void min_(pEnv env)
 {
-    value_t temp;
-    double dbl1, dbl2;
+    Node first, second;
 
-    NUMBERS2;
-    temp = stack_pop();
-    dbl2 = GET_AS_NUMBER(temp);
-    dbl1 = GET_AS_NUMBER(stack[-1]);
-    if (dbl1 > dbl2)
-        stack[-1] = temp;
-}
+    PARM(2, MAXMIN);
+    second = lst_pop(env->stck);
+    first = lst_pop(env->stck);
+    switch (first.op) {
+    case FLOAT_:
+	switch (second.op) {
+	case FLOAT_:
+	    if (second.u.dbl < first.u.dbl)
+		first.u.dbl = second.u.dbl;
+	    break;
 
-void i_min(void)
-{
-    value_t tmp1, tmp2;
+	default:
+	    if (second.u.num < first.u.dbl)
+		first.u.dbl = second.u.num;
+	    break;
+	}
+	break;
 
-    SAME2TYPES;
-    NUMERICTYPE;
-    tmp2 = stack_pop();
-    tmp1 = stack[-1];
-    if (IS_INTEGER(tmp1)) {
-        if (GET_AS_INTEGER(tmp1) > GET_AS_INTEGER(tmp2))
-            stack[-1] = tmp2;
-    } else if (IS_CHAR(tmp1)) {
-        if (GET_AS_CHAR(tmp1) > GET_AS_CHAR(tmp2))
-            stack[-1] = tmp2;
-    } else if (IS_BOOLEAN(tmp1)) {
-        if (GET_AS_BOOLEAN(tmp1) > GET_AS_BOOLEAN(tmp2))
-            stack[-1] = tmp2;
+    default:
+	switch (second.op) {
+	case FLOAT_:
+	    if (first.u.num < second.u.dbl)
+		second.u.dbl = first.u.num;
+	    lst_push(env->stck, second);
+	    return;
+
+	default:
+	    if (second.u.num < first.u.num)
+		first.u.num = second.u.num;
+	    break;
+	}
+	break;
     }
-}
-
-void do_min(void)
-{
-    TWOPARAMS;
-    if (IS_DOUBLE(stack[-1]) || IS_DOUBLE(stack[-2]))
-        f_min();
-    else
-        i_min();
+    lst_push(env->stck, first);
 }
 #endif

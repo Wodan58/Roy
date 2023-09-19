@@ -1,23 +1,27 @@
 /*
     module  : rolldownd.c
-    version : 1.8
-    date    : 06/21/22
+    version : 1.9
+    date    : 09/19/23
 */
 #ifndef ROLLDOWND_C
 #define ROLLDOWND_C
 
 /**
-1300  rolldownd  :  DDDDAAAA	X Y Z W  ->  Y Z X W
+OK 1300  rolldownd  :  DDDDAAAA	X Y Z W  ->  Y Z X W
 As if defined by:   rolldownd  ==  [rolldown] dip
 */
-void do_rolldownd(void)
+void rolldownd_(pEnv env)
 {
-    value_t temp;
+    Node first, second, third, fourth;
 
-    FOURPARAMS;
-    temp = stack[-4];
-    stack[-4] = stack[-3];
-    stack[-3] = stack[-2];
-    stack[-2] = temp;
+    PARM(4, ANYTYPE);
+    fourth = lst_pop(env->stck);
+    third = lst_pop(env->stck);
+    second = lst_pop(env->stck);
+    first = lst_pop(env->stck);
+    lst_push(env->stck, second);
+    lst_push(env->stck, third);
+    lst_push(env->stck, first);
+    lst_push(env->stck, fourth);
 }
 #endif

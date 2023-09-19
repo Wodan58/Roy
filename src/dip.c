@@ -1,43 +1,23 @@
 /*
     module  : dip.c
-    version : 1.13
-    date    : 06/21/22
+    version : 1.14
+    date    : 09/19/23
 */
 #ifndef DIP_C
 #define DIP_C
 
 /**
-2450  dip  :  DDAU	X [P]  ->  ...  X
+OK 2430  dip  :  DDAP	X [P]  ->  ...  X
 Saves X, executes P, pushes X back.
 */
-void dip(Stack *prog)
+PRIVATE void dip_(pEnv env)
 {
-    value_t temp;
+    Node list, node;
 
-    ONEPARAM;
-    temp = stack_pop();
-    execute(prog);
-    do_push(temp);
-}
-
-#ifdef COMPILING
-void put_dip(Stack *prog)
-{
-    fprintf(program, "{ value_t temp;");
-    fprintf(program, "temp = stack_pop();");
-    compile(prog);
-    fprintf(program, "do_push(temp); }");
-}
-#endif
-
-void do_dip(void)
-{
-    Stack *prog;
-
-    ONEPARAM;
-    ONEQUOTE;
-    prog = (Stack *)GET_AS_LIST(stack_pop());
-    INSTANT(put_dip);
-    dip(prog);
+    PARM(2, DIP);
+    list = lst_pop(env->stck);
+    node = lst_pop(env->stck);
+    exeterm(env, list.u.lis);
+    lst_push(env->stck, node);
 }
 #endif

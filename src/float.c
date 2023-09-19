@@ -1,18 +1,23 @@
 /*
     module  : float.c
-    version : 1.9
-    date    : 06/21/22
+    version : 1.10
+    date    : 09/19/23
 */
 #ifndef FLOAT_C
 #define FLOAT_C
 
 /**
-2410  float  :  DA	R  ->  B
+OK 2390  float  :  DA	R  ->  B
 Tests whether R is a float.
 */
-void do_float(void)
+void float_(pEnv env)
 {
-    ONEPARAM;
-    stack[-1] = MAKE_BOOLEAN(IS_DOUBLE(stack[-1]));
+    Node node;
+
+    PARM(1, ANYTYPE);
+    node = lst_pop(env->stck);
+    node.u.num = node.op == FLOAT_;
+    node.op = BOOLEAN_;
+    lst_push(env->stck, node);
 }
 #endif

@@ -1,24 +1,18 @@
 /*
     module  : app3.c
-    version : 1.6
-    date    : 06/21/22
+    version : 1.7
+    date    : 09/19/23
 */
 #ifndef APP3_C
 #define APP3_C
 
-#ifdef UNARY3_X
-#undef UNARY3_X
-#undef UNARY3_C
-#endif
-
-#include "unary3.c"
-
 /**
-2560  app3  :  DDDDAAA	X1 X2 X3 [P]  ->  R1 R2 R3
+OK 2540  app3  :  DDDDAAA	X1 X2 X3 [P]  ->  R1 R2 R3
 Obsolescent.  == unary3
 */
-void do_app3(void)
+void app3_(pEnv env)
 {
-    do_unary3();
+    unary3_(env);
+    /* nothing */
 }
 #endif

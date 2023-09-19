@@ -1,22 +1,23 @@
 /*
     module  : swap.c
-    version : 1.11
-    date    : 06/21/22
+    version : 1.12
+    date    : 09/19/23
 */
 #ifndef SWAP_C
 #define SWAP_C
 
 /**
-1220  swap  :  DDAA	X Y  ->  Y X
+OK 1220  swap  :  DDAA	X Y  ->  Y X
 Interchanges X and Y on top of the stack.
 */
-void do_swap(void)
+void swap_(pEnv env)
 {
-    value_t temp;
+    Node first, second;
 
-    TWOPARAMS;
-    temp = stack[-1];
-    stack[-1] = stack[-2];
-    stack[-2] = temp;
+    PARM(2, ANYTYPE);
+    second = lst_pop(env->stck);
+    first = lst_pop(env->stck);
+    lst_push(env->stck, second);
+    lst_push(env->stck, first);
 }
 #endif

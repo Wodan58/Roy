@@ -1,22 +1,27 @@
 /*
     module  : compare.c
-    version : 1.10
-    date    : 06/21/22
+    version : 1.11
+    date    : 09/19/23
 */
 #ifndef COMPARE_C
 #define COMPARE_C
 
-/**
-2060  compare  :  DDA 	A B  ->  I
-I (=-1,0,+1) is the comparison of aggregates A and B.
-The values correspond to the predicates <, =, >.
-*/
-void do_compare(void)
-{
-    value_t temp;
+#include "compare.h"
 
-    TWOPARAMS;
-    temp = stack_pop();
-    stack[-1] = MAKE_INTEGER(Compare(stack[-1], temp));
+/**
+OK 2050  compare  :  DDA	A B  ->  I
+I (=-1,0,+1) is the comparison of aggregates A and B.
+The values correspond to the predicates <=, =, >=.
+*/
+void compare_(pEnv env)
+{
+    Node first, second;
+
+    PARM(2, ANYTYPE);
+    second = lst_pop(env->stck);
+    first = lst_pop(env->stck);
+    first.u.num = Compare(env, first, second);
+    first.op = INTEGER_;
+    lst_push(env->stck, first);
 }
 #endif

@@ -1,26 +1,25 @@
 /*
     module  : neg.c
-    version : 1.9
-    date    : 06/21/22
+    version : 1.10
+    date    : 09/19/23
 */
 #ifndef NEG_C
 #define NEG_C
 
 /**
-1450  neg  :  DA	I  ->  J
+OK 1450  neg  :  DA	I  ->  J
 Integer J is the negative of integer I.  Also supports float.
 */
-void do_neg(void)
+void neg_(pEnv env)
 {
-    double dbl;
+    Node node;
 
-    ONEPARAM;
-    NUMBER;
-    if (IS_DOUBLE(stack[-1])) {
-        dbl = GET_AS_DOUBLE(stack[-1]);
-        dbl = -dbl;
-        stack[-1] = MAKE_DOUBLE(dbl);
-    } else if (IS_INTEGER(stack[-1]))
-        stack[-1] = MAKE_INTEGER(-GET_AS_INTEGER(stack[-1]));
+    PARM(1, UFLOAT);
+    node = lst_pop(env->stck);
+    if (node.op == FLOAT_)
+	node.u.dbl = -node.u.dbl;
+    else
+	node.u.num = -node.u.num;
+    lst_push(env->stck, node);
 }
 #endif

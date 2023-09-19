@@ -1,73 +1,52 @@
 /*
     module  : of.c
-    version : 1.9
-    date    : 06/21/22
+    version : 1.10
+    date    : 09/19/23
 */
 #ifndef OF_C
 #define OF_C
 
 /**
-2080  of  :  DDA	I A  ->  X
+OK 2070  of  :  DDA	I A  ->  X
 X (= A[I]) is the I-th member of aggregate A.
 */
-void of_lst(void)
+void of_(pEnv env)
 {
-    int index;
-    Stack *quot;
+    int i, j;
+    Node elem, aggr, node;
 
-    CHECKEMPTYLIST(stack[-1]);
-    quot = (Stack *)GET_AS_LIST(stack_pop());
-    INTEGER;
-    index = vec_size(quot) - 1 - GET_AS_INTEGER(stack[-1]);
-    if (index < 0 || index >= vec_size(quot))
-        INDEXTOOLARGE;
-    stack[-1] = vec_at(quot, index);
-}
+    PARM(2, OF);
+    aggr = lst_pop(env->stck);
+    elem = lst_pop(env->stck);
+    switch (aggr.op) {
+    case LIST_:
+	node = lst_at(aggr.u.lis, lst_size(aggr.u.lis) - elem.u.num - 1);
+	lst_push(env->stck, node);
+	break;
 
-void of_str(void)
-{
-    int index;
-    char *str;
+    case STRING_:
+    case BIGNUM_:
+    case USR_STRING_:
+	node.u.num = aggr.u.str[elem.u.num];
+	node.op = CHAR_;
+	lst_push(env->stck, node);
+	break;
 
-    CHECKEMPTYSTRING(stack[-1]);
-    str = get_string(stack_pop());
-    INTEGER;
-    index = GET_AS_INTEGER(stack[-1]);
-    if (index < 0 || index >= strlen(str))
-        INDEXTOOLARGE;
-    stack[-1] = MAKE_CHAR(str[index]);
-}
+    case SET_:
+	for (j = elem.u.num, i = 0; i < SETSIZE; i++)
+	    if (aggr.u.set & ((int64_t)1 << i)) {
+		if (!j) {
+		    node.u.num = i;
+		    node.op = INTEGER_;
+		    lst_push(env->stck, node);
+		    break;
+		}
+		j--;
+	    }
+	break;
 
-void of_set(void)
-{
-    uint64_t set;
-    int i, index;
-
-    CHECKEMPTYSET(stack[-1]);
-    set = GET_AS_SET(stack_pop());
-    INTEGER;
-    index = GET_AS_INTEGER(stack[-1]);
-    for (i = 0; i < SETSIZE_; i++)
-        if (set & ((uint64_t)1 << i)) {
-            if (!index) {
-                stack[-1] = MAKE_INTEGER(i);
-                return;
-            }
-            index--;
-        }
-    INDEXTOOLARGE;
-}
-
-void do_of(void)
-{
-    TWOPARAMS;
-    if (IS_LIST(stack[-1]))
-        of_lst();
-    else if (IS_USR_STRING(stack[-1]))
-        of_str();
-    else if (IS_SET(stack[-1]))
-        of_set();
-    else
-        BADAGGREGATE;
+    default:
+	break;
+    }
 }
 #endif

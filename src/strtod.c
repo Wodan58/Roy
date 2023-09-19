@@ -1,22 +1,23 @@
 /*
     module  : strtod.c
-    version : 1.10
-    date    : 06/21/22
+    version : 1.11
+    date    : 09/19/23
 */
 #ifndef STRTOD_C
 #define STRTOD_C
 
 /**
-1750  strtod  :  DA	S  ->  R
+OK 1750  strtod  :  DA	S  ->  R
 String S is converted to the float R.
 */
-void do_strtod(void)
+void strtod_(pEnv env)
 {
-    double dbl;
+    Node node;
 
-    ONEPARAM;
-    STRING;
-    dbl = strtod(get_string(stack[-1]), 0);
-    stack[-1] = MAKE_DOUBLE(dbl);
+    PARM(1, STRTOD);
+    node = lst_pop(env->stck);
+    node.u.dbl = strtod(node.u.str, 0);
+    node.op = FLOAT_;
+    lst_push(env->stck, node);
 }
 #endif

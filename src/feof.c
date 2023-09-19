@@ -1,23 +1,23 @@
 /*
     module  : feof.c
-    version : 1.9
-    date    : 06/21/22
+    version : 1.10
+    date    : 09/19/23
 */
 #ifndef FEOF_C
 #define FEOF_C
 
 /**
-1840  feof  :  A	S  ->  S B
+OK 1840  feof  :  A	S  ->  S B
 B is the end-of-file status of stream S.
 */
-void do_feof(void)
+void feof_(pEnv env)
 {
-    FILE *fp;
+    Node node;
 
-    COMPILE;
-    ONEPARAM;
-    FILE1;
-    fp = GET_AS_FILE(stack[-1]);
-    do_push(MAKE_BOOLEAN(feof(fp) != 0));
+    PARM(1, FGET);
+    node = lst_back(env->stck);
+    node.u.num = feof(node.u.fil);
+    node.op = BOOLEAN_;
+    lst_push(env->stck, node);    
 }
 #endif

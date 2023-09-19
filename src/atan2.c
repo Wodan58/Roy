@@ -1,24 +1,25 @@
 /*
     module  : atan2.c
-    version : 1.8
-    date    : 06/21/22
+    version : 1.9
+    date    : 09/19/23
 */
 #ifndef ATAN2_C
 #define ATAN2_C
 
 /**
-1520  atan2  :  DDA	F G  ->  H
+OK 1520  atan2  :  DDA	F G  ->  H
 H is the arc tangent of F / G.
 */
-void do_atan2(void)
+void atan2_(pEnv env)
 {
-    double dbl1, dbl2;
+    Node first, second;
 
-    TWOPARAMS;
-    NUMBERS2;
-    dbl2 = GET_AS_NUMBER(stack_pop());
-    dbl1 = GET_AS_NUMBER(stack[-1]);
-    dbl1 = atan2(dbl1, dbl2);
-    stack[-1] = MAKE_DOUBLE(dbl1);
+    PARM(2, BFLOAT);
+    second = lst_pop(env->stck);
+    first = lst_pop(env->stck);
+    first.u.dbl = atan2(first.op == FLOAT_ ? first.u.dbl : (double)first.u.num,
+		    second.op == FLOAT_ ? second.u.dbl : (double)second.u.num);
+    first.op = FLOAT_;
+    lst_push(env->stck, first);
 }
 #endif

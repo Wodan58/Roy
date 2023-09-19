@@ -1,19 +1,24 @@
 /*
     module  : dupd.c
-    version : 1.10
-    date    : 06/21/22
+    version : 1.11
+    date    : 09/19/23
 */
 #ifndef DUPD_C
 #define DUPD_C
 
 /**
-1270  dupd  :  DDAAA	Y Z  ->  Y Y Z
+OK 1270  dupd  :  DDAAA	Y Z  ->  Y Y Z
 As if defined by:   dupd  ==  [dup] dip
 */
-void do_dupd(void)
+void dupd_(pEnv env)
 {
-    TWOPARAMS;
-    do_push(stack[-1]);
-    stack[-2] = stack[-3];
+    Node first, second;
+
+    PARM(2, ANYTYPE);
+    second = lst_pop(env->stck);
+    first = lst_pop(env->stck);
+    lst_push(env->stck, first);
+    lst_push(env->stck, first);
+    lst_push(env->stck, second);
 }
 #endif

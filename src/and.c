@@ -1,26 +1,35 @@
 /*
     module  : and.c
-    version : 1.10
-    date    : 06/21/22
+    version : 1.11
+    date    : 09/19/23
 */
 #ifndef AND_C
 #define AND_C
 
 /**
-1360  and  :  DDA	X Y  ->  Z
+OK 1360  and  :  DDA	X Y  ->  Z
 Z is the intersection of sets X and Y, logical conjunction for truth values.
 */
-void do_and(void)
+void and_(pEnv env)
 {
-    TWOPARAMS;
-    SAME2TYPES;
-    if (IS_SET(stack[-1]))
-        stack[-2] = MAKE_SET(GET_AS_SET(stack[-2]) & GET_AS_SET(stack[-1]));
-    else if (IS_BOOLEAN(stack[-1]))
-        stack[-2] = MAKE_BOOLEAN(
-            GET_AS_BOOLEAN(stack[-2]) & GET_AS_BOOLEAN(stack[-1]));
-    else
-        BADDATA;
-    stack_pop();
+    Node first, second;
+
+    PARM(2, ANDORXOR);
+    second = lst_pop(env->stck);
+    first = lst_pop(env->stck);
+    switch (first.op) {
+    case SET_:
+	first.u.set = first.u.set & second.u.set;
+	break;
+    case BOOLEAN_:
+    case CHAR_:
+    case INTEGER_:
+	first.u.num = first.u.num && second.u.num;
+	first.op = BOOLEAN_;
+	break;
+    default:
+	break;
+    }
+    lst_push(env->stck, first);
 }
 #endif

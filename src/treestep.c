@@ -1,61 +1,39 @@
 /*
     module  : treestep.c
-    version : 1.15
-    date    : 06/21/22
+    version : 1.16
+    date    : 09/19/23
 */
 #ifndef TREESTEP_C
 #define TREESTEP_C
 
 /**
-2890  treestep  :  DDU	T [P]  ->  ...
+OK 2870  treestep  :  DDU	T [P]  ->  ...
 Recursively traverses leaves of tree T, executes P for each leaf.
 */
-void treestep(Stack *prog)
+void aux_treestep(pEnv env, NodeList *list)
 {
     int i;
-    Stack *item;
+    Node node, temp;
 
-    if (!IS_LIST(stack[-1]))
-        execute(prog);
+    node = lst_back(env->stck);
+    if (node.op != LIST_)
+	exeterm(env, list);
     else {
-        item = (Stack *)GET_AS_LIST(stack_pop());
-        for (i = vec_size(item) - 1; i >= 0; i--) {
-            do_push(vec_at(item, i));
-            treestep(prog);
-        }
+	node = lst_pop(env->stck);
+	for (i = lst_size(node.u.lis) - 1; i >= 0; i--) {
+	    temp = lst_at(node.u.lis, i);
+	    lst_push(env->stck, temp);
+	    aux_treestep(env, list);
+	}
     }
 }
 
-#ifdef COMPILING
-void put_treestep(Stack *prog)
+void treestep_(pEnv env)
 {
-    static int ident;
-    int ch;
-    FILE *old;
+    Node node;
 
-    printf("void treestep_%d();", ++ident);
-    fprintf(old = program, "treestep_%d();", ident);
-    program = my_tmpfile();
-    fprintf(program, "void treestep_%d(void) {", ident);
-    fprintf(program, "int i; Stack *item;");
-    fprintf(program, "if (!IS_LIST(stack[-1])) {");
-    compile(prog);
-    fprintf(program, "} else { item = (Stack *)GET_AS_LIST(stack_pop());");
-    fprintf(program, "for (i = vec_size(item) - 1; i >= 0; i--) {");
-    fprintf(program, "do_push(vec_at(item, i)); treestep_%d(); } } }", ident);
-    print_tmpfile(old);
-}
-#endif
-
-void do_treestep(void)
-{
-    Stack *prog;
-
-    ONEPARAM;
-    ONEQUOTE;
-    prog = (Stack *)GET_AS_LIST(stack_pop());
-    INSTANT(put_treestep);
-    ONEPARAM;
-    treestep(prog);
+    PARM(2, DIP);
+    node = lst_pop(env->stck);
+    aux_treestep(env, node.u.lis);
 }
 #endif

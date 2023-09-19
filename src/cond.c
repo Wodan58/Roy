@@ -1,75 +1,39 @@
 /*
     module  : cond.c
-    version : 1.19
-    date    : 06/21/22
+    version : 1.20
+    date    : 09/19/23
 */
 #ifndef COND_C
 #define COND_C
 
 /**
-2710  cond  :  DU	[..[[Bi] Ti]..[D]]  ->  ...
+OK 2690  cond  :  DU	[..[[Bi] Ti]..[D]]  ->  ...
 Tries each Bi. If that yields true, then executes Ti and exits.
 If no Bi yields true, executes default D.
 */
-void cond(Stack *prog)
+void cond_(pEnv env)
 {
     int i;
-    Stack *quot, *list, *result = 0;
+    Node aggr, quot, test, node;
 
-    for (i = vec_size(prog) - 1; i >= 0; i--) {
-        CHECKLIST(vec_at(prog, i));
-        quot = (Stack *)GET_AS_LIST(vec_at(prog, i));
-        if (!i) {
-            result = quot;
-            break;
-        }
-        CHECKLIST(vec_back(quot));
-        execute_cond((Stack *)GET_AS_LIST(vec_back(quot)), 0);
-        CHECKSTACK;
-        if (GET_AS_BOOLEAN(stack_pop())) {
-            vec_shallow_copy(result, quot);
-            vec_pop(result);
-            break;
-        }
+    PARM(1, CASE);
+    aggr = lst_pop(env->stck);
+    for (i = lst_size(aggr.u.lis) - 1; i >= 0; i--) {
+	quot = lst_at(aggr.u.lis, i);
+	if (!i) {
+	    node = quot;
+	    break;
+	}
+	test = lst_back(quot.u.lis);
+	exeterm(env, test.u.lis);
+	node = lst_pop(env->stck);
+	if (node.u.num) {
+	    lst_init(node.u.lis);
+	    lst_shallow_copy(node.u.lis, quot.u.lis);
+	    (void)lst_pop(node.u.lis);
+	    break;
+	}
     }
-    execute(result);
-}
-
-#ifdef COMPILING
-void put_cond(Stack *prog)
-{
-    int i;
-    Stack *quot, *result;
-
-    fprintf(program, "{ int num = 0; for (;;) {");
-    for (i = vec_size(prog) - 1; i > 0; i--) {
-        CHECKLIST(vec_at(prog, i));
-        quot = (Stack *)GET_AS_LIST(vec_at(prog, i));
-        CHECKLIST(vec_back(quot));
-        compile_cond((Stack *)GET_AS_LIST(vec_back(quot)), 0);
-        fprintf(program, "num = GET_AS_BOOLEAN(stack_pop());");
-        fprintf(program, "if (num) {");
-        vec_shallow_copy(result, quot);
-        vec_pop(result);
-        compile(result);
-        fprintf(program, "break; }");
-    }
-    fprintf(program, "break; } if (!num) {");
-    CHECKLIST(vec_at(prog, 0));
-    compile((Stack *)GET_AS_LIST(vec_at(prog, 0)));
-    fprintf(program, "} }");
-}
-#endif
-
-void do_cond(void)
-{
-    Stack *prog;
-
-    ONEPARAM;
-    LIST;
-    CHECKEMPTYLIST(stack[-1]);
-    prog = (Stack *)GET_AS_LIST(stack_pop());
-    INSTANT(put_cond);
-    cond(prog);
+    exeterm(env, node.u.lis);
 }
 #endif

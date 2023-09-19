@@ -1,28 +1,21 @@
 /*
     module  : putch.c
-    version : 1.13
-    date    : 06/21/22
+    version : 1.14
+    date    : 09/19/23
 */
 #ifndef PUTCH_C
 #define PUTCH_C
 
 /**
-3120  putch  :  D	N  ->
+OK 3090  putch  :  D	N  ->
 N : numeric, writes character whose ASCII is N.
 */
-void do_putch(void)
+void putch_(pEnv env)
 {
-    value_t temp;
+    Node node;
 
-    COMPILE;
-    ONEPARAM;
-    NUMERICTYPE;
-    temp = stack_pop();
-    if (IS_INTEGER(temp))
-	putchar(GET_AS_INTEGER(temp));
-    else if (IS_CHAR(temp))
-	putchar(GET_AS_CHAR(temp));
-    else if (IS_BOOLEAN(temp))
-	putchar(GET_AS_BOOLEAN(temp));
+    PARM(1, PREDSUCC);
+    node = lst_pop(env->stck);
+    putchar(node.u.num);
 }
 #endif

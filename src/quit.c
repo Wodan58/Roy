@@ -1,18 +1,40 @@
 /*
     module  : quit.c
-    version : 1.8
-    date    : 01/19/20
+    version : 1.9
+    date    : 09/19/23
 */
 #ifndef QUIT_C
 #define QUIT_C
 
 /**
-3160  quit  :  N	->
+OK 3130  quit  :  N	->
 Exit from Joy.
 */
-void do_quit(void)
+#if defined(STATS) || defined(SYMBOLS)
+static int exit_index;
+static void (*table[DISPLAYMAX])(pEnv);
+
+PUBLIC void my_atexit(void (*proc)(pEnv))
 {
-    COMPILE;
-    exit(0);
+#if 0
+    if (exit_index == DISPLAYMAX)
+	return;
+#endif
+    table[exit_index++] = proc;
+}
+
+PRIVATE void my_exit(pEnv env)
+{
+    while (--exit_index >= 0)
+	(*table[exit_index])(env);
+}
+#endif
+
+PUBLIC void quit_(pEnv env)
+{
+#if defined(STATS) || defined(SYMBOLS)
+    my_exit(env);
+#endif
+    exit(EXIT_SUCCESS);
 }
 #endif

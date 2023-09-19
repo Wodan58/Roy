@@ -1,23 +1,23 @@
 /*
     module  : ftell.c
-    version : 1.9
-    date    : 06/21/22
+    version : 1.10
+    date    : 09/19/23
 */
 #ifndef FTELL_C
 #define FTELL_C
 
 /**
-2000  ftell  :  A	S  ->  S I
+OK 1990  ftell  :  A	S  ->  S I
 I is the current position of stream S.
 */
-void do_ftell(void)
+void ftell_(pEnv env)
 {
-    FILE *fp;
+    Node node;
 
-    COMPILE;
-    ONEPARAM;
-    FILE1;
-    fp = GET_AS_FILE(stack[-1]);
-    do_push(MAKE_INTEGER(ftell(fp)));
+    PARM(1, FGET);
+    node = lst_back(env->stck);
+    node.u.num = ftell(node.u.fil);
+    node.op = INTEGER_;
+    lst_push(env->stck, node);    
 }
 #endif

@@ -1,22 +1,25 @@
 /*
     module  : swapd.c
-    version : 1.10
-    date    : 06/21/22
+    version : 1.11
+    date    : 09/19/23
 */
 #ifndef SWAPD_C
 #define SWAPD_C
 
 /**
-1280  swapd  :  DDDAAA	X Y Z  ->  Y X Z
+OK 1280  swapd  :  DDDAAA	X Y Z  ->  Y X Z
 As if defined by:   swapd  ==  [swap] dip
 */
-void do_swapd(void)
+void swapd_(pEnv env)
 {
-    value_t temp;
+    Node first, second, third;
 
-    THREEPARAMS;
-    temp = stack[-2];
-    stack[-2] = stack[-3];
-    stack[-3] = temp;
+    PARM(3, ANYTYPE);
+    third = lst_pop(env->stck);
+    second = lst_pop(env->stck);
+    first = lst_pop(env->stck);
+    lst_push(env->stck, second);
+    lst_push(env->stck, first);
+    lst_push(env->stck, third);
 }
 #endif

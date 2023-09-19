@@ -1,44 +1,24 @@
 /*
     module  : ifinteger.c
-    version : 1.9
-    date    : 06/21/22
+    version : 1.10
+    date    : 09/19/23
 */
 #ifndef IFINTEGER_C
 #define IFINTEGER_C
 
 /**
-2630  ifinteger  :  DDDU	X [T] [E]  ->  ...
+OK 2610  ifinteger  :  DDDP	X [T] [E]  ->  ...
 If X is an integer, executes T else executes E.
 */
-void ifinteger(Stack *prog[])
+void ifinteger_(pEnv env)
 {
-    ONEPARAM;
-    if (IS_INTEGER(stack[-1]))
-        execute(prog[0]);
-    else
-        execute(prog[1]);
-}
+    Node first, second, node;
 
-#ifdef COMPILING
-void put_ifinteger(Stack *prog[])
-{
-    fprintf(program, "if (IS_INTEGER(stack[-1])) {");
-    compile(prog[0]);
-    fprintf(program, "} else {");
-    compile(prog[1]);
-    fprintf(program, "}");
-}
-#endif
-
-void do_ifinteger(void)
-{
-    Stack *prog[2];
-
-    TWOPARAMS;
-    TWOQUOTES;
-    prog[1] = (Stack *)GET_AS_LIST(stack_pop());
-    prog[0] = (Stack *)GET_AS_LIST(stack_pop());
-    INSTANT(put_ifinteger);
-    ifinteger(prog);
+    PARM(3, WHILE);
+    second = lst_pop(env->stck);
+    first = lst_pop(env->stck);
+    node = lst_back(env->stck);
+    node = node.op == INTEGER_ ? first : second;
+    exeterm(env, node.u.lis);
 }
 #endif

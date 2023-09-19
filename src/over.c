@@ -1,18 +1,21 @@
 /*
     module  : over.c
-    version : 1.7
-    date    : 06/21/22
+    version : 1.8
+    date    : 09/19/23
 */
 #ifndef OVER_C
 #define OVER_C
 
 /**
-3220  over  :  A	X Y  ->  X Y X
-Pushes an extra copy of the second item X on top of the stack.
+OK 3210  over  :  A	X Y  ->  X Y X
+[EXT] Pushes an extra copy of the second item X on top of the stack.
 */
-void do_over(void)
+void over_(pEnv env)
 {
-    TWOPARAMS;
-    do_push(stack[-2]);
+    Node node;
+
+    PARM(2, ANYTYPE);
+    node = lst_at(env->stck, lst_size(env->stck) - 2);
+    lst_push(env->stck, node);
 }
 #endif

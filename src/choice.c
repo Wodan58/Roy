@@ -1,20 +1,24 @@
 /*
     module  : choice.c
-    version : 1.12
-    date    : 06/21/22
+    version : 1.13
+    date    : 09/19/23
 */
 #ifndef CHOICE_C
 #define CHOICE_C
 
 /**
-1330  choice  :  DDDA 	B T F  ->  X
+OK 1330  choice  :  DDDA	B T F  ->  X
 If B is true, then X = T else X = F.
 */
-void do_choice(void)
+void choice_(pEnv env)
 {
-    THREEPARAMS;
-    stack[-3] = GET_AS_BOOLEAN(stack[-3]) ? stack[-2] : stack[-1];
-    stack_pop();
-    stack_pop();
+    Node first, second, third;
+
+    PARM(3, ANYTYPE);
+    third = lst_pop(env->stck);
+    second = lst_pop(env->stck);
+    first = lst_pop(env->stck);
+    first = first.u.num ? second : third;
+    lst_push(env->stck, first);
 }
 #endif

@@ -1,25 +1,28 @@
 /*
     module  : modf.c
-    version : 1.10
-    date    : 06/21/22
+    version : 1.11
+    date    : 09/19/23
 */
 #ifndef MODF_C
 #define MODF_C
 
 /**
-1620  modf  :  DAA	F  ->  G H
+OK 1620  modf  :  DAA	F  ->  G H
 G is the fractional part and H is the integer part
 (but expressed as a float) of F.
 */
-void do_modf(void)
+void modf_(pEnv env)
 {
-    double dbl, exp;
+    Node node;
+    double exp;
 
-    ONEPARAM;
-    NUMBER;
-    dbl = GET_AS_NUMBER(stack[-1]);
-    dbl = modf(dbl, &exp);
-    stack[-1] = MAKE_DOUBLE(dbl);
-    do_push(MAKE_DOUBLE(exp));
+    PARM(1, UFLOAT);
+    node = lst_pop(env->stck);
+    node.u.dbl = modf(node.op == FLOAT_ ? node.u.dbl : node.u.num, &exp);
+    node.op = FLOAT_;
+    lst_push(env->stck, node);
+    node.u.dbl = exp;
+    node.op = FLOAT_;
+    lst_push(env->stck, node);
 }
 #endif

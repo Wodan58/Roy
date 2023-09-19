@@ -1,28 +1,29 @@
 /*
     module  : filetime.c
-    version : 1.10
-    date    : 06/21/22
+    version : 1.11
+    date    : 09/19/23
 */
 #ifndef FILETIME_C
 #define FILETIME_C
 
-#ifndef COSMO
 #include <sys/stat.h>
-#endif
 
 /**
-3180  filetime  :  DA 	F  ->  T
-T is the modification time of file F.
+OK 3190  filetime  :  DA 	F  ->  T
+[EXT] T is the modification time of file F.
 */
-void do_filetime(void)
+void filetime_(pEnv env)
 {
+    Node node;
     struct stat buf;
 
-    COMPILE;
-    ONEPARAM;
-    STRING;
-    if (stat(get_string(stack[-1]), &buf) == -1)
-        buf.st_mtime = 0;
-    stack[-1] = MAKE_INTEGER(buf.st_mtime);
+    PARM(1, STRTOD);
+    node = lst_pop(env->stck);
+    if (stat(node.u.str, &buf) == -1)
+	node.u.num = 0;
+    else
+	node.u.num = buf.st_mtime;
+    node.op = INTEGER_;
+    lst_push(env->stck, node);
 }
 #endif

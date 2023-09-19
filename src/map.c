@@ -1,144 +1,78 @@
 /*
     module  : map.c
-    version : 1.26
-    date    : 06/21/22
+    version : 1.27
+    date    : 09/19/23
 */
 #ifndef MAP_C
 #define MAP_C
 
 /**
-2810  map  :  DDA	A [P]  ->  B
+OK 2790  map  :  DDA	A [P]  ->  B
 Executes P on each member of aggregate A,
 collects results in sametype aggregate B.
 */
-void map_lst(Stack *prog)
+void map_(pEnv env)
 {
-    int i, j;
-    Stack *list, *quot;
+    int64_t i, j;
+    Node aggr, list, node, temp;
 
-    list = (Stack *)GET_AS_LIST(stack[-1]);
-    vec_init(quot);
-    for (i = 0, j = vec_size(list); i < j; i++) {
-        stack[-1] = vec_at(list, i);
-        execute_cond(prog, 1);
-        CHECKSTACK;
-        vec_push(quot, stack[-1]);
+    PARM(2, STEP);
+    list = lst_pop(env->stck);
+    aggr = lst_pop(env->stck);
+    temp.op = aggr.op;
+    switch (aggr.op) {
+    case LIST_:
+	lst_init(temp.u.lis);
+	for (i = 0, j = lst_size(aggr.u.lis); i < j; i++) {
+	    /*
+		push the element to be mapped
+	    */
+	    node = lst_at(aggr.u.lis, i);
+	    lst_push(env->stck, node);
+	    exeterm(env, list.u.lis);
+	    node = lst_pop(env->stck);
+	    lst_push(temp.u.lis, node);
+	}
+	lst_push(env->stck, temp);
+	break;
+
+    case STRING_:
+    case BIGNUM_:
+    case USR_STRING_:
+	temp.u.str = GC_strdup(aggr.u.str);
+	node.op = CHAR_;
+	for (i = 0, j = strlen(aggr.u.str); i < j; i++) {
+	    /*
+		push the element to be mapped
+	    */
+	    node.u.num = aggr.u.str[i];
+	    lst_push(env->stck, node);
+	    exeterm(env, list.u.lis);
+	    node = lst_pop(env->stck);
+	    temp.u.str[i] = node.u.num;
+	}
+	lst_push(env->stck, temp);
+	break;
+
+    case SET_:
+	temp.u.set = 0;
+	node.op = INTEGER_;
+	for (i = 0, j = 1; i < SETSIZE; i++, j <<= 1)
+	    if (aggr.u.set & j) {
+		/*
+		    push the element to be mapped
+		*/
+		node.u.num = i;
+		lst_push(env->stck, node);
+		exeterm(env, list.u.lis);
+		node = lst_pop(env->stck);
+		temp.u.set |= (uint64_t)1 << node.u.num;
+	    }
+	lst_push(env->stck, temp);
+	break;
+
+    default:
+	break;
     }
-    stack[-1] = MAKE_LIST(quot);
-}
-
-#ifdef COMPILING
-void put_map_lst(Stack *prog)
-{
-    fprintf(program, "{ int i, j; Stack *list, *quot; vec_init(quot);");
-    fprintf(program, "list = (Stack *)GET_AS_LIST(stack[-1]);");
-    fprintf(program, "for (i = 0, j = vec_size(list); i < j; i++) {");
-    fprintf(program, "stack[-1] = vec_at(list, i);");
-    compile_cond(prog, 1);
-    fprintf(program, "vec_push(quot, stack[-1]); }");
-    fprintf(program, "stack[-1] = MAKE_LIST(quot); }");
-}
-#endif
-
-void map_str(Stack *prog)
-{
-    int i = 0, j = 1;
-    char *ptr, *volatile str;
-
-    str = get_string(stack[-1]);
-    ptr = GC_malloc_atomic(strlen(str) + 2);
-    *ptr = '"';
-    while (str[i]) {
-        stack[-1] = MAKE_CHAR(str[i++]);
-        execute_cond(prog, 1);
-        CHECKSTACK;
-        ptr[j++] = GET_AS_CHAR(stack[-1]);
-    }
-    ptr[j] = 0;
-    stack[-1] = MAKE_USR_STRING(ptr);
-}
-
-#ifdef COMPILING
-void put_map_str(Stack *prog)
-{
-    fprintf(program, "{ int i = 0, j = 1; char *ptr, *volatile str;");
-    fprintf(program, "str = get_string(stack[-1]);");
-    fprintf(program, "ptr = GC_malloc_atomic(strlen(str) + 2); *ptr = '\"';");
-    fprintf(program, "while (str[i]) {");
-    fprintf(program, "stack[-1] = MAKE_CHAR(str[i++]);");
-    compile_cond(prog, 1);
-    fprintf(program, "ptr[j++] = GET_AS_CHAR(stack[-1]); } ptr[j] = 0;");
-    fprintf(program, "stack[-1] = MAKE_USR_STRING(ptr); }");
-}
-#endif
-
-void map_set(Stack *prog)
-{
-    int i;
-    uint64_t j, set, zet = 0;
-
-    set = GET_AS_SET(stack[-1]);
-    for (i = 0, j = 1; i < SETSIZE_; i++, j <<= 1)
-        if (set & j) {
-            stack[-1] = MAKE_INTEGER(i);
-            execute_cond(prog, 1);
-            CHECKSTACK;
-            zet |= (uint64_t)1 << GET_AS_INTEGER(stack[-1]);
-        }
-    stack[-1] = MAKE_SET(zet);
-}
-
-#ifdef COMPILING
-void put_map_set(Stack *prog)
-{
-    fprintf(program, "{ int i; uint64_t j, set, zet = 0;");
-    fprintf(program, "set = GET_AS_SET(stack[-1]);");
-    fprintf(program, "for (i = 0, j = 1; i < SETSIZE_; i++, j <<= 1)");
-    fprintf(program, "if (set & j) { stack[-1] = MAKE_INTEGER(i);");
-    compile_cond(prog, 1);
-    fprintf(program, "zet |= (uint64_t)1 << GET_AS_INTEGER(stack[-1]); }");
-    fprintf(program, "stack[-1] = MAKE_SET(zet); }");
-}
-#endif
-
-#ifdef COMPILING
-void put_map(Stack *prog)
-{
-    static int ident;
-    int ch;
-    FILE *old;
-
-    printf("void map_%d(void);", ++ident);
-    fprintf(old = program, "map_%d();", ident);
-    program = my_tmpfile();
-    fprintf(program, "void map_%d(void) {", ident);
-    fprintf(program, "if (IS_LIST(stack[-1]))");
-    put_map_lst(prog);
-    fprintf(program, "else if (IS_USR_STRING(stack[-1]))");
-    put_map_str(prog);
-    fprintf(program, "else if (IS_SET(stack[-1]))");
-    put_map_set(prog);
-    fprintf(program, "}");
-    print_tmpfile(old);
-}
-#endif
-
-void do_map(void)
-{
-    Stack *prog;
-
-    ONEPARAM;
-    ONEQUOTE;
-    prog = (Stack *)GET_AS_LIST(stack_pop());
-    INSTANT(put_map);
-    ONEPARAM;
-    if (IS_LIST(stack[-1]))
-        map_lst(prog);
-    else if (IS_USR_STRING(stack[-1]))
-        map_str(prog);
-    else if (IS_SET(stack[-1]))
-        map_set(prog);
-    else
-        BADAGGREGATE;
 }
 #endif

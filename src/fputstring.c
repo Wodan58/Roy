@@ -1,24 +1,18 @@
 /*
     module  : fputstring.c
-    version : 1.3
-    date    : 06/21/22
+    version : 1.4
+    date    : 09/19/23
 */
 #ifndef FPUTSTRING_C
 #define FPUTSTRING_C
 
-#ifdef FPUTCHARS_X
-#undef FPUTCHARS_X
-#undef FPUTCHARS_C
-#endif
-
-#include "fputchars.c"
-
 /**
-1980  fputstring  :  D	S "abc.."  ->  S
+OK 1970  fputstring  :  D	S "abc.."  ->  S
 == fputchars, as a temporary alternative.
 */
-void do_fputstring(void)
+void fputstring_(pEnv env)
 {
-    do_fputchars();
+    fputchars_(env);
+    /* nothing */
 }
 #endif
