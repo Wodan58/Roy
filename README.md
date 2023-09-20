@@ -1,4 +1,4 @@
-Coy
+Roy
 ---
 
 Build|Linux|Windows|Coverity
