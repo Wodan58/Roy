@@ -1,7 +1,7 @@
 /*
     module  : rolldownd.c
-    version : 1.9
-    date    : 09/19/23
+    version : 1.10
+    date    : 
 */
 #ifndef ROLLDOWND_C
 #define ROLLDOWND_C
@@ -15,13 +15,13 @@ void rolldownd_(pEnv env)
     Node first, second, third, fourth;
 
     PARM(4, ANYTYPE);
-    fourth = lst_pop(env->stck);
-    third = lst_pop(env->stck);
-    second = lst_pop(env->stck);
-    first = lst_pop(env->stck);
-    lst_push(env->stck, second);
-    lst_push(env->stck, third);
-    lst_push(env->stck, first);
-    lst_push(env->stck, fourth);
+    env->stck = pvec_pop(env->stck, &fourth);
+    env->stck = pvec_pop(env->stck, &third);
+    env->stck = pvec_pop(env->stck, &second);
+    env->stck = pvec_pop(env->stck, &first);
+    env->stck = pvec_add(env->stck, second);
+    env->stck = pvec_add(env->stck, third);
+    env->stck = pvec_add(env->stck, first);
+    env->stck = pvec_add(env->stck, fourth);
 }
 #endif

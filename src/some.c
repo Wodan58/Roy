@@ -1,7 +1,7 @@
 /*
     module  : some.c
-    version : 1.12
-    date    : 09/19/23
+    version : 1.13
+    date    : 10/02/23
 */
 #ifndef SOME_C
 #define SOME_C
@@ -16,18 +16,18 @@ void some_(pEnv env)
     int64_t i, j, result = 0;	/* assume false */
 
     PARM(2, STEP);
-    list = lst_pop(env->stck);
-    aggr = lst_pop(env->stck);
+    env->stck = pvec_pop(env->stck, &list);
+    env->stck = pvec_pop(env->stck, &aggr);
     switch (aggr.op) {
     case LIST_:
-	for (i = 0, j = lst_size(aggr.u.lis); i < j; i++) {
+	for (i = 0, j = pvec_cnt(aggr.u.lis); i < j; i++) {
 	    /*
 		push the element to be tested
 	    */
-	    node = lst_at(aggr.u.lis, i);
-	    lst_push(env->stck, node);
+	    node = pvec_nth(aggr.u.lis, i);
+	    env->stck = pvec_add(env->stck, node);
 	    exeterm(env, list.u.lis);
-	    node = lst_pop(env->stck);
+	    env->stck = pvec_pop(env->stck, &node);
 	    if (node.u.num) {
 		result = 1;
 		break;
@@ -44,9 +44,9 @@ void some_(pEnv env)
 		push the element to be tested
 	    */
 	    node.u.num = aggr.u.str[i];
-	    lst_push(env->stck, node);
+	    env->stck = pvec_add(env->stck, node);
 	    exeterm(env, list.u.lis);
-	    node = lst_pop(env->stck);
+	    env->stck = pvec_pop(env->stck, &node);
 	    if (node.u.num) {
 		result = 1;
 		break;
@@ -62,9 +62,9 @@ void some_(pEnv env)
 		    push the element to be tested
 		*/
 		node.u.num = i;
-		lst_push(env->stck, node);
+		env->stck = pvec_add(env->stck, node);
 		exeterm(env, list.u.lis);
-		node = lst_pop(env->stck);
+		env->stck = pvec_pop(env->stck, &node);
 		if (node.u.num) {
 		    result = 1;
 		    break;
@@ -77,6 +77,6 @@ void some_(pEnv env)
     }
     node.u.num = result;
     node.op = BOOLEAN_;
-    lst_push(env->stck, node);
+    env->stck = pvec_add(env->stck, node);
 }
 #endif

@@ -1,7 +1,7 @@
 /*
     module  : divide.c
-    version : 1.13
-    date    : 09/19/23
+    version : 1.14
+    date    : 10/02/23
 */
 #ifndef DIVIDE_C
 #define DIVIDE_C
@@ -15,8 +15,8 @@ void divide_(pEnv env)
     Node first, second;
 
     PARM(2, DIVIDE);
-    second = lst_pop(env->stck);
-    first = lst_pop(env->stck);
+    env->stck = pvec_pop(env->stck, &second);
+    env->stck = pvec_pop(env->stck, &first);
     switch (first.op) {
     case FLOAT_:
 	switch (second.op) {
@@ -34,7 +34,7 @@ void divide_(pEnv env)
 	switch (second.op) {
 	case FLOAT_:
 	    second.u.dbl = first.u.num / second.u.dbl;
-	    lst_push(env->stck, second);
+	    env->stck = pvec_add(env->stck, second);
 	    return;
 
 	default:
@@ -43,6 +43,6 @@ void divide_(pEnv env)
 	}
 	break;
     }
-    lst_push(env->stck, first);
+    env->stck = pvec_add(env->stck, first);
 }
 #endif

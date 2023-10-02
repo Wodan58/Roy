@@ -1,7 +1,7 @@
 /*
     module  : trunc.c
-    version : 1.11
-    date    : 09/19/23
+    version : 1.12
+    date    : 10/02/23
 */
 #ifndef TRUNC_C
 #define TRUNC_C
@@ -15,9 +15,9 @@ void trunc_(pEnv env)
     Node node;
 
     PARM(1, UFLOAT);
-    node = lst_pop(env->stck);
+    env->stck = pvec_pop(env->stck, &node);
     node.u.num = node.u.dbl;
     node.op = INTEGER_;
-    lst_push(env->stck, node);
+    env->stck = pvec_add(env->stck, node);
 }
 #endif

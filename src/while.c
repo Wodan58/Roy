@@ -1,7 +1,7 @@
 /*
     module  : while.c
-    version : 1.19
-    date    : 09/19/23
+    version : 1.20
+    date    : 10/02/23
 */
 #ifndef WHILE_C
 #define WHILE_C
@@ -15,11 +15,11 @@ void while_(pEnv env)
     Node test, body, node;
 
     PARM(2, WHILE);
-    body = lst_pop(env->stck);
-    test = lst_pop(env->stck);
+    env->stck = pvec_pop(env->stck, &body);
+    env->stck = pvec_pop(env->stck, &test);
     for (;;) {
 	exeterm(env, test.u.lis);
-	node = lst_pop(env->stck);
+	env->stck = pvec_pop(env->stck, &node);
 	if (!node.u.num)
 	    break;
 	exeterm(env, body.u.lis);

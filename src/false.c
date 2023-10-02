@@ -1,7 +1,7 @@
 /*
     module  : false.c
-    version : 1.11
-    date    : 09/19/23
+    version : 1.12
+    date    : 10/02/23
 */
 #ifndef FALSE_C
 #define FALSE_C
@@ -16,6 +16,6 @@ void false_(pEnv env)
 
     node.u.num = 0;
     node.op = BOOLEAN_;
-    lst_push(env->stck, node);
+    env->stck = pvec_add(env->stck, node);
 }
 #endif

@@ -1,7 +1,7 @@
 /*
     module  : binrec.c
-    version : 1.20
-    date    : 09/19/23
+    version : 1.21
+    date    : 10/02/23
 */
 #ifndef BINREC_C
 #define BINREC_C
@@ -17,14 +17,14 @@ void binrec(pEnv env, NodeList *prog[4])
     Node node;
 
     exeterm(env, prog[0]);
-    node = lst_pop(env->stck);
+    env->stck = pvec_pop(env->stck, &node);
     if (node.u.num)
 	exeterm(env, prog[1]);
     else {
 	exeterm(env, prog[2]);
-	node = lst_pop(env->stck);
+	env->stck = pvec_pop(env->stck, &node);
 	binrec(env, prog);
-	lst_push(env->stck, node);
+	env->stck = pvec_add(env->stck, node);
 	binrec(env, prog);
 	exeterm(env, prog[3]);
     }
@@ -36,13 +36,13 @@ void binrec_(pEnv env)
     NodeList *prog[4];
 
     PARM(4, LINREC);
-    node = lst_pop(env->stck);
+    env->stck = pvec_pop(env->stck, &node);
     prog[3] = node.u.lis;
-    node = lst_pop(env->stck);
+    env->stck = pvec_pop(env->stck, &node);
     prog[2] = node.u.lis;
-    node = lst_pop(env->stck);
+    env->stck = pvec_pop(env->stck, &node);
     prog[1] = node.u.lis;
-    node = lst_pop(env->stck);
+    env->stck = pvec_pop(env->stck, &node);
     prog[0] = node.u.lis;
     binrec(env, prog);
 }

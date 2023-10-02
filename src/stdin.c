@@ -1,7 +1,7 @@
 /*
     module  : stdin.c
-    version : 1.10
-    date    : 09/19/23
+    version : 1.11
+    date    : 10/02/23
 */
 #ifndef STDIN_C
 #define STDIN_C
@@ -16,6 +16,6 @@ void stdin_(pEnv env)
 
     node.u.fil = stdin;
     node.op = FILE_;
-    lst_push(env->stck, node);
+    env->stck = pvec_add(env->stck, node);
 }
 #endif

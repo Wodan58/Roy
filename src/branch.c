@@ -1,7 +1,7 @@
 /*
     module  : branch.c
-    version : 1.12
-    date    : 09/19/23
+    version : 1.13
+    date    : 10/02/23
 */
 #ifndef BRANCH_C
 #define BRANCH_C
@@ -15,9 +15,9 @@ void branch_(pEnv env)
     Node first, second, third;
 
     PARM(3, WHILE);
-    third = lst_pop(env->stck);
-    second = lst_pop(env->stck);
-    first = lst_pop(env->stck);
+    env->stck = pvec_pop(env->stck, &third);
+    env->stck = pvec_pop(env->stck, &second);
+    env->stck = pvec_pop(env->stck, &third);
     exeterm(env, first.u.num ? second.u.lis : third.u.lis);
 }
 #endif

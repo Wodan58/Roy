@@ -1,7 +1,7 @@
 /*
     module  : treestep.c
-    version : 1.16
-    date    : 09/19/23
+    version : 1.17
+    date    : 10/02/23
 */
 #ifndef TREESTEP_C
 #define TREESTEP_C
@@ -13,17 +13,16 @@ Recursively traverses leaves of tree T, executes P for each leaf.
 void aux_treestep(pEnv env, NodeList *list)
 {
     int i;
-    Node node, temp;
+    Node node;
 
-    node = lst_back(env->stck);
+    node = pvec_lst(env->stck);
     if (node.op != LIST_)
 	exeterm(env, list);
     else {
-	node = lst_pop(env->stck);
-	for (i = lst_size(node.u.lis) - 1; i >= 0; i--) {
-	    temp = lst_at(node.u.lis, i);
-	    lst_push(env->stck, temp);
-	    aux_treestep(env, list);
+	env->stck = pvec_pop(env->stck, &node);
+	for (i = pvec_cnt(node.u.lis) - 1; i >= 0; i--) {
+	    env->stck = pvec_add(env->stck, pvec_nth(node.u.lis, i));
+	    treestep(env, list);
 	}
     }
 }

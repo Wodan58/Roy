@@ -1,7 +1,7 @@
 /*
     module  : system.c
-    version : 1.10
-    date    : 09/19/23
+    version : 1.11
+    date    : 10/02/23
 */
 #ifndef SYSTEM_C
 #define SYSTEM_C
@@ -17,7 +17,7 @@ void system_(pEnv env)
     Node node;
 
     PARM(1, STRTOD);
-    node = lst_pop(env->stck);
+    env->stck = pvec_pop(env->stck, &node);
     system(node.u.str);
 }
 #endif

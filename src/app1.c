@@ -1,7 +1,7 @@
 /*
     module  : app1.c
-    version : 1.12
-    date    : 09/19/23
+    version : 1.13
+    date    : 10/02/23
 */
 #ifndef APP1_C
 #define APP1_C
@@ -15,7 +15,7 @@ void app1_(pEnv env)
     Node node;
 
     PARM(2, DIP);
-    node = lst_pop(env->stck);
+    env->stck = pvec_pop(env->stck, &node);
     exeterm(env, node.u.lis);
 }
 #endif

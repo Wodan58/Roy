@@ -1,7 +1,7 @@
 #
 #   module  : makefile
-#   version : 1.2
-#   date    : 09/19/23
+#   version : 1.3
+#   date    : 10/02/23
 #
 PROG   = fib
 .PRECIOUS: $(PROG).c
@@ -10,7 +10,7 @@ PROG   = fib
 .SUFFIXES: .c .o .joy
 
 CC     = gcc
-CFLAGS = -DTRACING -O3 -Wall -Wextra -Werror -Wno-unused-parameter
+CFLAGS = -O3 -Wall -Wextra -Werror -Wno-unused-parameter
 HDRS   = globals.h
 OBJS   = $(PROG).o exeterm.o ersatz.o main.o exec.o writ.o
 
@@ -31,4 +31,4 @@ prep:
 	./joy -c $<
 
 clean:
-	rm -f *.o $(PROG).c
+	rm -f *.o defs.h deps.h prim.c prim.h

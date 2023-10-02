@@ -1,7 +1,7 @@
 /*
     module  : condnestrec.c
-    version : 1.15
-    date    : 09/19/23
+    version : 1.16
+    date    : 10/02/23
 */
 #ifndef CONDNESTREC_C
 #define CONDNESTREC_C
@@ -19,25 +19,25 @@ void aux_condnestrec(pEnv env, Node aggr)
     int i, j = 0;
     Node elem, node;
 
-    for (i = lst_size(aggr.u.lis) - 1; i >= 0; i--) {
-	elem = lst_at(aggr.u.lis, i);
+    for (i = pvec_cnt(aggr.u.lis) - 1; i >= 0; i--) {
+	elem = pvec_nth(aggr.u.lis, i);
 	if (!i) {
-	    j = lst_size(elem.u.lis) - 1;
+	    j = pvec_cnt(elem.u.lis) - 1;
 	    break;
 	}
-	node = lst_back(elem.u.lis);
+	node = pvec_lst(elem.u.lis);
 	exeterm(env, node.u.lis);
-	node = lst_pop(env->stck);
+	env->stck = pvec_pop(env->stck, &node);
 	if (node.u.num) {
-	    j = lst_size(elem.u.lis) - 2;
+	    j = pvec_cnt(elem.u.lis) - 2;
 	    break;
 	}
     }
-    node = lst_at(elem.u.lis, j);
+    node = pvec_nth(elem.u.lis, j);
     exeterm(env, node.u.lis);
     for (i = j - 1; i >= 0; i--) {
 	aux_condnestrec(env, aggr);
-	node = lst_at(elem.u.lis, i);
+	node = pvec_nth(elem.u.lis, i);
 	exeterm(env, node.u.lis);
     }
 }
@@ -47,7 +47,7 @@ void condnestrec_(pEnv env)
     Node aggr;
 
     PARM(1, CASE);
-    aggr = lst_pop(env->stck);
+    env->stck = pvec_pop(env->stck, &aggr);
     aux_condnestrec(env, aggr);
 }
 #endif

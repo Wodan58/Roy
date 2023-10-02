@@ -1,7 +1,7 @@
 /*
     module  : unary3.c
-    version : 1.17
-    date    : 09/19/23
+    version : 1.18
+    date    : 10/02/23
 */
 #ifndef UNARY3_C
 #define UNARY3_C
@@ -15,19 +15,19 @@ PRIVATE void unary3_(pEnv env)
     PARM(4, DIP);
     Node list, node[3];
 
-    list = lst_pop(env->stck);
-    node[2] = lst_pop(env->stck);	/* Z, expose Y */
-    node[1] = lst_pop(env->stck);	/* Y, expose X */
+    env->stck = pvec_pop(env->stck, &list);
+    env->stck = pvec_pop(env->stck, &node[2]);	/* Z, expose Y */
+    env->stck = pvec_pop(env->stck, &node[1]);	/* Y, expose X */
     exeterm(env, list.u.lis);
-    node[0] = lst_pop(env->stck);	/* X' */
-    lst_push(env->stck, node[1]);	/* restore Y */
+    env->stck = pvec_pop(env->stck, &node[0]);	/* X' */
+    env->stck = pvec_add(env->stck, node[1]);	/* restore Y */
     exeterm(env, list.u.lis);
-    node[1] = lst_pop(env->stck);	/* Y' */
-    lst_push(env->stck, node[2]);	/* restore Z */
+    env->stck = pvec_pop(env->stck, &node[1]);	/* Y' */
+    env->stck = pvec_add(env->stck, node[2]);	/* restore Z */
     exeterm(env, list.u.lis);
-    node[2] = lst_pop(env->stck);	/* Z' */
-    lst_push(env->stck, node[0]);	/* push X' */
-    lst_push(env->stck, node[1]);	/* push Y' */
-    lst_push(env->stck, node[2]);	/* push Z' */
+    env->stck = pvec_pop(env->stck, &node[2]);	/* Z' */
+    env->stck = pvec_add(env->stck, node[0]);	/* push X' */
+    env->stck = pvec_add(env->stck, node[1]);	/* push Y' */
+    env->stck = pvec_add(env->stck, node[2]);	/* push Z' */
 }
 #endif

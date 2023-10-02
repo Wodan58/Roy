@@ -1,7 +1,7 @@
 /*
-    module  : %M%
-    version : %I%
-    date    : %G%
+    module  : compare.h
+    version : 1.2
+    date    : 10/02/23
 */
 #ifndef COMPARE_H
 #define COMPARE_H

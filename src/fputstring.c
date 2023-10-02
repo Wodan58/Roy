@@ -1,7 +1,7 @@
 /*
     module  : fputstring.c
-    version : 1.4
-    date    : 09/19/23
+    version : 1.5
+    date    : 10/02/23
 */
 #ifndef FPUTSTRING_C
 #define FPUTSTRING_C

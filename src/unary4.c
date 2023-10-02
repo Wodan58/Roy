@@ -1,7 +1,7 @@
 /*
     module  : unary4.c
-    version : 1.17
-    date    : 09/19/23
+    version : 1.18
+    date    : 10/02/23
 */
 #ifndef UNARY4_C
 #define UNARY4_C
@@ -16,23 +16,23 @@ PRIVATE void unary4_(pEnv env)
     Node list, node[4];
 
     list = lst_pop(env->stck);
-    node[3] = lst_pop(env->stck);	/* W, expose Z */
-    node[2] = lst_pop(env->stck);	/* Z, expose Y */
-    node[1] = lst_pop(env->stck);	/* Y, expose X */
+    env->stck = pvec_pop(env->stck, &node[3]);	/* W, expose Z */
+    env->stck = pvec_pop(env->stck, &node[2]);	/* Z, expose Y */
+    env->stck = pvec_pop(env->stck, &node[1]);	/* Y, expose X */
     exeterm(env, list.u.lis);
-    node[0] = lst_pop(env->stck);	/* X' */
-    lst_push(env->stck, node[1]);	/* restore Y */
+    env->stck = pvec_pop(env->stck, &node[0]);	/* X' */
+    env->stck = pvec_add(env->stck, node[1]);	/* restore Y */
     exeterm(env, list.u.lis);
-    node[1] = lst_pop(env->stck);	/* Y' */
-    lst_push(env->stck, node[2]);	/* restore Z */
+    env->stck = pvec_pop(env->stck, &node[1]);	/* Y' */
+    env->stck = pvec_add(env->stck, node[2]);	/* restore Z */
     exeterm(env, list.u.lis);
-    node[2] = lst_pop(env->stck);	/* Z' */
-    lst_push(env->stck, node[3]);	/* restore W */
+    env->stck = pvec_pop(env->stck, &node[2]);	/* Z' */
+    env->stck = pvec_add(env->stck, node[3]);	/* restore W */
     exeterm(env, list.u.lis);
-    node[3] = lst_pop(env->stck);	/* W' */
-    lst_push(env->stck, node[0]);	/* push X' */
-    lst_push(env->stck, node[1]);	/* push Y' */
-    lst_push(env->stck, node[2]);	/* push Z' */
-    lst_push(env->stck, node[3]);	/* push W' */
+    env->stck = pvec_pop(env->stck, &node[3]);	/* W' */
+    env->stck = pvec_add(env->stck, node[0]);	/* push X' */
+    env->stck = pvec_add(env->stck, node[1]);	/* push Y' */
+    env->stck = pvec_add(env->stck, node[2]);	/* push Z' */
+    env->stck = pvec_add(env->stck, node[3]);	/* push W' */
 }
 #endif

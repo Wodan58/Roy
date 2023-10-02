@@ -1,7 +1,7 @@
 /*
     module  : unary2.c
-    version : 1.20
-    date    : 09/19/23
+    version : 1.21
+    date    : 10/02/23
 */
 #ifndef UNARY2_C
 #define UNARY2_C
@@ -16,14 +16,14 @@ void unary2_(pEnv env)
     Node list, node[2];
 
     PARM(3, DIP);
-    list = lst_pop(env->stck);
-    node[1] = lst_pop(env->stck);	/* Z, expose Y */
+    env->stck = pvec_pop(env->stck, &list);
+    env->stck = pvec_pop(env->stck, &node[1]);	/* Z, expose Y */
     exeterm(env, list.u.lis);
-    node[0] = lst_pop(env->stck);	/* Y' */
-    lst_push(env->stck, node[1]);	/* restore Z */
+    env->stck = pvec_pop(env->stck, &node[0]);	/* Y' */
+    env->stck = pvec_add(env->stck, node[1]);	/* restore Z */
     exeterm(env, list.u.lis);
-    node[1] = lst_pop(env->stck);	/* Z' */
-    lst_push(env->stck, node[0]);	/* push Y' */
-    lst_push(env->stck, node[1]);	/* push Z' */
+    env->stck = pvec_pop(env->stck, &node[1]);	/* Z' */
+    env->stck = pvec_add(env->stck, node[0]);	/* push Y' */
+    env->stck = pvec_add(env->stck, node[1]);	/* push Z' */
 }
 #endif

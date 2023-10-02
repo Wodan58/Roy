@@ -1,7 +1,7 @@
 /*
     module  : sin.c
-    version : 1.9
-    date    : 09/19/23
+    version : 1.10
+    date    : 10/02/23
 */
 #ifndef SIN_C
 #define SIN_C
@@ -15,9 +15,9 @@ void sin_(pEnv env)
     Node node;
 
     PARM(1, UFLOAT);
-    node = lst_pop(env->stck);
+    env->stck = pvec_pop(env->stck, &node);
     node.u.dbl = sin(node.op == FLOAT_ ? node.u.dbl : (double)node.u.num);
     node.op = FLOAT_;
-    lst_push(env->stck, node);
+    env->stck = pvec_add(env->stck, node);
 }
 #endif

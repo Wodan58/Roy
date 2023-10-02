@@ -1,7 +1,7 @@
 /*
     module  : put.c
-    version : 1.13
-    date    : 09/19/23
+    version : 1.14
+    date    : 10/02/23
 */
 #ifndef PUT_C
 #define PUT_C
@@ -15,7 +15,7 @@ void put_(pEnv env)
     Node node;
 
     PARM(1, ANYTYPE);
-    node = lst_pop(env->stck);
+    env->stck = pvec_pop(env->stck, &node);
     if (node.op == LIST_) {
 	putchar('[');
 	writeterm(env, node.u.lis, stdout);

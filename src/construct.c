@@ -1,7 +1,7 @@
 /*
     module  : construct.c
-    version : 1.18
-    date    : 09/19/23
+    version : 1.19
+    date    : 10/02/23
 */
 #ifndef CONSTRUCT_C
 #define CONSTRUCT_C
@@ -17,13 +17,13 @@ PRIVATE void construct_(pEnv env)
     Node first, second, node[2], elem, result;
 
     PARM(2, WHILE);
-    second = lst_pop(env->stck);
-    first = lst_pop(env->stck);
+    env->stck = pvec_pop(env->stck, &second);
+    env->stck = pvec_pop(env->stck, &first);
     /*
 	save the old stack; this will become the new stack
     */
-    lst_init(node[0].u.lis);
-    lst_copy(node[0].u.lis, env->stck);
+    node[0].u.lis = pvec_init();
+    pvec_copy(node[0].u.lis, env->stck);
     /*
 	execute the first program
     */
@@ -31,24 +31,24 @@ PRIVATE void construct_(pEnv env)
     /*
 	the new stack after the first program needs to be saved
     */
-    lst_init(node[1].u.lis);
-    lst_copy(node[1].u.lis, env->stck);
+    node[1].u.lis = pvec_init();
+    pvec_copy(node[1].u.lis, env->stck);
     /*
 	each of the programs in the construct needs to be executed
     */
-    lst_init(result.u.lis);
-    for (i = lst_size(second.u.lis) - 1; i >= 0; i--) {
-	elem = lst_at(second.u.lis, i);
+    result.u.lis = pvec_init();
+    for (i = pvec_cnt(second.u.lis) - 1; i >= 0; i--) {
+	elem = pvec_nth(second.u.lis, i);
 	exeterm(env, elem.u.lis);
-	elem = lst_pop(env->stck);
-	lst_push(result.u.lis, elem);
+	env->stck = pvec_pop(env->stck, &elem);
+	result.u.lis = pvec_add(result.u.lis, elem);
 	if (i)
-	    lst_copy(env->stck, node[1].u.lis);
+	    pvec_copy(env->stck, node[1].u.lis);
     }
     lst_copy(env->stck, node[0].u.lis);
-    for (i = 0, j = lst_size(result.u.lis); i < j; i++) {
-	elem = lst_at(result.u.lis, i);
-	lst_push(env->stck, elem);
+    for (i = 0, j = pvec_cnt(result.u.lis); i < j; i++) {
+	elem = pvec_nth(result.u.lis, i);
+	env->stck = pvec_add(env->stck, elem);
     }
 }
 #endif

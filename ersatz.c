@@ -1,7 +1,7 @@
 /*
  *  module  : ersatz.c
- *  version : 1.3
- *  date    : 09/19/23
+ *  version : 1.4
+ *  date    : 10/02/23
  */
 #include "globals.h"
 
@@ -43,7 +43,7 @@ int include(pEnv env, char *name, int error)
 }
 
 /*
-    cmpname - return the name of an operator, used in writefactor and Compare.
+    cmpname - return the name of an operator, used in Compare.
 */
 PUBLIC char *cmpname(proc_t proc)
 {
@@ -53,6 +53,14 @@ PUBLIC char *cmpname(proc_t proc)
 	if (yytable[i].proc == proc)
 	    return yytable[i].name;
     return "ANON_FUNCT_";
+}
+
+/*
+    opername - return the name of an operator, used in writefactor.
+*/
+PUBLIC char *opername(proc_t proc)
+{
+    return cmpname(proc);
 }
 
 /*

@@ -1,7 +1,7 @@
 /*
     module  : dip.c
-    version : 1.14
-    date    : 09/19/23
+    version : 1.15
+    date    : 10/02/23
 */
 #ifndef DIP_C
 #define DIP_C
@@ -15,9 +15,9 @@ PRIVATE void dip_(pEnv env)
     Node list, node;
 
     PARM(2, DIP);
-    list = lst_pop(env->stck);
-    node = lst_pop(env->stck);
+    env->stck = pvec_pop(env->stck, &list);
+    env->stck = pvec_pop(env->stck, &node);
     exeterm(env, list.u.lis);
-    lst_push(env->stck, node);
+    env->stck = pvec_add(env->stck, node);
 }
 #endif

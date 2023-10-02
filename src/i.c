@@ -1,7 +1,7 @@
 /*
     module  : i.c
-    version : 1.12
-    date    : 09/19/23
+    version : 1.13
+    date    : 10/02/23
 */
 #ifndef I_C
 #define I_C
@@ -15,7 +15,7 @@ PRIVATE void i_(pEnv env)
     Node node;
 
     PARM(1, DIP);
-    node = lst_pop(env->stck);
+    env->stck = pvec_pop(env->stck, &node);
     exeterm(env, node.u.lis);
 }
 #endif

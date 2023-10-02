@@ -1,7 +1,7 @@
 /*
     module  : nullary.c
-    version : 1.11
-    date    : 09/19/23
+    version : 1.12
+    date    : 10/02/23
 */
 #ifndef NULLARY_C
 #define NULLARY_C
@@ -16,12 +16,12 @@ void nullary_(pEnv env)
     Node list, node;
 
     PARM(1, DIP);
-    list = lst_pop(env->stck);
-    lst_init(node.u.lis);
-    lst_copy(node.u.lis, env->stck);	/* stack is saved in node */
+    env->stck = pvec_pop(env->stck, &list);
+    node.u.lis = pvec_init();
+    pvec_copy(node.u.lis, env->stck);		/* stack is saved in node */
     exeterm(env, list.u.lis);
-    list = lst_pop(env->stck);		/* take R from stack */
-    lst_push(node.u.lis, list);		/* add R to old stack */
+    env->stck = pvec_pop(env->stck, &list);	/* take R from stack */
+    node.u.lis = pvec_add(node.u.lis, list);	/* add R to old stack */
     lst_copy(env->stck, node.u.lis);	/* restore old stack with R on top */
 }
 #endif

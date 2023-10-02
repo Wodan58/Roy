@@ -1,7 +1,7 @@
 /*
     module  : exeterm.c
-    version : 1.4
-    date    : 09/18/23
+    version : 1.5
+    date    : 10/02/23
 */
 #include "globals.h"
 
@@ -13,8 +13,8 @@ void exeterm(pEnv env, NodeList *prog)
     int i;
     Node node;
 
-    for (i = lst_size(prog) - 1; i >= 0; i--) {
-        node = lst_at(prog, i);
+    for (i = pvec_cnt(prog) - 1; i >= 0; i--) {
+        node = pvec_nth(prog, i);
 #ifdef TRACING
 	if (env->debugging) {
 	    writestack(env, env->stck, stdout);
@@ -41,7 +41,7 @@ void exeterm(pEnv env, NodeList *prog)
 	case FILE_:
 	case BIGNUM_:
 	case USR_STRING_:
-	    lst_push(env->stck, node);
+	    env->stck = pvec_add(env->stck, node);
 	    break;
 	}
     }

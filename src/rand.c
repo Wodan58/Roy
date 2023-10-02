@@ -1,7 +1,7 @@
 /*
     module  : rand.c
-    version : 1.12
-    date    : 09/19/23
+    version : 1.13
+    date    : 10/02/23
 */
 #ifndef RAND_C
 #define RAND_C
@@ -16,6 +16,6 @@ void rand_(pEnv env)
 
     node.u.num = rand();
     node.op = INTEGER_;
-    lst_push(env->stck, node);
+    env->stck = pvec_add(env->stck, node);
 }
 #endif

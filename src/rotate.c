@@ -1,7 +1,7 @@
 /*
     module  : rotate.c
-    version : 1.13
-    date    : 09/19/23
+    version : 1.14
+    date    : 10/02/23
 */
 #ifndef ROTATE_C
 #define ROTATE_C
@@ -15,11 +15,11 @@ void rotate_(pEnv env)
     Node first, second, third;
 
     PARM(3, ANYTYPE);
-    third = lst_pop(env->stck);
-    second = lst_pop(env->stck);
-    first = lst_pop(env->stck);
-    lst_push(env->stck, third);
-    lst_push(env->stck, second);
-    lst_push(env->stck, first);
+    env->stck = pvec_pop(env->stck, &third);
+    env->stck = pvec_pop(env->stck, &second);
+    env->stck = pvec_pop(env->stck, &first);
+    env->stck = pvec_add(env->stck, third);
+    env->stck = pvec_add(env->stck, second);
+    env->stck = pvec_add(env->stck, first);
 }
 #endif

@@ -1,7 +1,7 @@
 /*
     module  : ifte.c
-    version : 1.22
-    date    : 09/19/23
+    version : 1.23
+    date    : 10/02/23
 */
 #ifndef IFTE_C
 #define IFTE_C
@@ -15,9 +15,9 @@ void ifte_(pEnv env)
     Node first, second, third;
 
     PARM(3, IFTE);
-    third = lst_pop(env->stck);
-    second = lst_pop(env->stck);
-    first = lst_pop(env->stck);
+    env->stck = pvec_pop(env->stck, &third);
+    env->stck = pvec_pop(env->stck, &second);
+    env->stck = pvec_pop(env->stck, &first);
     /*
 	execute the test of the ifte
     */
@@ -25,7 +25,7 @@ void ifte_(pEnv env)
     /*
 	pop the result from the stack
     */
-    first = lst_pop(env->stck);
+    env->stck = pvec_pop(env->stck, &first);
     if (first.u.num)
 	exeterm(env, second.u.lis);
     else
