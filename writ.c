@@ -1,7 +1,7 @@
 /*
- *  module  : %M%
- *  version : %I%
- *  date    : %G%
+ *  module  : writ.c
+ *  version : 1.14
+ *  date    : 10/12/23
  */
 #include "globals.h"
 

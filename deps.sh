@@ -1,7 +1,7 @@
 #
 #   module  : deps.sh
-#   version : 1.3
-#   date    : 09/19/23
+#   version : 1.4
+#   date    : 10/16/23
 #
 #   Generate deps.h
 #   The directory needs to be given as parameter.
@@ -65,8 +65,13 @@ done >$1/deps.h
 for i in $1/*.c
 do
   k=`grep "[^e]code(env" $i | sed 's/.*code(env, \(.*\));/\1C/'`
+  l=`grep "_(env);" $i | sed 's/[ \t]*\(.*\)(env);/\1C/'`
   if [ "$k" != "" ]
   then
     echo "$k" | tr '[a-z]' '[A-Z]' | sed 's/^/#undef /'
+  fi
+  if [ "$l" != "" ]
+  then
+    echo "$l" | tr '[a-z]' '[A-Z]' | sed 's/^/#undef /'
   fi
 done >>$1/deps.h
