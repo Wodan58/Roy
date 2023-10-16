@@ -1,7 +1,7 @@
 /*
     module  : unary4.c
-    version : 1.18
-    date    : 10/02/23
+    version : 1.19
+    date    : 10/12/23
 */
 #ifndef UNARY4_C
 #define UNARY4_C
@@ -15,7 +15,7 @@ PRIVATE void unary4_(pEnv env)
     PARM(5, DIP);
     Node list, node[4];
 
-    list = lst_pop(env->stck);
+    list = pvec_pop(env->stck);
     env->stck = pvec_pop(env->stck, &node[3]);	/* W, expose Z */
     env->stck = pvec_pop(env->stck, &node[2]);	/* Z, expose Y */
     env->stck = pvec_pop(env->stck, &node[1]);	/* Y, expose X */

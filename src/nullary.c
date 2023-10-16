@@ -1,7 +1,7 @@
 /*
     module  : nullary.c
-    version : 1.12
-    date    : 10/02/23
+    version : 1.13
+    date    : 10/12/23
 */
 #ifndef NULLARY_C
 #define NULLARY_C
@@ -22,6 +22,6 @@ void nullary_(pEnv env)
     exeterm(env, list.u.lis);
     env->stck = pvec_pop(env->stck, &list);	/* take R from stack */
     node.u.lis = pvec_add(node.u.lis, list);	/* add R to old stack */
-    lst_copy(env->stck, node.u.lis);	/* restore old stack with R on top */
+    pvec_copy(env->stck, node.u.lis);	/* restore old stack with R on top */
 }
 #endif

@@ -1,7 +1,7 @@
 /*
     module  : step.c
-    version : 1.16
-    date    : 10/02/23
+    version : 1.17
+    date    : 10/12/23
 */
 #ifndef STEP_C
 #define STEP_C
@@ -32,10 +32,10 @@ void step_(pEnv env)
     case STRING_:
     case BIGNUM_:
     case USR_STRING_:
-	node.op = CHAR_;
 	ptr = aggr.u.str;
-	for (i = 0, j = strlen(aggr.u.str); i < j; i++) {
-	    node.u.num = aggr.u.str[i];
+	node.op = CHAR_;
+	for (i = 0, j = strlen(ptr); i < j; i++) {
+	    node.u.num = ptr[i];
 	    env->stck = pvec_add(env->stck, node);
 	    exeterm(env, list.u.lis);
 	}

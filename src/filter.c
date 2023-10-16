@@ -1,7 +1,7 @@
 /*
     module  : filter.c
-    version : 1.27
-    date    : 10/02/23
+    version : 1.28
+    date    : 10/12/23
 */
 #ifndef FILTER_C
 #define FILTER_C
@@ -39,14 +39,14 @@ void filter_(pEnv env)
     case STRING_:
     case BIGNUM_:
     case USR_STRING_:
-	temp.u.str = GC_strdup(aggr.u.str);
-	node.op = CHAR_;
 	ptr = aggr.u.str;
-	for (k = i = 0, j = strlen(aggr.u.str); i < j; i++) {
+	temp.u.str = GC_strdup(ptr);
+	node.op = CHAR_;
+	for (k = i = 0, j = strlen(ptr); i < j; i++) {
 	    /*
 		push the element to be filtered
 	    */
-	    node.u.num = aggr.u.str[i];
+	    node.u.num = ptr[i];
 	    env->stck = pvec_add(env->stck, node);
 	    exeterm(env, list.u.lis);
 	    env->stck = pvec_pop(env->stck, &test);

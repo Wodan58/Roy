@@ -1,7 +1,7 @@
 /*
     module  : map.c
-    version : 1.28
-    date    : 10/02/23
+    version : 1.29
+    date    : 10/12/23
 */
 #ifndef MAP_C
 #define MAP_C
@@ -39,14 +39,14 @@ void map_(pEnv env)
     case STRING_:
     case BIGNUM_:
     case USR_STRING_:
-	temp.u.str = GC_strdup(aggr.u.str);
-	node.op = CHAR_;
 	ptr = aggr.u.str;
-	for (i = 0, j = strlen(aggr.u.str); i < j; i++) {
+	temp.u.str = GC_strdup(ptr);
+	node.op = CHAR_;
+	for (i = 0, j = strlen(ptr); i < j; i++) {
 	    /*
 		push the element to be mapped
 	    */
-	    node.u.num = aggr.u.str[i];
+	    node.u.num = ptr[i];
 	    env->stck = pvec_add(env->stck, node);
 	    exeterm(env, list.u.lis);
 	    env->stck = pvec_pop(env->stck, &node);
@@ -68,7 +68,7 @@ void map_(pEnv env)
 		env->stck = pvec_pop(env->stck, &node);
 		temp.u.set |= (uint64_t)1 << node.u.num;
 	    }
-	lst_push(env->stck, temp);
+	env->stck = pvec_add(env->stck, temp);
 	break;
 
     default:

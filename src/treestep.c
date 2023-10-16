@@ -1,7 +1,7 @@
 /*
     module  : treestep.c
-    version : 1.17
-    date    : 10/02/23
+    version : 1.18
+    date    : 10/12/23
 */
 #ifndef TREESTEP_C
 #define TREESTEP_C
@@ -32,7 +32,7 @@ void treestep_(pEnv env)
     Node node;
 
     PARM(2, DIP);
-    node = lst_pop(env->stck);
+    node = pvec_pop(env->stck);
     aux_treestep(env, node.u.lis);
 }
 #endif

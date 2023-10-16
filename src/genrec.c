@@ -1,7 +1,7 @@
 /*
     module  : genrec.c
-    version : 1.22
-    date    : 10/02/23
+    version : 1.23
+    date    : 10/12/23
 */
 #ifndef GENREC_C
 #define GENREC_C
@@ -37,7 +37,7 @@ void genrec(pEnv env)
 	env->stck = pvec_add(env->stck, list);	/* push on stack */
 
 	cons_(env);				/* build aggregate */
-	lst_shallow_copy(list.u.lis, aggr.u.lis);
+	pvec_shallow_copy(list.u.lis, aggr.u.lis);
 	list.u.lis = pvec_del(list.u.lis);	/* remove [B] [T] [R1] */
 	list.u.lis = pvec_del(list.u.lis);
 	list.u.lis = pvec_del(list.u.lis);

@@ -1,7 +1,7 @@
 /*
     module  : construct.c
-    version : 1.19
-    date    : 10/02/23
+    version : 1.20
+    date    : 10/12/23
 */
 #ifndef CONSTRUCT_C
 #define CONSTRUCT_C
@@ -45,7 +45,7 @@ PRIVATE void construct_(pEnv env)
 	if (i)
 	    pvec_copy(env->stck, node[1].u.lis);
     }
-    lst_copy(env->stck, node[0].u.lis);
+    pvec_copy(env->stck, node[0].u.lis);
     for (i = 0, j = pvec_cnt(result.u.lis); i < j; i++) {
 	elem = pvec_nth(result.u.lis, i);
 	env->stck = pvec_add(env->stck, elem);

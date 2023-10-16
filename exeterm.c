@@ -1,9 +1,22 @@
 /*
     module  : exeterm.c
-    version : 1.5
-    date    : 10/02/23
+    version : 1.6
+    date    : 10/12/23
 */
 #include "globals.h"
+
+#ifdef TRACING
+static void trace(pEnv env, Node node, FILE *fp)
+{
+    if (!env->debugging)
+	return;
+    writestack(env, env->stck, fp);
+    fprintf(fp, " : ");
+    writefactor(env, node, fp);
+    fputc('\n', fp);
+    fflush(fp);
+}
+#endif
 
 /*
     exeterm - execute the fetch, decode, evaluate cycle.
@@ -16,33 +29,13 @@ void exeterm(pEnv env, NodeList *prog)
     for (i = pvec_cnt(prog) - 1; i >= 0; i--) {
         node = pvec_nth(prog, i);
 #ifdef TRACING
-	if (env->debugging) {
-	    writestack(env, env->stck, stdout);
-	    printf(" : ");
-	    writefactor(env, node, stdout);
-	    putchar('\n');
-	    fflush(stdout);
-	}
+	trace(env, node, stdout);
 #endif
-        switch (node.op) {
-	case USR_LIST_:
-	    exeterm(env, node.u.lis);
-	    break;
-	case ANON_FUNCT_:
+	if (node.op == ANON_FUNCT_)
 	    (*node.u.proc)(env);
-	    break;
-	case BOOLEAN_:
-	case CHAR_:
-	case INTEGER_:
-	case SET_:
-	case STRING_:
-	case LIST_:
-	case FLOAT_:
-	case FILE_:
-	case BIGNUM_:
-	case USR_STRING_:
+        else if (node.op == USR_LIST_)
+	    exeterm(env, node.u.lis);
+	else
 	    env->stck = pvec_add(env->stck, node);
-	    break;
-	}
     }
 }
