@@ -1,14 +1,14 @@
 /*
     module  : put.c
-    version : 1.14
-    date    : 10/02/23
+    version : 1.11
+    date    : 04/11/24
 */
 #ifndef PUT_C
 #define PUT_C
 
 /**
-OK 3080  put  :  D 	X  ->
-Writes X to output, pops X off stack.
+Q0  IGNORE_POP  3080  put  :  D  X  ->
+[IMPURE] Writes X to output, pops X off stack.
 */
 void put_(pEnv env)
 {
@@ -22,6 +22,5 @@ void put_(pEnv env)
 	putchar(']');
     } else
 	writefactor(env, node, stdout);
-    putchar(' ');
 }
 #endif

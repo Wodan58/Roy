@@ -1,7 +1,3 @@
 roy.tar
-defs.h
-deps.h
-*.o
-*.exe
-prim.c
-prim.h
+bdwgc
+build

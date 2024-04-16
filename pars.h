@@ -35,8 +35,8 @@
    especially those whose name start with YY_ or yy_.  They are
    private implementation details that can be changed or removed.  */
 
-#ifndef YY_YY_PARS_H_INCLUDED
-# define YY_YY_PARS_H_INCLUDED
+#ifndef YY_YY_HOME_RUURD_JOY_NOY_PARS_H_INCLUDED
+# define YY_YY_HOME_RUURD_JOY_NOY_PARS_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -54,12 +54,12 @@ extern int yydebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    MODULE = 258,                  /* MODULE  */
-    JPRIVATE = 259,                /* JPRIVATE  */
-    JPUBLIC = 260,                 /* JPUBLIC  */
+    MODULE_ = 258,                 /* MODULE_  */
+    PRIVATE = 259,                 /* PRIVATE  */
+    PUBLIC = 260,                  /* PUBLIC  */
     EQDEF = 261,                   /* EQDEF  */
     END = 262,                     /* END  */
-    KEYWORD_ = 1,                  /* KEYWORD_  */
+    CONST_ = 263,                  /* CONST_  */
     USR_ = 2,                      /* USR_  */
     ANON_FUNCT_ = 3,               /* ANON_FUNCT_  */
     BOOLEAN_ = 4,                  /* BOOLEAN_  */
@@ -83,7 +83,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 40 "pars.y"
+#line 57 "/home/Ruurd/JOY/Noy/pars.y"
 
     int64_t num;	/* USR, BOOLEAN, CHAR, INTEGER */
     proc_t proc;	/* ANON_FUNCT */
@@ -92,9 +92,9 @@ union YYSTYPE
     NodeList *lis;	/* LIST */
     double dbl;		/* FLOAT */
     FILE *fil;		/* FILE */
-    pEntry ent;		/* SYMBOL */
+    int ent;		/* SYMBOL */
 
-#line 98 "pars.h"
+#line 98 "/home/Ruurd/JOY/Noy/pars.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -123,4 +123,4 @@ extern YYLTYPE yylloc;
 int yyparse (pEnv env);
 
 
-#endif /* !YY_YY_PARS_H_INCLUDED  */
+#endif /* !YY_YY_HOME_RUURD_JOY_NOY_PARS_H_INCLUDED  */

@@ -1,14 +1,15 @@
 /*
     module  : fwrite.c
-    version : 1.14
-    date    : 10/02/23
+    version : 1.9
+    date    : 03/05/24
 */
 #ifndef FWRITE_C
 #define FWRITE_C
 
 /**
-OK 1910  fwrite  :  D	S L  ->  S
-A list of integers are written as bytes to the current position of stream S.
+Q0  OK  1910  fwrite  :  D  S L  ->  S
+[FOREIGN] A list of integers are written as bytes to the current position of
+stream S.
 */
 void fwrite_(pEnv env)
 {

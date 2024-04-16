@@ -1,13 +1,13 @@
 /*
     module  : null.c
-    version : 1.14
-    date    : 10/02/23
+    version : 1.12
+    date    : 04/11/24
 */
 #ifndef NULL_C
 #define NULL_C
 
 /**
-OK 2200  null  :  DA	X  ->  B
+Q0  OK  2200  null  :  DA  X  ->  B
 Tests for empty aggregate X or zero numeric.
 */
 void null_(pEnv env)
@@ -17,6 +17,7 @@ void null_(pEnv env)
     PARM(1, ANYTYPE);
     env->stck = pvec_pop(env->stck, &node);
     switch (node.op) {
+#if 0
     case USR_:
     case USR_PRIME_:
 	node.u.num = !node.u.ent;
@@ -25,6 +26,7 @@ void null_(pEnv env)
     case ANON_PRIME_:
 	node.u.num = !node.u.proc;
 	break;
+#endif
     case BOOLEAN_:
     case CHAR_:
     case INTEGER_:
@@ -47,8 +49,13 @@ void null_(pEnv env)
     case FILE_:
 	node.u.num = !node.u.fil;
 	break;
+#ifdef USE_BIGNUM_ARITHMETIC
     case BIGNUM_:
 	node.u.num = node.u.str[1] == '0';
+	break;
+#endif
+    default:
+	node.u.num = 0;		/* false */
 	break;
     }
     node.op = BOOLEAN_;

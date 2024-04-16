@@ -1,6 +1,0 @@
-(*
-    module  : tanh.joy
-    version : 1.3
-    date    : 09/19/23
-*)
-1.5 tanh 'g 0 6 formatf strtod 0.905148 =.

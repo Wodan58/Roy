@@ -1,13 +1,13 @@
 /*
     module  : and.c
-    version : 1.12
-    date    : 10/02/23
+    version : 1.8
+    date    : 03/05/24
 */
 #ifndef AND_C
 #define AND_C
 
 /**
-OK 1360  and  :  DDA	X Y  ->  Z
+Q0  OK  1360  and  :  DDA  X Y  ->  Z
 Z is the intersection of sets X and Y, logical conjunction for truth values.
 */
 void and_(pEnv env)
@@ -26,8 +26,6 @@ void and_(pEnv env)
     case INTEGER_:
 	first.u.num = first.u.num && second.u.num;
 	first.op = BOOLEAN_;
-	break;
-    default:
 	break;
     }
     env->stck = pvec_add(env->stck, first);

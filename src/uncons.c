@@ -1,13 +1,13 @@
 /*
     module  : uncons.c
-    version : 1.19
-    date    : 10/02/23
+    version : 1.10
+    date    : 03/05/24
 */
 #ifndef UNCONS_C
 #define UNCONS_C
 
 /**
-OK 2110  uncons  :  DAA	A  ->  F R
+Q0  OK  2110  uncons  :  DAA  A  ->  F R
 F and R are the first and the rest of non-empty aggregate A.
 */
 void uncons_(pEnv env)
@@ -41,9 +41,6 @@ void uncons_(pEnv env)
 	elem.op = INTEGER_;
 	env->stck = pvec_add(env->stck, elem);	/* push element */
 	aggr.u.set &= ~((int64_t)1 << i);
-	break;
-
-    default:
 	break;
     }
     env->stck = pvec_add(env->stck, aggr);	/* push remainder */

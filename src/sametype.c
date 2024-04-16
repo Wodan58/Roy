@@ -1,13 +1,13 @@
 /*
     module  : sametype.c
-    version : 1.13
-    date    : 10/02/23
+    version : 1.10
+    date    : 04/11/24
 */
 #ifndef SAMETYPE_C
 #define SAMETYPE_C
 
 /**
-OK 3240  sametype  :  DDA	X Y  ->  B
+Q0  OK  3210  sametype  :  DDA  X Y  ->  B
 [EXT] Tests whether X and Y have the same type.
 */
 void sametype_(pEnv env)

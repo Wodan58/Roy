@@ -1,6 +1,0 @@
-(*
-    module  : gmtime.joy
-    version : 1.3
-    date    : 09/19/23
-*)
-time gmtime 6 take.

@@ -1,7 +1,7 @@
 /*
     module  : equal.c
-    version : 1.18
-    date    : 10/02/23
+    version : 1.10
+    date    : 03/21/24
 */
 #ifndef EQUAL_C
 #define EQUAL_C
@@ -9,10 +9,10 @@
 #include "compare.h"
 
 /**
-OK 2280  equal  :  DDA	T U  ->  B
+Q0  OK  2280  equal  :  DDA  T U  ->  B
 (Recursively) tests whether trees T and U are identical.
 */
-PRIVATE int compatible(int first, int second)
+int compatible(int first, int second)
 {
     switch (first) {
     case BOOLEAN_:
@@ -51,6 +51,7 @@ PRIVATE int compatible(int first, int second)
 	}
 	break;
 
+#ifdef USE_BIGNUM_ARITHMETIC
     case BIGNUM_:
 	switch (second) {
 	case USR_:
@@ -69,14 +70,12 @@ PRIVATE int compatible(int first, int second)
 	    return 0;
 	}
 	break;
-
-    default:
-	break;
+#endif
     }
     return first == second;
 }
 
-PRIVATE int is_equal(pEnv env, Node first, Node second)
+int is_equal(pEnv env, Node first, Node second)
 {
     int i, j;
     vector(Node) *stackf = 0, *stacks = 0;

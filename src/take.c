@@ -1,13 +1,13 @@
 /*
     module  : take.c
-    version : 1.17
-    date    : 10/02/23
+    version : 1.9
+    date    : 03/05/24
 */
 #ifndef TAKE_C
 #define TAKE_C
 
 /**
-OK 2140  take  :  DDA	A N  ->  B
+Q0  OK  2140  take  :  DDA  A N  ->  B
 Aggregate B is the result of retaining just the first N elements of A.
 */
 void take_(pEnv env)
@@ -18,6 +18,7 @@ void take_(pEnv env)
     PARM(2, TAKE);
     env->stck = pvec_pop(env->stck, &elem);
     env->stck = pvec_pop(env->stck, &aggr);
+    node = aggr;
     switch (aggr.op) {
     case LIST_:
 	if ((j = pvec_cnt(aggr.u.lis)) <= elem.u.num)
@@ -51,10 +52,6 @@ void take_(pEnv env)
 		elem.u.num--;
 	    }
 	node.op = SET_;
-	break;
-
-    default:
-	node = aggr;
 	break;
     }
     env->stck = pvec_add(env->stck, node);

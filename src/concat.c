@@ -1,13 +1,13 @@
 /*
     module  : concat.c
-    version : 1.18
-    date    : 10/02/23
+    version : 1.9
+    date    : 03/05/24
 */
 #ifndef CONCAT_C
 #define CONCAT_C
 
 /**
-OK 2150  concat  :  DDA	S T  ->  U
+Q0  OK  2150  concat  :  DDA  S T  ->  U
 Sequence U is the concatenation of sequences S and T.
 */
 void concat_(pEnv env)
@@ -44,10 +44,6 @@ void concat_(pEnv env)
 
     case SET_:
 	result.u.set = first.u.set | second.u.set;
-	break;
-
-    default:
-	result = first;
 	break;
     }
     result.op = first.op;

@@ -1,14 +1,14 @@
 /*
     module  : stderr.c
-    version : 1.11
-    date    : 10/02/23
+    version : 1.9
+    date    : 03/05/24
 */
 #ifndef STDERR_C
 #define STDERR_C
 
 /**
-OK 1190  stderr  :  A	->  S
-Pushes the standard error stream.
+Q0  IMMEDIATE  1190  stderr  :  A  ->  S
+[FOREIGN] Pushes the standard error stream.
 */
 void stderr_(pEnv env)
 {

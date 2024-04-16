@@ -1,7 +1,7 @@
 /*
     module  : has.c
-    version : 1.14
-    date    : 10/02/23
+    version : 1.10
+    date    : 03/05/24
 */
 #ifndef HAS_C
 #define HAS_C
@@ -9,7 +9,7 @@
 #include "compare.h"
 
 /**
-OK 2290  has  :  DDA	A X  ->  B
+Q0  OK  2290  has  :  DDA  A X  ->  B
 Tests whether aggregate A has X as a member.
 */
 void has_(pEnv env)
@@ -30,6 +30,7 @@ void has_(pEnv env)
 	    }
 	}
 	break;
+
     case STRING_:
     case BIGNUM_:
     case USR_STRING_:
@@ -39,10 +40,9 @@ void has_(pEnv env)
 		break;
 	    }
 	break;
+
     case SET_:
 	found = (aggr.u.set & ((int64_t)1 << elem.u.num)) > 0;
-	break;
-    default:
 	break;
     }
     node.u.num = found;

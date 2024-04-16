@@ -1,9 +1,0 @@
-(*
-    module  : fold.joy
-    version : 1.4
-    date    : 09/19/23
-*)
-DEFINE
-    sum == 0 [+] fold.
-
-[1 2 3] sum 6 =.

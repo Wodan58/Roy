@@ -1,9 +1,0 @@
-(*
-    module  : binary.joy
-    version : 1.4
-    date    : 09/19/23
-*)
-3 4 5 [+] binary stack [9 3] equal.
-
-[] unstack.
-3 4 5 [] binary stack [5 3] equal.

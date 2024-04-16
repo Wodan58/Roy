@@ -1,14 +1,13 @@
 /*
     module  : pvec.h
-    version : 1.5
-    date    : 10/02/23
+    version : 1.10
+    date    : 04/11/24
 */
 struct NodeList {
-    uint64_t m : 30,	/* capacity */
-	     n : 30,	/* valid items */
-	     o :  1,	/* ownership */
-	     r :  2,	/* arity */
-	     u :  1;	/* used */
+    unsigned m : 31,	/* capacity */
+	     o :  1;	/* ownership */
+    unsigned n : 30,	/* valid items */
+	     r :  2;	/* arity */
     YYSTYPE *a;		/* union */
     Operator *b;	/* datatype */
 };
@@ -19,13 +18,14 @@ enum owner_t {
     OWNER,
 };
 
+#if 0
 /* arity tells: saving and restoring stack in a condition is necessary */
 enum arity_t {
     ARITY_UNKNOWN,	/* not yet calculated */
-    ARITY_KNOWN,
     ARITY_NOT_OK,
     ARITY_OK,
 };
+#endif
 
 /* initialize vector header and set the array as not owned by the head */
 static inline NodeList *pvec_init(void)
@@ -36,8 +36,23 @@ static inline NodeList *pvec_init(void)
     v->b = 0;
     v->o = NOT_OWNER;
     v->r = ARITY_UNKNOWN;
-    v->u = 0;
     return v;
+}
+
+/* pvec_concat concatenates two existing vectors, and returns 1 result */
+static inline NodeList *pvec_concat(NodeList *v, NodeList *w)
+{
+    NodeList *r = GC_malloc(sizeof(NodeList));
+    r->m = r->n = v->n + w->n;
+    r->a = GC_malloc(r->m * sizeof(YYSTYPE));
+    r->b = GC_malloc(r->m);
+    memcpy(r->a, w->a, w->n * sizeof(YYSTYPE));
+    memcpy(r->b, w->b, w->n);
+    memcpy(r->a + w->n, v->a, v->n * sizeof(YYSTYPE));
+    memcpy(r->b + w->n, v->b, v->n);
+    r->o = OWNER;
+    r->r = ARITY_UNKNOWN;
+    return r;
 }
 
 /* pvec_add assumes that head has been initialized before it is called */
@@ -46,7 +61,7 @@ static inline NodeList *pvec_add(NodeList *v, Node x)
     void *ptr;
 
     if (v->n == v->m) {
-	v->m = v->m ? v->m << 1 : 1;
+	v->m = v->m ? v->m << 1 : 2;
 	ptr = GC_malloc(v->m * sizeof(YYSTYPE));
 	if (v->n)
 	    memcpy(ptr, v->a, v->n * sizeof(YYSTYPE));
@@ -67,6 +82,11 @@ static inline int pvec_cnt(NodeList *v)
     return v ? v->n : 0;
 }
 
+static inline int pvec_max(NodeList *v)
+{
+    return v ? v->m : 0;
+}
+
 /* pvec_copy assumes that v exists and need not be created array is ok */
 static inline void pvec_copy(NodeList *v, NodeList *w)
 {
@@ -77,7 +97,6 @@ static inline void pvec_copy(NodeList *v, NodeList *w)
 	    v->b = GC_malloc(v->m);
 	    v->o = OWNER;
 	    v->r = w->r;
-	    v->u = w->u;
 	}
 	memcpy(v->a, w->a, v->n * sizeof(YYSTYPE));
 	memcpy(v->b, w->b, v->n);
@@ -88,13 +107,14 @@ static inline void pvec_copy(NodeList *v, NodeList *w)
 static inline void pvec_shallow_copy(NodeList *v, NodeList *w)
 {
     memcpy(v, w, sizeof(NodeList));
+    v->o = NOT_OWNER;
 }
 
 /* pvec_shallow_copy_take_ownership makes a copy while taking ownership */
 static inline void pvec_shallow_copy_take_ownership(NodeList *v, NodeList *w)
 {
     if (w->o == OWNER) {
-	pvec_shallow_copy(v, w);
+	memcpy(v, w, sizeof(NodeList));
 	w->o = NOT_OWNER;
     } else
 	pvec_copy(v, w);
@@ -152,14 +172,4 @@ static inline int pvec_getarity(NodeList *v)
 static inline void pvec_setarity(NodeList *v, int s)
 {
     v->r = s;
-}
-
-static inline int pvec_getused(NodeList *v)
-{
-    return v->u;
-}
-
-static inline void pvec_setused(NodeList *v)
-{
-    v->u = 1;
 }

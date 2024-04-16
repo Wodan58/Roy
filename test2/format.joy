@@ -1,6 +1,0 @@
-(*
-    module  : format.joy
-    version : 1.3
-    date    : 09/19/23
-*)
-1 'd 10 10 format "0000000001" =.

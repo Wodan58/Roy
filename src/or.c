@@ -1,13 +1,13 @@
 /*
     module  : or.c
-    version : 1.12
-    date    : 10/02/23
+    version : 1.8
+    date    : 03/05/24
 */
 #ifndef OR_C
 #define OR_C
 
 /**
-OK 1340  or  :  DDA	X Y  ->  Z
+Q0  OK  1340  or  :  DDA  X Y  ->  Z
 Z is the union of sets X and Y, logical disjunction for truth values.
 */
 void or_(pEnv env)
@@ -26,8 +26,6 @@ void or_(pEnv env)
     case INTEGER_:
 	first.u.num = first.u.num || second.u.num;
 	first.op = BOOLEAN_;
-	break;
-    default:
 	break;
     }
     env->stck = pvec_add(env->stck, first);

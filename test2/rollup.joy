@@ -1,6 +1,0 @@
-(*
-    module  : rollup.joy
-    version : 1.3
-    date    : 09/19/23
-*)
-1 2 3 rollup stack [2 1 3] equal.

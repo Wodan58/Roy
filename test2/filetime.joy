@@ -1,7 +1,0 @@
-(*
-    module  : filetime.joy
-    version : 1.2
-    date    : 09/19/23
-*)
-"filetime.joy" filetime
-"test1" filetime null.

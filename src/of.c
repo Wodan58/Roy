@@ -1,13 +1,13 @@
 /*
     module  : of.c
-    version : 1.11
-    date    : 10/02/23
+    version : 1.10
+    date    : 03/05/24
 */
 #ifndef OF_C
 #define OF_C
 
 /**
-OK 2070  of  :  DDA	I A  ->  X
+Q0  OK  2070  of  :  DDA  I A  ->  X
 X (= A[I]) is the I-th member of aggregate A.
 */
 void of_(pEnv env)
@@ -41,9 +41,6 @@ void of_(pEnv env)
 		}
 		elem.u.num--;
 	    }
-	break;
-
-    default:
 	break;
     }
     env->stck = pvec_add(env->stck, elem);

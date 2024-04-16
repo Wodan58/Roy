@@ -1,6 +1,0 @@
-(*
-    module  : fputchars.joy
-    version : 1.4
-    date    : 09/19/23
-*)
-"test" "w" fopen "\"test\"\n" fputchars fclose.

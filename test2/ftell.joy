@@ -1,6 +1,0 @@
-(*
-    module  : ftell.joy
-    version : 1.4
-    date    : 09/19/23
-*)
-"ftell.joy" "r" fopen 0 2 fseek swap ftell 110 =.

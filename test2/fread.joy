@@ -1,6 +1,0 @@
-(*
-    module  : fread.joy
-    version : 1.3
-    date    : 09/19/23
-*)
-"fread.joy" "r" fopen 10 fread [40 42 10 32 32 32 32 109 111 100] equal.

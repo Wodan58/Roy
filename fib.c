@@ -1,5 +1,5 @@
 /*
- * generated Tue Sep 19 18:03:14 2023
+ * generated Thu Apr  4 10:53:48 2024
  */
 #include "globals.h"
 #include "prim.h"
@@ -33,29 +33,27 @@ YYSTYPE L4_a[] = {
     { .proc=dup_ },
 };
 NodeList L4 = { .n=2, .a=L4_a, .b=L4_b };
-Operator L1_b[] = {
-    ANON_FUNCT_,
-    LIST_,
-    LIST_,
-    LIST_,
-    LIST_,
-    INTEGER_,
-};
-YYSTYPE L1_a[] = {
-    { .proc=binrec_ },
-    { .lis=&L2 },
-    { .lis=&L3 },
-    { .lis=0 },
-    { .lis=&L4 },
-    { .num=40 },
-};
-NodeList L1 = { .n=6, .a=L1_a, .b=L1_b };
 
 int yyparse(pEnv env)
 {
-    static unsigned char init;
-    if (init) return 0; init = 1;
-    execute(env, &L1);
+    Node node;
+    node.u.num=40;
+    node.op=INTEGER_;
+    env->stck = pvec_add(env->stck, node);
+    node.u.lis=&L4;
+    node.op=LIST_;
+    env->stck = pvec_add(env->stck, node);
+    node.u.lis=0;
+    node.op=LIST_;
+    env->stck = pvec_add(env->stck, node);
+    node.u.lis=&L3;
+    node.op=LIST_;
+    env->stck = pvec_add(env->stck, node);
+    node.u.lis=&L2;
+    node.op=LIST_;
+    env->stck = pvec_add(env->stck, node);
+    binrec_(env);
+    execute(env, 0);
     return 0;
 }
 

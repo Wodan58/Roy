@@ -1,22 +1,22 @@
 /*
     module  : formatf.c
-    version : 1.14
-    date    : 10/02/23
+    version : 1.10
+    date    : 04/11/24
 */
 #ifndef FORMATF_C
 #define FORMATF_C
 
 /**
-OK 1770  formatf  :  DDDDA 	F C I J  ->  S
+Q0  OK  1770  formatf  :  DDDDA  F C I J  ->  S
 S is the formatted version of F in mode C
 ('e or 'E = exponential, 'f = fractional,
 'g or G = general with lower or upper case letters)
 with maximum width I and precision J.
 */
-PRIVATE void formatf_(pEnv env)
+void formatf_(pEnv env)
 {
     int leng;
-    char format[6], *result;
+    char format[MAXNUM], *result;
     Node first, second, third, fourth;
 
     PARM(4, FORMATF);

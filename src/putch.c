@@ -1,14 +1,14 @@
 /*
     module  : putch.c
-    version : 1.15
-    date    : 10/02/23
+    version : 1.9
+    date    : 03/21/24
 */
 #ifndef PUTCH_C
 #define PUTCH_C
 
 /**
-OK 3090  putch  :  D	N  ->
-N : numeric, writes character whose ASCII is N.
+Q0  IGNORE_POP  3090  putch  :  D  N  ->
+[IMPURE] N : numeric, writes character whose ASCII is N.
 */
 void putch_(pEnv env)
 {

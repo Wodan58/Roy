@@ -1,7 +1,0 @@
-(*
-    module  : rand.joy
-    version : 1.3
-    date    : 09/19/23
-*)
-1 srand.
-rand 1481765933 =.

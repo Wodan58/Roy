@@ -1,8 +1,0 @@
-(*
-    module  : take.joy
-    version : 1.7
-    date    : 09/19/23
-*)
-[1 2 3] 2 take [1 2] equal.
-"test" 2 take "te" =.
-{1 2 3} 2 take {1 2} =.

@@ -1,7 +1,7 @@
 /*
     module  : in.c
-    version : 1.15
-    date    : 10/02/23
+    version : 1.12
+    date    : 03/05/24
 */
 #ifndef IN_C
 #define IN_C
@@ -9,7 +9,7 @@
 #include "compare.h"
 
 /**
-OK 2300  in  :  DDA	X A  ->  B
+Q0  OK  2300  in  :  DDA  X A  ->  B
 Tests whether X is a member of aggregate A.
 */
 void in_(pEnv env)
@@ -17,7 +17,7 @@ void in_(pEnv env)
     int i, found = 0;
     Node aggr, elem, node;
 
-    PARM(2, CONS);
+    PARM(2, IN_);
     env->stck = pvec_pop(env->stck, &aggr);
     env->stck = pvec_pop(env->stck, &elem);
     switch (aggr.op) {
@@ -30,6 +30,7 @@ void in_(pEnv env)
 	    }
 	}
 	break;
+
     case STRING_:
     case BIGNUM_:
     case USR_STRING_:
@@ -39,10 +40,9 @@ void in_(pEnv env)
 		break;
 	    }
 	break;
+
     case SET_:
 	found = (aggr.u.set & ((int64_t)1 << elem.u.num)) > 0;
-	break;
-    default:
 	break;
     }
     node.u.num = found;

@@ -1,7 +1,0 @@
-(*
-    module  : tailrec.joy
-    version : 1.3
-    date    : 09/19/23
-*)
-[] 0 [dup 10 =] [pop] [dup [swons] dip succ] tailrec
-[9 8 7 6 5 4 3 2 1 0] equal.

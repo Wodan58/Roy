@@ -1,6 +1,0 @@
-(*
-    module  : cos.joy
-    version : 1.3
-    date    : 09/19/23
-*)
-0.5 cos 'g 0 6 formatf strtod 0.877583 =.

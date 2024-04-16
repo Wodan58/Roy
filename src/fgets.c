@@ -1,14 +1,14 @@
 /*
     module  : fgets.c
-    version : 1.13
-    date    : 10/02/23
+    version : 1.9
+    date    : 03/05/24
 */
 #ifndef FGETS_C
 #define FGETS_C
 
 /**
-OK 1880  fgets  :  A	S  ->  S L
-L is the next available line (as a string) from stream S.
+Q0  OK  1880  fgets  :  A  S  ->  S L
+[FOREIGN] L is the next available line (as a string) from stream S.
 */
 void fgets_(pEnv env)
 {

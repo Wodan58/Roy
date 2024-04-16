@@ -1,13 +1,13 @@
 /*
     module  : opcase.c
-    version : 1.17
-    date    : 10/02/23
+    version : 1.9
+    date    : 04/11/24
 */
 #ifndef OPCASE_C
 #define OPCASE_C
 
 /**
-OK 2090  opcase  :  DA	X [..[X Xs]..]  ->  X [Xs]
+Q0  OK  2090  opcase  :  DA  X [..[X Xs]..]  ->  X [Xs]
 Indexing on type of X, returns the list [Xs].
 */
 void opcase_(pEnv env)
@@ -26,15 +26,15 @@ void opcase_(pEnv env)
 	}
 	temp = pvec_lst(elem.u.lis);
 	if (node.op == temp.op) {
-	    if (node.op == ANON_FUNCT_ && node.u.proc != temp.u.proc)
-		;
-	    else {
-		node.u.lis = pvec_init();
-		pvec_shallow_copy(node.u.lis, elem.u.lis);
-		node.u.lis = pvec_del(elem.u.lis);
-		node.op = LIST_;
-		break;
+	    if (node.op == ANON_FUNCT_) {
+		if (node.u.proc != temp.u.proc)
+		    continue;
 	    }
+	    node.u.lis = pvec_init();
+	    pvec_shallow_copy(node.u.lis, elem.u.lis);
+	    node.u.lis = pvec_del(elem.u.lis);
+	    node.op = LIST_;
+	    break;
 	}
     }
     env->stck = pvec_add(env->stck, node);

@@ -1,7 +1,7 @@
 /*
     module  : exeterm.c
-    version : 1.6
-    date    : 10/12/23
+    version : 1.8
+    date    : 04/13/24
 */
 #include "globals.h"
 

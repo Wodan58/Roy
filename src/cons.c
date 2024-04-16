@@ -1,13 +1,13 @@
 /*
     module  : cons.c
-    version : 1.12
-    date    : 10/02/23
+    version : 1.10
+    date    : 03/05/24
 */
 #ifndef CONS_C
 #define CONS_C
 
 /**
-OK 2010  cons  :  DDA	X A  ->  B
+Q0  OK  2010  cons  :  DDA  X A  ->  B
 Aggregate B is A with a new member X (first member for sequences).
 */
 void cons_(pEnv env)
@@ -35,10 +35,6 @@ void cons_(pEnv env)
 
     case SET_:
 	node.u.set = aggr.u.set | ((int64_t)1 << elem.u.num);
-	break;
-
-    default:
-	node = aggr;
 	break;
     }
     node.op = aggr.op;

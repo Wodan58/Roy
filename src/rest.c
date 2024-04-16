@@ -1,13 +1,13 @@
 /*
     module  : rest.c
-    version : 1.13
-    date    : 10/02/23
+    version : 1.10
+    date    : 03/05/24
 */
 #ifndef REST_C
 #define REST_C
 
 /**
-OK 2040  rest  :  DA	A  ->  R
+Q0  OK  2040  rest  :  DA  A  ->  R
 R is the non-empty aggregate A with its first member removed.
 */
 void rest_(pEnv env)
@@ -34,9 +34,6 @@ void rest_(pEnv env)
 	while (!(node.u.set & ((int64_t)1 << i)))
 	    i++;
 	node.u.set &= ~((int64_t)1 << i);
-	break;
-
-    default:
 	break;
     }
     env->stck = pvec_add(env->stck, node);	/* push remainder */

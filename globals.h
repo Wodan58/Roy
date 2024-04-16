@@ -1,7 +1,7 @@
 /*
     module  : globals.h
-    version : 1.22
-    date    : 10/15/23
+    version : 1.42
+    date    : 04/11/24
 */
 #ifndef GLOBALS_H
 #define GLOBALS_H
@@ -15,34 +15,49 @@
 #include <time.h>
 #include <inttypes.h>
 
+#ifdef _MSC_VER
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <io.h>
+#pragma warning(disable: 4244 4267 4996)
+#else
+#include <unistd.h>		/* alarm function */
+#include <termios.h>
+#include <sys/ioctl.h>
+#endif
+
 /*
-    The following #defines are present in the source code.
-*/
+ * The following #defines are present in the source code.
+ */
 #if 0
 #define USE_BIGNUM_ARITHMETIC
 #define USE_MULTI_THREADS_JOY
 #endif
 
 #include <gc.h>			/* system installed BDW or local gc.h */
-#include "khash.h"
 #include "kvec.h"
+#include "khash.h"
 #ifdef USE_BIGNUM_ARITHMETIC
 #include "bignum.h"
 #endif
 
-/* configure		     */
-#define INPSTACKMAX 10
-#define INPLINEMAX 255
-#define BUFFERMAX 80
-#define DISPLAYMAX 10		/* nesting in HIDE & MODULE */
-#define INIECHOFLAG 0
-#define INIAUTOPUT 1
-#define INIUNDEFERROR 0
-#define INIWARNING 1
+/* configure			*/
+#define INPSTACKMAX	10
+#define INPLINEMAX	255
+#define BUFFERMAX	80	/* smaller buffer */
+#define HELPLINEMAX	72
+#define MAXNUM		32	/* even smaller buffer */
+#define FILENAMEMAX	14
+#define DISPLAYMAX	10	/* nesting in HIDE & MODULE */
+#define INIECHOFLAG	0
+#define INIAUTOPUT	1
+#define INITRACEGC	1
+#define INIUNDEFERROR	0
+#define INIWARNING	1
 
-/* installation dependent    */
-#define SETSIZE 64
-#define MAXINT 9223372036854775807LL
+/* installation dependent	*/
+#define SETSIZE (int)(CHAR_BIT * sizeof(uint64_t))	/* from limits.h */
+#define MAXINT_ INT64_MAX				/* from stdint.h */
 
 typedef enum {
     ANYTYPE,
@@ -70,7 +85,7 @@ typedef enum {
     MAXMIN,
     PREDSUCC,
     PLUSMINUS,
-    SIZE,
+    SIZE_,
     STEP,
     TAKE,
     CONCAT,
@@ -83,6 +98,7 @@ typedef enum {
     FORMAT,
     FORMATF,
     CONS,
+    IN_,
     HAS,
     CASE,
     FIRST,
@@ -92,26 +108,29 @@ typedef enum {
     REM,
     DIVIDE,
     FWRITE,
+    ASSIGN,
+#ifdef USE_MULTI_THREADS_JOY
     RECEIVE,
     SEND
+#endif
 } Params;
 
 typedef enum {
-    NOT_USED,
-    MY_ABORT,
-    PARS_ERR,
-    EXEC_ERR
-} Aborts;
-
-typedef enum {
     OK,
-    IMMEDIATE
+    IGNORE_OK,
+    IGNORE_PUSH,
+    IGNORE_POP,
+    IMMEDIATE,
+    POSTPONE
 } Flags;
 
-#define PRIVATE
-#define PUBLIC
+typedef enum {
+    ABORT_NONE,
+    ABORT_RETRY,
+    ABORT_QUIT
+} Abort;
 
-/* types		     */
+/* types			*/
 typedef int Symbol;			/* symbol created by scanner */
 
 typedef struct Env *pEnv;		/* pointer to global variables */
@@ -120,18 +139,16 @@ typedef void (*proc_t)(pEnv);		/* procedure */
 
 typedef struct NodeList NodeList;	/* forward */
 
-typedef int pEntry;			/* index in symbol table */
-
 typedef unsigned char Operator;		/* opcode / datatype */
 
 /*
-    Lists are stored in vectors of type Node.
-*/
+ * Lists are stored in vectors of type Node.
+ */
 #include "pars.h"	/* YYSTYPE */
 
 /*
-    Nodes are in consecutive memory locations. No next pointer needed.
-*/
+ * Nodes are in consecutive memory locations. No next pointer needed.
+ */
 typedef struct Node {
     YYSTYPE u;
     Operator op;
@@ -139,10 +156,14 @@ typedef struct Node {
 
 #include "pvec.h"	/* struct NodeList */
 
+#ifdef USE_MULTI_THREADS_JOY
+#include "task.h"
+#endif
+
 /*
-    The symbol table has a name/value pair. Type of value depends on is_user.
-    The flags are used to distinguish between immediate and normal functions.
-*/
+ * The symbol table has a name/value pair. Type of value depends on is_user.
+ * The flags are used to distinguish between immediate and normal functions.
+ */
 typedef struct Entry {
     char *name, is_user, flags;
     union {
@@ -157,18 +178,18 @@ typedef struct Token {
 } Token;
 
 /*
-    The symbol table is accessed through a hash table.
-*/
-KHASH_MAP_INIT_STR(Symtab, pEntry)
-
-#ifdef USE_MULTI_THREADS_JOY
-#include "task.h"		/* context, channel */
-#endif
+ * The symbol table is accessed through two hash tables, one with name as
+ * index; the other with function address as index, cast to int64_t.
+ */
+KHASH_MAP_INIT_STR(Symtab, int)
+KHASH_MAP_INIT_INT64(Funtab, int)
 
 /*
-    Global variables are stored locally in the main function.
-*/
+ * Global variables are stored locally in the main function.
+ */
 typedef struct Env {
+    double calls;		/* statistics */
+    double opers;
     vector(Token) *tokens;	/* read ahead table */
     vector(Entry) *symtab;	/* symbol table */
 #ifdef USE_MULTI_THREADS_JOY
@@ -176,38 +197,41 @@ typedef struct Env {
     vector(Channel) *channel;
 #endif
     khash_t(Symtab) *hash;
+    khash_t(Funtab) *prim;
     NodeList *stck, *prog;	/* stack, code, and quotations are vectors */
     clock_t startclock;		/* main */
+    char **g_argv;
     char *pathname;
     char *filename;
-    char **g_argv;
     int g_argc;
     int token;			/* yylex */
-    pEntry location;		/* lookup */
+#ifdef USE_BIGNUM_ARITHMETIC
+    int scale;			/* number of digits after the decimal point */
+#endif
 #ifdef USE_MULTI_THREADS_JOY
-    int current;
+    int current;		/* currently executing thread */
 #endif
     int hide_stack[DISPLAYMAX];
-    struct module {
+    struct {
 	char *name;
 	int hide;
     } module_stack[DISPLAYMAX];
+    unsigned char inlining;
     unsigned char autoput;	/* options */
+    unsigned char autoput_set;
     unsigned char echoflag;
-    unsigned char undeferror;
     unsigned char tracegc;
-    unsigned char debugging;
-    unsigned char overwrite;
-    unsigned char compiling;
+    unsigned char undeferror;
+    unsigned char undeferror_set;
     unsigned char alarming;
+    unsigned char bytecoding;
+    unsigned char compiling;
+    unsigned char debugging;
+    unsigned char ignore;
+    unsigned char overwrite;
+    unsigned char printing;
+    unsigned char recurse;
 } Env;
-
-typedef struct OpTable {
-    char flags;
-    char *name;
-    proc_t proc;
-    char *arity, *messg1, *messg2;
-} OpTable;
 
 typedef struct table_t {
     proc_t proc;
@@ -216,76 +240,89 @@ typedef struct table_t {
 
 /* Public procedures: */
 /* arty.c */
-PUBLIC int arity(pEnv env, NodeList *quot, int num);
+int arity(pEnv env, NodeList *quot, int num);
 /* comp.c */
-PUBLIC void initcompile(pEnv env);
-PUBLIC void compileprog(pEnv env, NodeList *list);
+void initcompile(pEnv env);
+void exitcompile(pEnv env);
+void compileprog(pEnv env, NodeList *list);
 /* eval.c */
-PUBLIC void exeterm(pEnv env, NodeList *list);
-PUBLIC char *showname(int i);
-PUBLIC int operindex(proc_t proc);
-PUBLIC char *cmpname(proc_t proc);
-PUBLIC char *opername(proc_t proc);
-PUBLIC char *operarity(proc_t proc);
+void evaluate(pEnv env, NodeList *list);
 /* exec.c */
-PUBLIC void execute(pEnv env, NodeList *list);
+void execute(pEnv env, NodeList *list);
+/* exeterm.c */
+void exeterm(pEnv env, NodeList *list);
 /* lexr.l */
-PUBLIC void new_buffer(void);
-PUBLIC void old_buffer(int num);
-PUBLIC int my_yylex(pEnv env);
-PUBLIC int get_char(void);
+void new_buffer(void);
+void old_buffer(int num);
+int my_yylex(pEnv env);
+int get_input(void);
 /* main.c */
-PUBLIC void abortexecution_(int num);
+void abortexecution_(int num);
+void stats(pEnv env);
+void dump(pEnv env);
 /* modl.c */
-PUBLIC void savemod(int *hide, int *modl, int *hcnt);
-PUBLIC void undomod(int hide, int modl, int hcnt);
-PUBLIC void initmod(pEnv env, char *name);
-PUBLIC void initpriv(pEnv env);
-PUBLIC void stoppriv(void);
-PUBLIC void exitpriv(void);
-PUBLIC void exitmod(void);
-PUBLIC char *classify(pEnv env, char *name);
-PUBLIC pEntry qualify(pEnv env, char *name);
+void savemod(int *hide, int *modl, int *hcnt);
+void undomod(int hide, int modl, int hcnt);
+void initmod(pEnv env, char *name);
+void initpriv(pEnv env);
+void stoppriv(void);
+void exitpriv(void);
+void exitmod(void);
+char *classify(pEnv env, char *name);
+int qualify(pEnv env, char *name);
 /* otab.c */
-PUBLIC OpTable *readtable(int i);
+char *showname(int i);
+int operindex(pEnv env, proc_t proc);
+char *opername(pEnv env, proc_t proc);
+char *cmpname(pEnv env, proc_t proc);
+char *operarity(int i);
+int tablesize(void);
+int operqcode(int index);
+void inisymboltable(pEnv env);	/* initialise */
 /* parm.c */
-PUBLIC void parm(pEnv env, int num, Params type, char *file);
+void parm(pEnv env, int num, Params type, char *file);
 /* prog.c */
-PUBLIC void prog(pEnv env, NodeList *list);
-PUBLIC void code(pEnv env, proc_t proc);
-PUBLIC void push(pEnv env, int64_t num);
-PUBLIC void prime(pEnv env, Node node);
-PUBLIC Node pop(pEnv env);
+void prog(pEnv env, NodeList *list);
+void code(pEnv env, proc_t proc);
+void push(pEnv env, int64_t num);
+void prime(pEnv env, Node node);
+Node pop(pEnv env);
 /* read.c */
-PUBLIC void readfactor(pEnv env) /* read a JOY factor */;
-PUBLIC void readterm(pEnv env);
+int readfactor(pEnv env);	/* read a JOY factor */
+void readterm(pEnv env);
 /* repl.c */
-PUBLIC void inisymboltable(pEnv env) /* initialise */;
-PUBLIC void lookup(pEnv env, char *name);
-PUBLIC void enteratom(pEnv env, char *name, NodeList *list);
-PUBLIC NodeList *newnode(Operator op, YYSTYPE u);
+int lookup(pEnv env, char *name);
+void enteratom(pEnv env, char *name, NodeList *list);
+NodeList *newnode(Operator op, YYSTYPE u);
 /* save.c */
-PUBLIC void save(pEnv env, NodeList *list, int num, int remove);
+void save(pEnv env, NodeList *list, int num, int remove);
 /* scan.c */
-PUBLIC void inilinebuffer(char *str);
-PUBLIC int redirect(char *file, char *name, FILE *fp);
-PUBLIC int include(pEnv env, char *name, int error);
-PUBLIC int yywrap(void);
-PUBLIC void my_error(char *str, YYLTYPE *bloc);
-PUBLIC int yyerror(pEnv env, char *str);
+void inilinebuffer(pEnv env);
+void include(pEnv env, char *str);
+int yywrap(void);
+void my_error(char *str, YYLTYPE *bloc);
+void yyerror(pEnv env, char *str);
 /* util.c */
-PUBLIC int ChrVal(char *str);
-PUBLIC char *StrVal(char *str);
-PUBLIC char *DelSpace(char *str);
+int ChrVal(pEnv env, char *str);
+char *StrVal(pEnv env, char *str);
 /* writ.c */
-PUBLIC void writefactor(pEnv env, Node node, FILE *fp);
-PUBLIC void writeterm(pEnv env, NodeList *list, FILE *fp);
-PUBLIC void writestack(pEnv env, NodeList *list, FILE *fp);
+void writefactor(pEnv env, Node node, FILE *fp);
+void writeterm(pEnv env, NodeList *list, FILE *fp);
+void writestack(pEnv env, NodeList *list, FILE *fp);
 /* xerr.c */
-PUBLIC void execerror(char *filename, char *message, char *op);
+void execerror(char *filename, char *message, char *op);
 /* ylex.c */
-PUBLIC int yylex(pEnv env);
-/* quit.c */
-PUBLIC void my_atexit(proc_t proc);
-PUBLIC void quit_(pEnv env);
+int yylex(pEnv env);
+/* byte.c */
+void initbytes(pEnv env);
+void bytecode(pEnv env, NodeList *list);
+void exitbytes(pEnv env);
+/* code.c */
+void readbytes(pEnv env, int flag);
+/* dump.c */
+void dumpbytes(pEnv env);
+/* optm.c */
+void rewritebic(pEnv env);
+/* kraw.c */
+void SetRaw(pEnv env);
 #endif

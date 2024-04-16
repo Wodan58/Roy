@@ -1,6 +1,0 @@
-(*
-    module  : nullary.joy
-    version : 1.6
-    date    : 09/19/23
-*)
-2 20 [] nullary stack [20 20 2] equal.

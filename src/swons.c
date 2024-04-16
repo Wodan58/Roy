@@ -1,13 +1,13 @@
 /*
     module  : swons.c
-    version : 1.12
-    date    : 10/02/23
+    version : 1.10
+    date    : 03/05/24
 */
 #ifndef SWONS_C
 #define SWONS_C
 
 /**
-OK 2020  swons  :  DDA	A X  ->  B
+Q0  OK  2020  swons  :  DDA  A X  ->  B
 Aggregate B is A with a new member X (first member for sequences).
 */
 void swons_(pEnv env)
@@ -35,10 +35,6 @@ void swons_(pEnv env)
 
     case SET_:
 	node.u.set = aggr.u.set | ((int64_t)1 << elem.u.num);
-	break;
-
-    default:
-	node = aggr;
 	break;
     }
     node.op = aggr.op;

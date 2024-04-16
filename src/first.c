@@ -1,13 +1,13 @@
 /*
     module  : first.c
-    version : 1.14
-    date    : 10/02/23
+    version : 1.10
+    date    : 03/05/24
 */
 #ifndef FIRST_C
 #define FIRST_C
 
 /**
-OK 2030  first  :  DA	A  ->  F
+Q0  OK  2030  first  :  DA  A  ->  F
 F is the first member of the non-empty aggregate A.
 */
 void first_(pEnv env)
@@ -34,9 +34,6 @@ void first_(pEnv env)
 	    i++;
 	node.u.num = i;
 	node.op = INTEGER_;
-	break;
-
-    default:
 	break;
     }
     env->stck = pvec_add(env->stck, node);

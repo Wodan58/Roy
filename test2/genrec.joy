@@ -1,8 +1,0 @@
-(*
-    module  : genrec.joy
-    version : 1.3
-    date    : 09/19/23
-*)
-DEFINE	g-fib == [dup small] [] [pred dup pred] [app2 +] genrec.
-
-10 g-fib 55 =.

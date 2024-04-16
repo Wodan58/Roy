@@ -1,6 +1,0 @@
-(*
-    module  : fputch.joy
-    version : 1.4
-    date    : 09/19/23
-*)
-"test" "w" fopen 39 fputch 65 fputch 10 fputch fclose.

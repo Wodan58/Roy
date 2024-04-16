@@ -1,13 +1,13 @@
 /*
     module  : __memorymax.c
-    version : 1.13
-    date    : 10/02/23
+    version : 1.10
+    date    : 03/21/24
 */
 #ifndef __MEMORYMAX_C
 #define __MEMORYMAX_C
 
 /**
-OK 1160  __memorymax  :  A 	->  I
+Q0  IGNORE_PUSH  1160  __memorymax  :  A  ->  I
 Pushes value of total size of memory.
 */
 void __memorymax_(pEnv env)

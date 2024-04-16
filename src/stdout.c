@@ -1,14 +1,14 @@
 /*
     module  : stdout.c
-    version : 1.11
-    date    : 10/02/23
+    version : 1.9
+    date    : 03/05/24
 */
 #ifndef STDOUT_C
 #define STDOUT_C
 
 /**
-OK 1180  stdout  :  A	->  S
-Pushes the standard output stream.
+Q0  IMMEDIATE  1180  stdout  :  A  ->  S
+[FOREIGN] Pushes the standard output stream.
 */
 void stdout_(pEnv env)
 {

@@ -1,7 +1,0 @@
-(*
-    module  : ifte.joy
-    version : 1.4
-    date    : 09/19/23
-*)
-[0 not] [true] [false] ifte.
-[1 not] [true] [false] ifte false =.

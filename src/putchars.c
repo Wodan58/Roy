@@ -1,14 +1,14 @@
 /*
     module  : putchars.c
-    version : 1.14
-    date    : 10/02/23
+    version : 1.9
+    date    : 03/21/24
 */
 #ifndef PUTCHARS_C
 #define PUTCHARS_C
 
 /**
-OK 3100  putchars  :  D	"abc.."  ->
-Writes abc.. (without quotes)
+Q0  IGNORE_POP  3100  putchars  :  D  "abc.."  ->
+[IMPURE] Writes abc.. (without quotes)
 */
 void putchars_(pEnv env)
 {

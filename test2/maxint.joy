@@ -1,6 +1,0 @@
-(*
-    module  : maxint.joy
-    version : 1.4
-    date    : 09/19/23
-*)
-maxint pred 9223372036854775806 =.
