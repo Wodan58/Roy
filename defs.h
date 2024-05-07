@@ -98,7 +98,6 @@
 #define GENRECAUX_C
 #define GEQL_C
 #define GET_C
-#define GETCH_C
 #define GETENV_C
 #define GMTIME_C
 #define GREATER_C

@@ -1,7 +1,7 @@
 /*
  *  module  : ersatz.c
- *  version : 1.6
- *  date    : 04/13/24
+ *  version : 1.7
+ *  date    : 05/07/24
  */
 #include "globals.h"
 
@@ -31,6 +31,11 @@ void include(pEnv env, char *name)
 void yyerror(pEnv env, char *str)
 {
     /* compiled programs do not error on source */
+}
+
+void trace(pEnv env, FILE *fp)
+{
+    /* no trace in compiled programs */
 }
 
 /*
@@ -71,19 +76,6 @@ int arity(pEnv env, NodeList *quot, int num)
 {
     /* compiled programs do not check the arity */
     return 1;	/* arity is ok */
-}
-
-/*
- * get_char - read a character, first skip spaces.
- */
-int get_char(void)
-{
-    int ch;
-
-    do
-	ch = getchar();
-    while (isspace(ch));
-    return ch;
 }
 
 /*

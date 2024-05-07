@@ -20,3 +20,5 @@ Changes
 -------
 
 Some builtins are not supported because they have no business in compiled code.
+Also, unlike [Soy](https://github.com/Wodan58/Soy), the arities in the code
+must be correct.

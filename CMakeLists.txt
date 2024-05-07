@@ -1,9 +1,9 @@
 #
 #   module  : CMakeLists.txt
-#   version : 1.3
-#   date    : 04/13/24
+#   version : 1.4
+#   date    : 05/07/24
 #
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.5)
 project(Roy VERSION 1.0)
 if("${CMAKE_BUILD_TYPE}" STREQUAL "")
   set(CMAKE_BUILD_TYPE "Release")
@@ -47,9 +47,10 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 else()
   add_dependencies(fib always)
   add_custom_target(always
-		    COMMAND sh ${CMAKE_SOURCE_DIR}/prim.sh ${CMAKE_SOURCE_DIR}
-		    COMMAND sh ${CMAKE_SOURCE_DIR}/defs.sh ${CMAKE_SOURCE_DIR}
-		    COMMAND sh ${CMAKE_SOURCE_DIR}/deps.sh ${CMAKE_SOURCE_DIR}
+		    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+		    COMMAND sh ${CMAKE_SOURCE_DIR}/prim.sh .
+		    COMMAND sh ${CMAKE_SOURCE_DIR}/defs.sh .
+		    COMMAND sh ${CMAKE_SOURCE_DIR}/deps.sh .
 		   )
   set(CF "-Wall -Wextra -Wpedantic -Werror -Wno-unused-parameter")
   if("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
