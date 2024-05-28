@@ -1,21 +1,21 @@
 #
 #   module  : CMakeLists.txt
-#   version : 1.4
-#   date    : 05/07/24
+#   version : 1.5
+#   date    : 05/28/24
 #
 cmake_minimum_required(VERSION 3.5)
 project(Roy VERSION 1.0)
 if("${CMAKE_BUILD_TYPE}" STREQUAL "")
   set(CMAKE_BUILD_TYPE "Release")
 endif()
+add_executable(fib fib.c exeterm.c ersatz.c main.c writ.c)
+add_dependencies(fib gc)
 add_definitions(-DLINK="\\"${CMAKE_EXE_LINKER_FLAGS}\\"")
 add_definitions(-DVERS="${CMAKE_BUILD_TYPE} ${PROJECT_VERSION}")
-add_executable(fib fib.c exeterm.c ersatz.c main.c writ.c)
 #
 #	MSVC: cmake --build . --config Release
 #
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-  add_definitions(-DGC_NOT_DLL -D_CRT_SECURE_NO_WARNINGS)
   set(CMAKE_VERBOSE_MAKEFILE ON)
   option(BUILD_SHARED_LIBS OFF)
   option(BUILD_TESTING OFF)

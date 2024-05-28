@@ -35,8 +35,8 @@
    especially those whose name start with YY_ or yy_.  They are
    private implementation details that can be changed or removed.  */
 
-#ifndef YY_YY_HOME_RUURD_JOY_NOY_PARS_H_INCLUDED
-# define YY_YY_HOME_RUURD_JOY_NOY_PARS_H_INCLUDED
+#ifndef YY_YY_PARS_H_INCLUDED
+# define YY_YY_PARS_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -83,7 +83,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 57 "/home/Ruurd/JOY/Noy/pars.y"
+#line 57 "pars.y"
 
     int64_t num;	/* USR, BOOLEAN, CHAR, INTEGER */
     proc_t proc;	/* ANON_FUNCT */
@@ -94,7 +94,7 @@ union YYSTYPE
     FILE *fil;		/* FILE */
     int ent;		/* SYMBOL */
 
-#line 98 "/home/Ruurd/JOY/Noy/pars.h"
+#line 98 "pars.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -123,4 +123,4 @@ extern YYLTYPE yylloc;
 int yyparse (pEnv env);
 
 
-#endif /* !YY_YY_HOME_RUURD_JOY_NOY_PARS_H_INCLUDED  */
+#endif /* !YY_YY_PARS_H_INCLUDED  */

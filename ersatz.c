@@ -1,7 +1,7 @@
 /*
  *  module  : ersatz.c
- *  version : 1.7
- *  date    : 05/07/24
+ *  version : 1.8
+ *  date    : 05/28/24
  */
 #include "globals.h"
 
@@ -23,9 +23,10 @@ void inilinebuffer(pEnv env)
 /*
  * include - read another source file.
  */
-void include(pEnv env, char *name)
+int include(pEnv env, char *name)
 {
     /* compiled programs do not include source files */
+    return 0;
 }
 
 void yyerror(pEnv env, char *str)
@@ -44,8 +45,8 @@ void trace(pEnv env, FILE *fp)
 void inisymboltable(pEnv env)
 {
     /* compiled programs use an empty symbol table */
-    env->hash = kh_init(Symtab);
-    env->prim = kh_init(Funtab);
+    env->hash = symtab_init();
+    env->prim = funtab_init();
 }
 
 /*
