@@ -12,7 +12,7 @@ environment:
   BDWGC_ARCHIVE: gc-%BDWGC_VERSION%.tar.gz
 
 install:
-  # install BDWGC and flex/bison
+  # install BDWGC
   - if not exist %BDWGC_ARCHIVE% appveyor DownloadFile "https://github.com/ivmai/bdwgc/releases/download/v%BDWGC_VERSION%/%BDWGC_ARCHIVE%"
   - move gc-%BDWGC_VERSION% bdwgc
  
