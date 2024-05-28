@@ -14,6 +14,7 @@ environment:
 install:
   # install BDWGC
   - if not exist %BDWGC_ARCHIVE% appveyor DownloadFile "https://github.com/ivmai/bdwgc/releases/download/v%BDWGC_VERSION%/%BDWGC_ARCHIVE%"
+  - tar xf %BDWGC_ARCHIVE%
   - move gc-%BDWGC_VERSION% bdwgc
  
 build_script:
