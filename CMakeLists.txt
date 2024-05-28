@@ -1,6 +1,6 @@
 #
 #   module  : CMakeLists.txt
-#   version : 1.6
+#   version : 1.7
 #   date    : 05/28/24
 #
 cmake_minimum_required(VERSION 3.5)
@@ -46,6 +46,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
   add_dependencies(fib always)
   add_custom_target(always 
 		    WORKING_DIRECTORY bdwgc
+		    COMMAND cmake .
 		    COMMAND cmake --build . --config Release)
 else()
   add_dependencies(fib always)
