@@ -1,6 +1,6 @@
 #
 #   module  : CMakeLists.txt
-#   version : 1.5
+#   version : 1.6
 #   date    : 05/28/24
 #
 cmake_minimum_required(VERSION 3.5)
@@ -9,7 +9,6 @@ if("${CMAKE_BUILD_TYPE}" STREQUAL "")
   set(CMAKE_BUILD_TYPE "Release")
 endif()
 add_executable(fib fib.c exeterm.c ersatz.c main.c writ.c)
-add_dependencies(fib gc)
 add_definitions(-DLINK="\\"${CMAKE_EXE_LINKER_FLAGS}\\"")
 add_definitions(-DVERS="${CMAKE_BUILD_TYPE} ${PROJECT_VERSION}")
 #
@@ -44,6 +43,10 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
   target_link_libraries(fib bdwgc/Release/gc)
   include_directories(bdwgc/include)
   add_subdirectory(bdwgc)
+  add_dependencies(fib always)
+  add_custom_target(always 
+		    WORKING_DIRECTORY bdwgc
+		    COMMAND cmake --build . --config Release)
 else()
   add_dependencies(fib always)
   add_custom_target(always
