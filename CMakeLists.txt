@@ -1,6 +1,6 @@
 #
 #   module  : CMakeLists.txt
-#   version : 1.7
+#   version : 1.8
 #   date    : 05/28/24
 #
 cmake_minimum_required(VERSION 3.5)
@@ -40,7 +40,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
   option(without_libatomic_ops ON)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DGC_NOT_DLL -D_CRT_SECURE_NO_DEPRECATE")
   add_definitions(-DCOMP="\\"${CMAKE_C_FLAGS}\\"")
-  target_link_libraries(fib bdwgc/Release/gc)
+  target_link_libraries(fib bdwgc/Release/gcmt-lib)
   include_directories(bdwgc/include)
   add_subdirectory(bdwgc)
   add_dependencies(fib always)
