@@ -73,6 +73,7 @@
 #define FILE_C
 #define FILETIME_C
 #define FILTER_C
+#define FINCLUDE_C
 #define FIRST_C
 #define FJUMP_C
 #define FLOAT_C
@@ -231,6 +232,7 @@
 #define UNARY2_C
 #define UNARY3_C
 #define UNARY4_C
+#define UNASSIGN_C
 #define UNCONS_C
 #define UNDEFERROR_C
 #define UNDEFS_C

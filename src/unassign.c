@@ -1,30 +1,28 @@
 /*
-    module  : assign.c
-    version : 1.4
+    module  : unassign.c
+    version : 1.2
     date    : 06/22/24
 */
-#ifndef ASSIGN_C
-#define ASSIGN_C
+#ifndef UNASSIGN_C
+#define UNASSIGN_C
 
 /**
-Q0  IGNORE_POP  3140  assign  :  DD  V [N]  ->
-[IMPURE] Assigns value V to the variable with name N.
+Q0  IGNORE_POP  3230  unassign  :  D  [N]  ->
+[IMPURE] Sets the body of the name N to uninitialized.
 */
-void assign_(pEnv env)
+void unassign_(pEnv env)
 {
     Node node;
     int index;
     Entry ent;
 
-    PARM(2, ASSIGN);				/* quotation on top */
+    PARM(1, ASSIGN);				/* quotation on top */
     env->stck = pvec_pop(env->stck, &node);	/* singleton list */
     node = pvec_lst(node.u.lis);		/* first/last element */
     index = node.u.ent;				/* index user defined name */
     ent = vec_at(env->symtab, index);		/* symbol table entry */
-    env->stck = pvec_pop(env->stck, &node);	/* value */
     ent.is_user = 1;				/* ensure again user defined */
-    ent.u.body = pvec_init();			/* (re)initialise body */
-    ent.u.body = pvec_add(ent.u.body, node);	/* insert value in body */
+    ent.u.body = 0;				/* (re)initialise body */
     vec_at(env->symtab, index) = ent;		/* update symbol table */
 }
 #endif
