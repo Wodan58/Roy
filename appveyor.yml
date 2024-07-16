@@ -4,19 +4,17 @@ image: Visual Studio 2022
 platform:
   - x64
 
-cache:
-  - gc-8.0.4.tar.gz
-
 environment:
-  BDWGC_VERSION: 8.0.4
+  BDWGC_VERSION: 8.2.6
   BDWGC_ARCHIVE: gc-%BDWGC_VERSION%.tar.gz
 
 install:
-  # install BDWGC and flex/bison
+  # install BDWGC
   - if not exist %BDWGC_ARCHIVE% appveyor DownloadFile "https://github.com/ivmai/bdwgc/releases/download/v%BDWGC_VERSION%/%BDWGC_ARCHIVE%"
+  - tar xf %BDWGC_ARCHIVE%
   - move gc-%BDWGC_VERSION% bdwgc
- 
+
 build_script:
   - call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
   - cmake .
-  - cmake --build .
+  - cmake --build . --config Release
