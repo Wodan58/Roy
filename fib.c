@@ -37,7 +37,7 @@ NodeList L4 = { .n=2, .a=L4_a, .b=L4_b };
 int yyparse(pEnv env)
 {
     Node node;
-    node.u.num=40;
+    node.u.num=35;
     node.op=INTEGER_;
     env->stck = pvec_add(env->stck, node);
     node.u.lis=&L4;
