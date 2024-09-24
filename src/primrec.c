@@ -1,13 +1,13 @@
 /*
     module  : primrec.c
-    version : 1.16
-    date    : 10/02/23
+    version : 1.17
+    date    : 09/18/24
 */
 #ifndef PRIMREC_C
 #define PRIMREC_C
 
 /**
-OK 2820  primrec  :  DDDA	X [I] [C]  ->  R
+OK  2820  primrec  :  DDDA  X [I] [C]  ->  R
 Executes I to obtain an initial value R0.
 For integer X uses increasing positive integers to X, combines by C for new R.
 For aggregate X uses successive members and combines by C for new R.
@@ -19,13 +19,13 @@ void primrec_(pEnv env)
     Node first, second, third, node;
 
     PARM(3, PRIMREC);
-    env->stck = pvec_pop(env->stck, &third);
-    env->stck = pvec_pop(env->stck, &second);
-    env->stck = pvec_pop(env->stck, &first);
+    third = vec_pop(env->stck);
+    second = vec_pop(env->stck);
+    first = vec_pop(env->stck);
     switch (first.op) {
     case LIST_:
-	for (i = pvec_cnt(first.u.lis) - 1; i >= 0; i--) {
-	    env->stck = pvec_add(env->stck, pvec_nth(first.u.lis, i));
+	for (i = vec_size(first.u.lis) - 1; i >= 0; i--) {
+	    vec_push(env->stck, vec_at(first.u.lis, i));
 	    num++;
 	}
 	break;
@@ -36,7 +36,7 @@ void primrec_(pEnv env)
 	node.op = CHAR_;
 	for (str = first.u.str; *str; str++) {
 	    node.u.num = *str;
-	    env->stck = pvec_add(env->stck, node);
+	    vec_push(env->stck, node);
 	    num++;
 	}
 	break;
@@ -46,7 +46,7 @@ void primrec_(pEnv env)
 	for (j = 1, i = 0; i < SETSIZE; i++, j <<= 1)
 	    if (first.u.set & j) {
 		node.u.num = i;
-		env->stck = pvec_add(env->stck, node);
+		vec_push(env->stck, node);
 		num++;
 	    }
 	break;
@@ -55,7 +55,7 @@ void primrec_(pEnv env)
 	node.op = INTEGER_;
 	for (i = first.u.num; i > 0; i--) {
 	    node.u.num = i;
-	    env->stck = pvec_add(env->stck, node);
+	    vec_push(env->stck, node);
 	    num++;
 	}
 	break;

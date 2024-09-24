@@ -89,7 +89,7 @@ union YYSTYPE
     proc_t proc;	/* ANON_FUNCT */
     uint64_t set;	/* SET */
     char *str;		/* STRING */
-    NodeList *lis;	/* LIST */
+    NodeList lis;	/* LIST */
     double dbl;		/* FLOAT */
     FILE *fil;		/* FILE */
     int ent;		/* SYMBOL */

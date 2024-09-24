@@ -1,13 +1,13 @@
 /*
     module  : filter.c
-    version : 1.28
-    date    : 10/12/23
+    version : 1.29
+    date    : 09/18/24
 */
 #ifndef FILTER_C
 #define FILTER_C
 
 /**
-OK 2830  filter  :  DDA	A [B]  ->  A1
+OK  2830  filter  :  DDA  A [B]  ->  A1
 Uses test B to filter aggregate A producing sametype aggregate A1.
 */
 void filter_(pEnv env)
@@ -17,22 +17,22 @@ void filter_(pEnv env)
     Node list, aggr, node, temp, test;
 
     PARM(2, STEP);
-    env->stck = pvec_pop(env->stck, &list);
-    env->stck = pvec_pop(env->stck, &aggr);
+    list = vec_pop(env->stck);
+    aggr = vec_pop(env->stck);
     temp = aggr;
     switch (aggr.op) {
     case LIST_:
-	temp.u.lis = pvec_init();
-	for (i = 0, j = pvec_cnt(aggr.u.lis); i < j; i++) {
+	vec_init(temp.u.lis);
+	for (i = 0, j = vec_size(aggr.u.lis); i < j; i++) {
 	    /*
 		push the element to be filtered
 	    */
-	    node = pvec_nth(aggr.u.lis, i);
-	    env->stck = pvec_add(env->stck, node);
+	    node = vec_at(aggr.u.lis, i);
+	    vec_push(env->stck, node);
 	    exeterm(env, list.u.lis);
-	    env->stck = pvec_pop(env->stck, &test);
+	    test = vec_pop(env->stck);
 	    if (test.u.num)
-		temp.u.lis = pvec_add(temp.u.lis, node);
+		vec_push(temp.u.lis, node);
 	}
 	break;
 
@@ -47,9 +47,9 @@ void filter_(pEnv env)
 		push the element to be filtered
 	    */
 	    node.u.num = ptr[i];
-	    env->stck = pvec_add(env->stck, node);
+	    vec_push(env->stck, node);
 	    exeterm(env, list.u.lis);
-	    env->stck = pvec_pop(env->stck, &test);
+	    test = vec_pop(env->stck);
 	    if (test.u.num)
 		temp.u.str[k++] = node.u.num;
 	}
@@ -65,9 +65,9 @@ void filter_(pEnv env)
 		    push the element to be filtered
 		*/
 		node.u.num = i;
-		env->stck = pvec_add(env->stck, node);
+		vec_push(env->stck, node);
 		exeterm(env, list.u.lis);
-		env->stck = pvec_pop(env->stck, &test);
+		test = vec_pop(env->stck);
 		if (test.u.num)
 		    temp.u.set |= (uint64_t)1 << i;
 	    }
@@ -76,6 +76,6 @@ void filter_(pEnv env)
     default:
 	break;
     }
-    env->stck = pvec_add(env->stck, temp);
+    vec_push(env->stck, temp);
 }
 #endif

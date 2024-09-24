@@ -61,7 +61,6 @@
 #define ENCONCAT_C
 #define EQL_C
 #define EQUAL_C
-#define EXIT_C
 #define EXP_C
 #define FALSE_C
 #define FCLOSE_C
@@ -123,7 +122,6 @@
 #define INTERN_C
 #define JFALSE_C
 #define JUMP_C
-#define KILL_C
 #define LDEXP_C
 #define LEAF_C
 #define LEQL_C
@@ -168,7 +166,6 @@
 #define PUTCHARS_C
 #define QUIT_C
 #define RAND_C
-#define RECV_C
 #define REM_C
 #define REST_C
 #define ROLLDOWN_C
@@ -179,8 +176,6 @@
 #define ROTATED_C
 #define ROUND_C
 #define SAMETYPE_C
-#define SCALE_C
-#define SEND_C
 #define SET_C
 #define SETAUTOPUT_C
 #define SETECHO_C
@@ -215,7 +210,6 @@
 #define TAKE_C
 #define TAN_C
 #define TANH_C
-#define TASK_C
 #define TERNARY_C
 #define TIME_C
 #define TIMES_C

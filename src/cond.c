@@ -1,13 +1,13 @@
 /*
     module  : cond.c
-    version : 1.21
-    date    : 10/02/23
+    version : 1.22
+    date    : 09/18/24
 */
 #ifndef COND_C
 #define COND_C
 
 /**
-OK 2690  cond  :  DU	[..[[Bi] Ti]..[D]]  ->  ...
+OK  2690  cond  :  DU  [..[[Bi] Ti]..[D]]  ->  ...
 Tries each Bi. If that yields true, then executes Ti and exits.
 If no Bi yields true, executes default D.
 */
@@ -17,20 +17,19 @@ void cond_(pEnv env)
     Node aggr, elem, node;
 
     PARM(1, CASE);
-    env->stck = pvec_pop(env->stck, &aggr);
-    for (i = pvec_cnt(aggr.u.lis) - 1; i >= 0; i--) {
-	elem = pvec_nth(aggr.u.lis, i);
+    aggr = vec_pop(env->stck);
+    for (i = vec_size(aggr.u.lis) - 1; i >= 0; i--) {
+	elem = vec_at(aggr.u.lis, i);
 	if (!i) {
 	    node = elem;
 	    break;
 	}
-	node = pvec_lst(elem.u.lis);
+	node = vec_back(elem.u.lis);
 	exeterm(env, node.u.lis);
-	env->stck = pvec_pop(env->stck, &node);
+	node = vec_pop(env->stck);
 	if (node.u.num) {
-	    node.u.lis = pvec_init();
-	    pvec_shallow_copy(node.u.lis, elem.u.lis);
-	    node.u.lis = pvec_del(node.u.lis);
+	    vec_shallow_copy(node.u.lis, elem.u.lis);
+	    (void)vec_pop(node.u.lis);
 	    break;
 	}
     }

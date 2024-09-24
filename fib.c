@@ -1,60 +1,68 @@
 /*
- * generated Thu Apr  4 10:53:48 2024
+ * generated Thu Sep 19 13:21:28 2024
  */
 #include "globals.h"
 #include "prim.h"
 
 #define PARM(n, m)
 
-Operator L2_b[] = {
-    ANON_FUNCT_,
+Node N2[] = {
+    { .u.proc=plus_, .op=ANON_FUNCT_ },
 };
-YYSTYPE L2_a[] = {
-    { .proc=plus_ },
-};
-NodeList L2 = { .n=1, .a=L2_a, .b=L2_b };
-Operator L3_b[] = {
-    ANON_FUNCT_,
-    ANON_FUNCT_,
-    ANON_FUNCT_,
-};
-YYSTYPE L3_a[] = {
-    { .proc=pred_ },
-    { .proc=dup_ },
-    { .proc=pred_ },
-};
-NodeList L3 = { .n=3, .a=L3_a, .b=L3_b };
-Operator L4_b[] = {
-    ANON_FUNCT_,
-    ANON_FUNCT_,
-};
-YYSTYPE L4_a[] = {
-    { .proc=small_ },
-    { .proc=dup_ },
-};
-NodeList L4 = { .n=2, .a=L4_a, .b=L4_b };
 
-int yyparse(pEnv env)
+Node N3[] = {
+    { .u.proc=pred_, .op=ANON_FUNCT_ },
+    { .u.proc=dup_, .op=ANON_FUNCT_ },
+    { .u.proc=pred_, .op=ANON_FUNCT_ },
+};
+
+Node N5[] = {
+    { .u.proc=small_, .op=ANON_FUNCT_ },
+    { .u.proc=dup_, .op=ANON_FUNCT_ },
+};
+
+void L1(pEnv env)
 {
     Node node;
-    node.u.num=35;
-    node.op=INTEGER_;
-    env->stck = pvec_add(env->stck, node);
-    node.u.lis=&L4;
+    NodeList list;
+
+    vec_init(list);
+    list->n = 2;
+    list->c = N5;
+    node.u.lis=list;
     node.op=LIST_;
-    env->stck = pvec_add(env->stck, node);
-    node.u.lis=0;
+    vec_push(env->stck, node);
+
+    vec_init(list);
+    node.u.lis=list;
     node.op=LIST_;
-    env->stck = pvec_add(env->stck, node);
-    node.u.lis=&L3;
+    vec_push(env->stck, node);
+
+    vec_init(list);
+    list->n = 3;
+    list->c = N3;
+    node.u.lis=list;
     node.op=LIST_;
-    env->stck = pvec_add(env->stck, node);
-    node.u.lis=&L2;
+    vec_push(env->stck, node);
+
+    vec_init(list);
+    list->n = 1;
+    list->c = N2;
+    node.u.lis=list;
     node.op=LIST_;
-    env->stck = pvec_add(env->stck, node);
+    vec_push(env->stck, node);
+
     binrec_(env);
-    execute(env, 0);
-    return 0;
+}
+
+void joy(pEnv env)
+{
+    Node node;
+
+    node.u.num=10;
+    node.op=INTEGER_;
+    vec_push(env->stck, node);
+    L1(env);
 }
 
 #include "defs.h"
@@ -64,14 +72,16 @@ int yyparse(pEnv env)
 #undef PLUS_C
 #undef DUP_C
 #undef BINREC_C
+#undef POP_C
 
 table_t yytable[] = {
-{ small_, "small_" },
-{ pred_, "pred_" },
-{ plus_, "plus_" },
-{ dup_, "dup_" },
-{ binrec_, "binrec_" },
-{ 0 } };
+    { small_, "small_" },
+    { pred_, "pred_" },
+    { plus_, "plus_" },
+    { dup_, "dup_" },
+    { binrec_, "binrec_" },
+    { 0 }
+};
 
 #include "deps.h"
 #include "prim.c"

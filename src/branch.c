@@ -1,13 +1,13 @@
 /*
     module  : branch.c
-    version : 1.13
-    date    : 10/02/23
+    version : 1.14
+    date    : 09/18/24
 */
 #ifndef BRANCH_C
 #define BRANCH_C
 
 /**
-OK 2590  branch  :  DDDP	B [T] [F]  ->  ...
+OK  2590  branch  :  DDDP  B [T] [F]  ->  ...
 If B is true, then executes T else executes F.
 */
 void branch_(pEnv env)
@@ -15,9 +15,9 @@ void branch_(pEnv env)
     Node first, second, third;
 
     PARM(3, WHILE);
-    env->stck = pvec_pop(env->stck, &third);
-    env->stck = pvec_pop(env->stck, &second);
-    env->stck = pvec_pop(env->stck, &third);
+    third = vec_pop(env->stck);
+    second = vec_pop(env->stck);
+    first = vec_pop(env->stck);
     exeterm(env, first.u.num ? second.u.lis : third.u.lis);
 }
 #endif

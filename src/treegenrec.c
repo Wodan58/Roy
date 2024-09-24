@@ -1,13 +1,13 @@
 /*
     module  : treegenrec.c
-    version : 1.17
-    date    : 10/02/23
+    version : 1.18
+    date    : 09/18/24
 */
 #ifndef TREEGENREC_C
 #define TREEGENREC_C
 
 /**
-OK 2890  treegenrec  :  DDDDU	T [O1] [O2] [C]  ->  ...
+OK  2890  treegenrec  :  DDDDU  T [O1] [O2] [C]  ->  ...
 T is a tree. If T is a leaf, executes O1.
 Else executes O2 and then [[[O1] [O2] C] treegenrec] C.
 */
@@ -16,32 +16,31 @@ void treegenrec(pEnv env)
     Node prog, node, list, temp;
 
     PARM(1, DIP);
-    env->stck = pvec_pop(env->stck, &prog);	/* item on top of the stack */
-    node = pvec_lst(env->stck);				/* 2nd item on stack */
+    prog = vec_pop(env->stck);			/* item on top of the stack */
+    node = vec_back(env->stck);			/* 2nd item on stack */
     if (node.op != LIST_) {
-	list = pvec_lst(prog.u.lis);			/* O1 */
+	list = vec_back(prog.u.lis);		/* O1 */
 	exeterm(env, list.u.lis);
     } else {
-	list = pvec_nth(prog.u.lis, 1);			/* O2 */
+	list = vec_at(prog.u.lis, 1);		/* O2 */
 	exeterm(env, list.u.lis);
-	env->stck = pvec_add(env->stck, prog);		/* push [[O1] [O2] C] */
-	temp.u.lis = pvec_init();			/* [] */
+	vec_push(env->stck, prog);		/* push [[O1] [O2] C] */
+	vec_init(temp.u.lis);			/* [] */
 	temp.op = LIST_;
-	node.u.proc = treegenrec;			/* treegenrec */
+	node.u.proc = treegenrec;		/* treegenrec */
 	node.op = ANON_FUNCT_;
-	temp.u.lis = pvec_add(temp.u.lis, node);	/* [treegenrec] */
-	env->stck = pvec_add(env->stck, temp);		/* push on stack */
-	cons_(env);					/* build aggregate */
-	list.u.lis = pvec_init();
-	pvec_shallow_copy(list.u.lis, prog.u.lis);
-	list.u.lis = pvec_del(list.u.lis);		/* remove [O1] */
-	list.u.lis = pvec_del(list.u.lis);		/* remove [O2] */
-	exeterm(env, list.u.lis);			/* C */
+	vec_push(temp.u.lis, node);		/* [treegenrec] */
+	vec_push(env->stck, temp);		/* push on stack */
+	cons_(env);				/* build aggregate */
+	vec_shallow_copy(list.u.lis, prog.u.lis);
+	(void)vec_pop(list.u.lis);		/* remove [O1] */
+	(void)vec_pop(list.u.lis);		/* remove [O2] */
+	exeterm(env, list.u.lis);		/* C */
     }
 }
 
 void treegenrec_(pEnv env)
-{			/* T [O1] [O2] [C] */
+{						/* T [O1] [O2] [C] */
     PARM(4, IFTE);
     cons_(env);
     cons_(env);

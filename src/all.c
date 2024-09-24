@@ -1,33 +1,33 @@
 /*
     module  : all.c
-    version : 1.13
-    date    : 10/02/23
+    version : 1.14
+    date    : 09/18/24
 */
 #ifndef ALL_C
 #define ALL_C
 
 /**
-OK 2860  all  :  DDA	A [B]  ->  X
+OK  2860  all  :  DDA  A [B]  ->  X
 Applies test B to members of aggregate A, X = true if all pass.
 */
 void all_(pEnv env)
 {
-    Node aggr, list, node;
+    Node list, aggr, node;
     int64_t i, j, result = 1;	/* assume true */
 
     PARM(2, STEP);
-    env->stck = pvec_pop(env->stck, &list);
-    env->stck = pvec_pop(env->stck, &aggr);
+    list = vec_pop(env->stck);
+    aggr = vec_pop(env->stck);
     switch (aggr.op) {
     case LIST_:
-	for (i = pvec_cnt(aggr.u.lis) - 1; i >= 0; i--) {
+	for (i = vec_size(aggr.u.lis) - 1; i >= 0; i--) {
 	    /*
 		push the element to be tested
 	    */
-	    node = pvec_nth(aggr.u.lis, i);
-	    env->stck = pvec_add(env->stck, node);
+	    node = vec_at(aggr.u.lis, i);
+	    vec_push(env->stck, node);
 	    exeterm(env, list.u.lis);
-	    env->stck = pvec_pop(env->stck, &node);
+	    node = vec_pop(env->stck);
 	    if (result != node.u.num) {
 		result = 0;
 		break;
@@ -44,9 +44,9 @@ void all_(pEnv env)
 		push the element to be tested
 	    */
 	    node.u.num = aggr.u.str[i];
-	    env->stck = pvec_add(env->stck, node);
+	    vec_push(env->stck, node);
 	    exeterm(env, list.u.lis);
-	    env->stck = pvec_pop(env->stck, &node);
+	    node = vec_pop(env->stck);
 	    if (result != node.u.num) {
 		result = 0;
 		break;
@@ -62,9 +62,9 @@ void all_(pEnv env)
 		    push the element to be tested
 		*/
 		node.u.num = i;
-		env->stck = pvec_add(env->stck, node);
+		vec_push(env->stck, node);
 		exeterm(env, list.u.lis);
-		env->stck = pvec_pop(env->stck, &node);
+		node = vec_pop(env->stck);
 		if (result != node.u.num) {
 		    result = 0;
 		    break;
@@ -77,6 +77,6 @@ void all_(pEnv env)
     }
     node.u.num = result;
     node.op = BOOLEAN_;
-    env->stck = pvec_add(env->stck, node);
+    vec_push(env->stck, node);
 }
 #endif

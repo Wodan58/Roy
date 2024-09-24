@@ -1,12 +1,12 @@
 /*
     module  : exeterm.c
-    version : 1.8
-    date    : 04/13/24
+    version : 1.10
+    date    : 09/19/24
 */
 #include "globals.h"
 
 #ifdef TRACING
-static void trace(pEnv env, Node node, FILE *fp)
+static void my_trace(pEnv env, Node node, FILE *fp)
 {
     if (!env->debugging)
 	return;
@@ -21,21 +21,21 @@ static void trace(pEnv env, Node node, FILE *fp)
 /*
     exeterm - execute the fetch, decode, evaluate cycle.
 */
-void exeterm(pEnv env, NodeList *prog)
+void exeterm(pEnv env, NodeList prog)
 {
     int i;
     Node node;
 
-    for (i = pvec_cnt(prog) - 1; i >= 0; i--) {
-        node = pvec_nth(prog, i);
+    for (i = vec_size(prog) - 1; i >= 0; i--) {
+        node = vec_at(prog, i);
 #ifdef TRACING
-	trace(env, node, stdout);
+	my_trace(env, node, stdout);
 #endif
 	if (node.op == ANON_FUNCT_)
 	    (*node.u.proc)(env);
         else if (node.op == USR_LIST_)
 	    exeterm(env, node.u.lis);
 	else
-	    env->stck = pvec_add(env->stck, node);
+	    vec_push(env->stck, node);
     }
 }

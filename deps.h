@@ -35,7 +35,7 @@
 #undef FPUTCHARS_C
 #endif
 #ifndef GENREC_C
-#undef CONS_C				/* BUILD AGGREGATE */
+#undef CONS_C			/* BUILD AGGREGATE */
 #undef CONS_C
 #undef CONS_C
 #undef CONS_C
@@ -49,14 +49,11 @@
 #ifndef JFALSE_C
 #undef FALSE_C
 #endif
-#ifndef RECV_C
-#undef RECV_C		/* RESCHEDULE THIS INSTRUCTION */
-#endif
 #ifndef STRUE_C
 #undef TRUE_C
 #endif
 #ifndef TREEGENREC_C
-#undef CONS_C					/* BUILD AGGREGATE */
+#undef CONS_C				/* BUILD AGGREGATE */
 #undef CONS_C
 #undef CONS_C
 #endif
@@ -65,7 +62,7 @@
 #undef CONS_C
 #endif
 #ifndef TREEREC_C
-#undef CONS_C				/* BUILD AGGREGATE */
+#undef CONS_C			/* BUILD AGGREGATE */
 #undef CONS_C
 #endif
 #ifndef TREERECAUX_C

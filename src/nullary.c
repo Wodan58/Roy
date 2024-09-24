@@ -1,27 +1,28 @@
 /*
     module  : nullary.c
-    version : 1.13
-    date    : 10/12/23
+    version : 1.14
+    date    : 09/18/24
 */
 #ifndef NULLARY_C
 #define NULLARY_C
 
 /**
-OK 2480  nullary  :  DA	[P]  ->  R
+OK  2480  nullary  :  DA  [P]  ->  R
 Executes P, which leaves R on top of the stack.
 No matter how many parameters this consumes, none are removed from the stack.
 */
 void nullary_(pEnv env)
 {
+    int size;
     Node list, node;
 
     PARM(1, DIP);
-    env->stck = pvec_pop(env->stck, &list);
-    node.u.lis = pvec_init();
-    pvec_copy(node.u.lis, env->stck);		/* stack is saved in node */
+    list = vec_pop(env->stck);
+    size = vec_size(env->stck);
+    vec_copy_count(node.u.lis, env->stck, size);	/* save stack */
     exeterm(env, list.u.lis);
-    env->stck = pvec_pop(env->stck, &list);	/* take R from stack */
-    node.u.lis = pvec_add(node.u.lis, list);	/* add R to old stack */
-    pvec_copy(env->stck, node.u.lis);	/* restore old stack with R on top */
+    list = vec_pop(env->stck);		/* take R from stack */
+    vec_push(node.u.lis, list);		/* add R to old stack */
+    vec_copy_count(env->stck, node.u.lis, size + 1);	/* restore old stack */
 }
 #endif

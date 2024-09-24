@@ -1,13 +1,13 @@
 /*
     module  : map.c
-    version : 1.29
-    date    : 10/12/23
+    version : 1.30
+    date    : 09/18/24
 */
 #ifndef MAP_C
 #define MAP_C
 
 /**
-OK 2790  map  :  DDA	A [P]  ->  B
+OK  2790  map  :  DDA  A [P]  ->  B
 Executes P on each member of aggregate A,
 collects results in sametype aggregate B.
 */
@@ -18,21 +18,21 @@ void map_(pEnv env)
     Node list, aggr, node, temp;
 
     PARM(2, STEP);
-    env->stck = pvec_pop(env->stck, &list);
-    env->stck = pvec_pop(env->stck, &aggr);
+    list = vec_pop(env->stck);
+    aggr = vec_pop(env->stck);
     temp = aggr;
     switch (aggr.op) {
     case LIST_:
-	temp.u.lis = pvec_init();
-	for (i = 0, j = pvec_cnt(aggr.u.lis); i < j; i++) {
+	vec_init(temp.u.lis);
+	for (i = 0, j = vec_size(aggr.u.lis); i < j; i++) {
 	    /*
 		push the element to be mapped
 	    */
-	    node = pvec_nth(aggr.u.lis, i);
-	    env->stck = pvec_add(env->stck, node);
+	    node = vec_at(aggr.u.lis, i);
+	    vec_push(env->stck, node);
 	    exeterm(env, list.u.lis);
-	    env->stck = pvec_pop(env->stck, &node);
-	    temp.u.lis = pvec_add(temp.u.lis, node);
+	    node = vec_pop(env->stck);
+	    vec_push(temp.u.lis, node);
 	}
 	break;
 
@@ -47,9 +47,9 @@ void map_(pEnv env)
 		push the element to be mapped
 	    */
 	    node.u.num = ptr[i];
-	    env->stck = pvec_add(env->stck, node);
+	    vec_push(env->stck, node);
 	    exeterm(env, list.u.lis);
-	    env->stck = pvec_pop(env->stck, &node);
+	    node = vec_pop(env->stck);
 	    temp.u.str[i] = node.u.num;
 	}
 	break;
@@ -63,17 +63,17 @@ void map_(pEnv env)
 		    push the element to be mapped
 		*/
 		node.u.num = i;
-		env->stck = pvec_add(env->stck, node);
+		vec_push(env->stck, node);
 		exeterm(env, list.u.lis);
-		env->stck = pvec_pop(env->stck, &node);
+		node = vec_pop(env->stck);
 		temp.u.set |= (uint64_t)1 << node.u.num;
 	    }
-	env->stck = pvec_add(env->stck, temp);
+	vec_push(env->stck, temp);
 	break;
 
     default:
 	break;
     }
-    env->stck = pvec_add(env->stck, temp);
+    vec_push(env->stck, temp);
 }
 #endif

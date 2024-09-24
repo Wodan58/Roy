@@ -1,13 +1,13 @@
 /*
     module  : x.c
-    version : 1.12
-    date    : 10/02/23
+    version : 1.13
+    date    : 09/18/24
 */
 #ifndef X_C
 #define X_C
 
 /**
-OK 2420  x  :  P	[P] x  ->  ...
+OK  2420  x  :  P  [P] x  ->  ...
 Executes P without popping [P]. So, [P] x  ==  [P] P.
 */
 void x_(pEnv env)
@@ -15,7 +15,7 @@ void x_(pEnv env)
     Node node;
 
     PARM(1, DIP);
-    node = pvec_lst(env->stck);
+    node = vec_back(env->stck);
     exeterm(env, node.u.lis);
 }
 #endif

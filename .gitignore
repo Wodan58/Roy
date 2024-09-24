@@ -1,12 +1,3 @@
 roy.tar
-bdwgc
 build
-CMakeCache.txt
-fib.dir
-*.vcxproj
-*.vcxproj.*
-x64
-CMakeFiles
-*.cmake
-*.exe
-*.sln
+ATTIC

@@ -1,13 +1,13 @@
 /*
     module  : ifte.c
-    version : 1.23
-    date    : 10/02/23
+    version : 1.24
+    date    : 09/18/24
 */
 #ifndef IFTE_C
 #define IFTE_C
 
 /**
-OK 2600  ifte  :  DDDP	[B] [T] [F]  ->  ...
+OK  2600  ifte  :  DDDP  [B] [T] [F]  ->  ...
 Executes B. If that yields true, then executes T else executes F.
 */
 void ifte_(pEnv env)
@@ -15,9 +15,9 @@ void ifte_(pEnv env)
     Node first, second, third;
 
     PARM(3, IFTE);
-    env->stck = pvec_pop(env->stck, &third);
-    env->stck = pvec_pop(env->stck, &second);
-    env->stck = pvec_pop(env->stck, &first);
+    third = vec_pop(env->stck);
+    second = vec_pop(env->stck);
+    first = vec_pop(env->stck);
     /*
 	execute the test of the ifte
     */
@@ -25,7 +25,7 @@ void ifte_(pEnv env)
     /*
 	pop the result from the stack
     */
-    env->stck = pvec_pop(env->stck, &first);
+    first = vec_pop(env->stck);
     if (first.u.num)
 	exeterm(env, second.u.lis);
     else
