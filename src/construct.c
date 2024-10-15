@@ -1,7 +1,7 @@
 /*
     module  : construct.c
-    version : 1.21
-    date    : 09/18/24
+    version : 1.22
+    date    : 10/11/24
 */
 #ifndef CONSTRUCT_C
 #define CONSTRUCT_C
@@ -22,7 +22,7 @@ void construct_(pEnv env)
     /*
 	save the old stack; this will become the new stack
     */
-    vec_copy_count(node[0].u.lis, env->stck, vec_size(env->stck));
+    vec_copy_all(node[0].u.lis, env->stck);
     /*
 	execute the first program
     */
@@ -30,7 +30,7 @@ void construct_(pEnv env)
     /*
 	the new stack after the first program needs to be saved
     */
-    vec_copy_count(node[1].u.lis, env->stck, vec_size(env->stck));
+    vec_copy_all(node[1].u.lis, env->stck);
     /*
 	each of the programs in the construct needs to be executed
     */
@@ -41,9 +41,9 @@ void construct_(pEnv env)
 	elem = vec_pop(env->stck);
 	vec_push(result.u.lis, elem);
 	if (i)
-	    vec_copy_count(env->stck, node[1].u.lis, vec_size(node[1].u.lis);
+	    vec_copy_all(env->stck, node[1].u.lis);
     }
-    vec_copy_count(env->stck, node[0].u.lis, vec_size(node[0].u.lis));
+    vec_copy_all(env->stck, node[0].u.lis);
     for (i = 0, j = vec_size(result.u.lis); i < j; i++) {
 	elem = vec_at(result.u.lis, i);
 	vec_push(env->stck, elem);

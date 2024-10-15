@@ -46,12 +46,6 @@
 #undef JUMP_C
 #undef FJUMP_C
 #endif
-#ifndef JFALSE_C
-#undef FALSE_C
-#endif
-#ifndef STRUE_C
-#undef TRUE_C
-#endif
 #ifndef TREEGENREC_C
 #undef CONS_C				/* BUILD AGGREGATE */
 #undef CONS_C
@@ -69,4 +63,9 @@
 #undef CONS_C
 #undef CONS_C
 #endif
-#undef BINREC_C
+#undef DUP_C
+#undef SMALL_C
+#undef PRED_C
+#undef DUP_C
+#undef PRED_C
+#undef PLUS_C

@@ -1,7 +1,7 @@
 /*
     module  : unary4.c
-    version : 1.20
-    date    : 09/18/24
+    version : 1.21
+    date    : 09/26/24
 */
 #ifndef UNARY4_C
 #define UNARY4_C
@@ -12,9 +12,9 @@ Executes P four times, with Xi, returns Ri (i = 1..4).
 */
 void unary4_(pEnv env)
 {					/* X Y Z W [P] unary4 ==> X' Y' Z' W' */
-    PARM(5, DIP);
     Node list, node[4];
 
+    PARM(5, DIP);
     list = vec_pop(env->stck);
     node[3] = vec_pop(env->stck);	/* W, expose Z */
     node[2] = vec_pop(env->stck);	/* Z, expose Y */

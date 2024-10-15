@@ -1,7 +1,7 @@
 /*
     module  : unary3.c
-    version : 1.19
-    date    : 09/18/24
+    version : 1.20
+    date    : 09/26/24
 */
 #ifndef UNARY3_C
 #define UNARY3_C
@@ -12,9 +12,9 @@ Executes P three times, with Xi, returns Ri (i = 1..3).
 */
 void unary3_(pEnv env)
 {					/*  X Y Z [P]  unary3  ==>  X' Y' Z'  */
-    PARM(4, DIP);
     Node list, node[3];
 
+    PARM(4, DIP);
     list = vec_pop(env->stck);
     node[2] = vec_pop(env->stck);	/* Z, expose Y */
     node[1] = vec_pop(env->stck);	/* Y, expose X */

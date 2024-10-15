@@ -1,7 +1,7 @@
 #
 #   module  : makefile
-#   version : 1.6
-#   date    : 09/19/24
+#   version : 1.8
+#   date    : 10/15/24
 #
 .POSIX:
 .SUFFIXES:
@@ -9,11 +9,11 @@
 
 PROG   = fib
 CC     = gcc
-CFLAGS = -DTRACING -O3 -Wall -Wextra -Wpedantic -Werror -Wno-unused-parameter
+CFLAGS = -O3 -Wall -Wextra -Wpedantic -Werror -Wno-unused-parameter
 HDRS   = globals.h
-OBJS   = $(PROG).o main.o exeterm.o writ.o print.o
+OBJS   = $(PROG).o main.o writ.o print.o
 
-$(PROG):	prep $(OBJS)
+$(PROG): prep $(OBJS)
 	$(CC) -o$@ $(OBJS) -lm -lgc
 
 $(OBJS): $(HDRS)
@@ -30,4 +30,4 @@ prep:
 	./joy -c $<
 
 clean:
-	rm -f *.o defs.h deps.h prim.c prim.h
+	rm -f *.o

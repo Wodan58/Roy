@@ -1,87 +1,50 @@
 /*
- * generated Thu Sep 19 13:21:28 2024
+ * generated Fri Oct 11 15:34:10 2024
  */
 #include "globals.h"
-#include "prim.h"
-
 #define PARM(n, m)
+#include "builtin.h"
 
-Node N2[] = {
-    { .u.proc=plus_, .op=ANON_FUNCT_ },
-};
-
-Node N3[] = {
-    { .u.proc=pred_, .op=ANON_FUNCT_ },
-    { .u.proc=dup_, .op=ANON_FUNCT_ },
-    { .u.proc=pred_, .op=ANON_FUNCT_ },
-};
-
-Node N5[] = {
-    { .u.proc=small_, .op=ANON_FUNCT_ },
-    { .u.proc=dup_, .op=ANON_FUNCT_ },
-};
-
-void L1(pEnv env)
-{
-    Node node;
-    NodeList list;
-
-    vec_init(list);
-    list->n = 2;
-    list->c = N5;
-    node.u.lis=list;
-    node.op=LIST_;
-    vec_push(env->stck, node);
-
-    vec_init(list);
-    node.u.lis=list;
-    node.op=LIST_;
-    vec_push(env->stck, node);
-
-    vec_init(list);
-    list->n = 3;
-    list->c = N3;
-    node.u.lis=list;
-    node.op=LIST_;
-    vec_push(env->stck, node);
-
-    vec_init(list);
-    list->n = 1;
-    list->c = N2;
-    node.u.lis=list;
-    node.op=LIST_;
-    vec_push(env->stck, node);
-
-    binrec_(env);
-}
-
+void binrec_1(pEnv env);
 void joy(pEnv env)
 {
-    Node node;
-
-    node.u.num=10;
-    node.op=INTEGER_;
-    vec_push(env->stck, node);
-    L1(env);
+NULLARY(INTEGER_NEWNODE, 10);
+binrec_1(env);
+/* JOY */
 }
 
-#include "defs.h"
+void binrec_1(pEnv env)
+{	/* BINREC */
+    Node node;
 
-#undef SMALL_C
-#undef PRED_C
-#undef PLUS_C
+dup_(env);
+small_(env);
+    node = vec_pop(env->stck);
+    if (node.u.num) {
+    } else {
+pred_(env);
+dup_(env);
+pred_(env);
+	node = vec_pop(env->stck);
+	binrec_1(env);
+	vec_push(env->stck, node);
+	binrec_1(env);
+plus_(env);
+    }
+}	/* BINREC */
+#include "defines.h"
+
 #undef DUP_C
-#undef BINREC_C
-#undef POP_C
+#undef PLUS_C
+#undef PRED_C
+#undef SMALL_C
 
 table_t yytable[] = {
-    { small_, "small_" },
-    { pred_, "pred_" },
-    { plus_, "plus_" },
-    { dup_, "dup_" },
-    { binrec_, "binrec_" },
-    { 0 }
+{ dup_, "dup" },
+{ plus_, "+" },
+{ pred_, "pred" },
+{ small_, "small" },
+{ 0 }
 };
 
-#include "deps.h"
-#include "prim.c"
+#include "builtin.c"

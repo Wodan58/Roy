@@ -1,7 +1,7 @@
 /*
  *  module  : main.c
- *  version : 1.2
- *  date    : 09/24/24
+ *  version : 1.3
+ *  date    : 10/11/24
  */
 #include "globals.h"
 
@@ -69,10 +69,10 @@ int main(int argc, char **argv)
     env.g_argv = argv;
     vec_init(env.stck);		/* start with an empty stack */
     vec_init(env.prog);		/* and an empty program */
-    if (setjmp(begin))		/* return here after error or abort */
-	return 1;
-    joy(&env);			/* evaluate */
-    print(&env);		/* print */
+    if (!setjmp(begin))	{	/* return here after error or abort */
+	joy(&env);		/* evaluate */
+	print(&env);		/* print */
+    }
     return 0;
 }
 

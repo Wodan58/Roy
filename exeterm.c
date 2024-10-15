@@ -1,7 +1,7 @@
 /*
     module  : exeterm.c
-    version : 1.10
-    date    : 09/19/24
+    version : 1.11
+    date    : 10/11/24
 */
 #include "globals.h"
 
@@ -19,8 +19,8 @@ static void my_trace(pEnv env, Node node, FILE *fp)
 #endif
 
 /*
-    exeterm - execute the fetch, decode, evaluate cycle.
-*/
+ * exeterm - execute the fetch, decode, evaluate cycle.
+ */
 void exeterm(pEnv env, NodeList prog)
 {
     int i;
@@ -33,8 +33,6 @@ void exeterm(pEnv env, NodeList prog)
 #endif
 	if (node.op == ANON_FUNCT_)
 	    (*node.u.proc)(env);
-        else if (node.op == USR_LIST_)
-	    exeterm(env, node.u.lis);
 	else
 	    vec_push(env->stck, node);
     }

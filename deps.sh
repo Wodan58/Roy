@@ -3,21 +3,21 @@
 #   version : 1.4
 #   date    : 10/16/23
 #
-#   Generate deps.h
+#   Generate depends.h
 #   The directory needs to be given as parameter.
 #
-echo checking deps.h
+echo checking depends.h
 todo=0
-if [ ! -f $1/deps.h ]
+if [ ! -f $1/depends.h ]
 then
-  echo creating deps.h
+  echo creating depends.h
   todo=1
 else
   for i in $1/src/*.c
   do
-    if [ $i -nt $1/deps.h ]
+    if [ $i -nt $1/depends.h ]
     then
-      echo updating deps.h
+      echo updating depends.h
       todo=1
       break
     fi
@@ -25,10 +25,10 @@ else
 fi
 if [ $todo -eq 0 ]
 then
-  echo deps.h is up-to-date
+  echo depends.h is up-to-date
   exit
 fi
-rm -f $1/deps.h
+rm -f $1/depends.h
 for i in $1/src/*.c
 do
   j=`basename $i`
@@ -61,7 +61,7 @@ do
   then
     echo "#endif"
   fi
-done >$1/deps.h
+done >$1/depends.h
 for i in $1/*.c
 do
   k=`grep "[^e]code(env" $i | sed 's/.*code(env, \(.*\));/\1C/'`
@@ -74,4 +74,4 @@ do
   then
     echo "$l" | tr '[a-z]' '[A-Z]' | sed 's/^/#undef /'
   fi
-done >>$1/deps.h
+done >>$1/depends.h
