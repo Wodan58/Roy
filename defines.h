@@ -49,6 +49,8 @@
 #define CONTS_C
 #define COS_C
 #define COSH_C
+#define CPUSH_C
+#define CSWAP_C
 #define DIP_C
 #define DIV_C
 #define DIVIDE_C
@@ -72,12 +74,14 @@
 #define FILTER_C
 #define FINCLUDE_C
 #define FIRST_C
+#define FJUMP_C
 #define FLOAT_C
 #define FLOOR_C
 #define FOLD_C
 #define FOPEN_C
 #define FORMAT_C
 #define FORMATF_C
+#define FPUSH_C
 #define FPUT_C
 #define FPUTCH_C
 #define FPUTCHARS_C
@@ -116,6 +120,8 @@
 #define INFRA_C
 #define INTEGER_C
 #define INTERN_C
+#define JFALSE_C
+#define JUMP_C
 #define LDEXP_C
 #define LEAF_C
 #define LEQL_C
@@ -146,6 +152,7 @@
 #define OR_C
 #define ORD_C
 #define OVER_C
+#define PFALSE_C
 #define PICK_C
 #define PLUS_C
 #define POP_C
@@ -153,6 +160,7 @@
 #define POW_C
 #define PRED_C
 #define PRIMREC_C
+#define PUSH_C
 #define PUT_C
 #define PUTCH_C
 #define PUTCHARS_C
@@ -180,6 +188,7 @@
 #define SMALL_C
 #define SOME_C
 #define SPLIT_C
+#define SPUSH_C
 #define SQRT_C
 #define SRAND_C
 #define STACK_C
@@ -191,6 +200,7 @@
 #define STRING_C
 #define STRTOD_C
 #define STRTOL_C
+#define STRUE_C
 #define SUCC_C
 #define SWAP_C
 #define SWAPD_C
@@ -203,6 +213,7 @@
 #define TERNARY_C
 #define TIME_C
 #define TIMES_C
+#define TPUSH_C
 #define TREEGENREC_C
 #define TREEGENRECAUX_C
 #define TREEREC_C
