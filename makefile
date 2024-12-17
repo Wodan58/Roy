@@ -1,14 +1,15 @@
 #
 #   module  : makefile
-#   version : 1.8
-#   date    : 10/15/24
+#   version : 1.9
+#   date    : 12/16/24
 #
 .POSIX:
 .SUFFIXES:
 .SUFFIXES: .c .o .joy
 
 PROG   = fib
-CC     = gcc
+# Use CC environment variable
+# CC   = gcc
 CFLAGS = -O3 -Wall -Wextra -Wpedantic -Werror -Wno-unused-parameter
 HDRS   = globals.h
 OBJS   = $(PROG).o main.o writ.o print.o

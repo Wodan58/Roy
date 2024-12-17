@@ -8,7 +8,7 @@
 void binrec_1(pEnv env);
 void joy(pEnv env)
 {
-NULLARY(INTEGER_NEWNODE, 10);
+NULLARY(INTEGER_NEWNODE, 35);
 binrec_1(env);
 /* JOY */
 }
